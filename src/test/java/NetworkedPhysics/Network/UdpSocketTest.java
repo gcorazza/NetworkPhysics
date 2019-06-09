@@ -52,12 +52,6 @@ class UdpSocketTest {
         ByteBuf copy = buffer.copy();
         b.getChannel().writeAndFlush(new DatagramPacket(buffer,localhost));
         a.getChannel().writeAndFlush(new DatagramPacket(copy,localhost));
-        //new DefaultAddressedEnvelope<>(new Point(3,2), localhost)
-    }
-
-    @Test
-    void doConnect() {
-        udpSocket.connect(new InetSocketAddress(8080));
     }
 
     @Test

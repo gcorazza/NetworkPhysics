@@ -9,13 +9,14 @@ import NetworkedPhysics.Network.IncomingPacketHandlerServer;
 import NetworkedPhysics.Network.Messages.UdpClient;
 import NetworkedPhysics.Network.UdpSocket;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable {
 
-    Map<InetSocketAddress, UdpClient> clients;
+    Map<InetSocketAddress, UdpClient> clients= new HashMap<>();
 
     public NetworkedPhysicsServer(int port, UpdateInputsCallback updateInputs) {
         super(updateInputs);

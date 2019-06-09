@@ -51,8 +51,8 @@ public class UdpSocket {
         }
     }
 
-    public void connect(SocketAddress socketAddress) {
-        channel.connect(socketAddress);
+    public ChannelFuture connect(SocketAddress socketAddress) {
+        return channel.connect(socketAddress);
     }
 
     public int getLocalPort() {
@@ -63,9 +63,9 @@ public class UdpSocket {
         return channel;
     }
 
-    public void send(PhysicsMessage object){
+    public void send(PhysicsMessage message){
         if (channel.isConnected()){
-            ByteBuf buffer = blobToByteBuf(object);
+            ByteBuf buffer = blobToByteBuf(message);
             channel.writeAndFlush(new DatagramPacket(buffer,channel.remoteAddress()));
         }else{
             throw new RuntimeException("Not Connected: give a destination");
@@ -77,8 +77,8 @@ public class UdpSocket {
         channel.writeAndFlush(new DatagramPacket(buffer,destination));
     }
 
-    private ByteBuf blobToByteBuf(PhysicsMessage object) {
-        byte[] bytes = object.toBlob();
+    private ByteBuf blobToByteBuf(PhysicsMessage message) {
+        byte[] bytes = message.toByteMessage();
         ByteBuf buffer = channel.alloc().buffer(bytes.length);
         buffer.writeBytes(bytes);
         return buffer;

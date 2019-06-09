@@ -3,10 +3,12 @@ package NetworkedPhysics.Common;
 import NetworkedPhysics.Common.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Manipulations.WorldManipulation;
 import NetworkedPhysics.Network.Client;
+import NetworkedPhysics.Network.Messages.UdpClient;
 import NetworkedPhysics.Network.UdpSocket;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +18,7 @@ public class NetworkedPhysics {
 
     protected DiscreteDynamicsWorld world;
     List<NetworkedPhysicsObject> objects = new ArrayList<NetworkedPhysicsObject>();
-    List<Client> clients = new ArrayList<Client>();
+    Map<InetSocketAddress, UdpClient> clients = new HashMap<>();
 
     UpdateInputsCallback updateInputs;
 
@@ -32,6 +34,10 @@ public class NetworkedPhysics {
     protected int stepsPerSecond = 20;
     protected long startTime;
     protected boolean running = false;
+
+    public UdpSocket getConnection() {
+        return connection;
+    }
 
     protected UdpSocket connection;
 
@@ -65,6 +71,9 @@ public class NetworkedPhysics {
     }
 
     protected void step() {
+        if (world == null) {
+            return;
+        }
         waitTilNextFrame();
 
         processManipulations();
@@ -80,7 +89,7 @@ public class NetworkedPhysics {
     private void processManipulations() {
         List<WorldManipulation> worldManipulations = manipulations.get(frame);
         if (worldManipulations != null) {
-            worldManipulations.forEach( w -> w.manipulate(this));
+            //
         }
     }
 
@@ -92,6 +101,50 @@ public class NetworkedPhysics {
 
     public void addRigidBody(RigidBody rigidBody) {
         addManipulation(new AddRigidBody(frame, rigidBody));
+    }
+
+    public DiscreteDynamicsWorld getWorld() {
+        return world;
+    }
+
+    public List<NetworkedPhysicsObject> getObjects() {
+        return objects;
+    }
+
+    public Map<InetSocketAddress, UdpClient> getClients() {
+        return clients;
+    }
+
+    public UpdateInputsCallback getUpdateInputs() {
+        return updateInputs;
+    }
+
+    public UdpSocket getUdpSocket() {
+        return udpSocket;
+    }
+
+    public Map<Integer, List<WorldManipulation>> getManipulations() {
+        return manipulations;
+    }
+
+    public int getFrame() {
+        return frame;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public int getStepsPerSecond() {
+        return stepsPerSecond;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }
 

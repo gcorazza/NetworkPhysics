@@ -1,31 +1,25 @@
 package NetworkedPhysics.Common.Protocol;
 
-import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkedPhysics;
-import NetworkedPhysics.Network.Client;
 
 import java.net.InetSocketAddress;
 
-public class CompleteWorldState extends PhysicsMessage{
-    public static final byte COMMANDID=1;
-    int frame;
-    long btSeed;
+public class GetInit extends PhysicsMessage{
+    public static final byte COMMANDID=2;
 
-    protected CompleteWorldState(InetSocketAddress from, NetworkedPhysics networkedPhysics) {
-    }
 
     @Override
     public byte[] toBlob() {
         return new byte[0];
     }
 
-    @Override
     public PhysicsMessage fromBlob(byte[] blob) {
-        return null;
+        return this;
     }
 
     @Override
     public void processMessage(NetworkedPhysics networkedPhysics, InetSocketAddress from) {
+        networkedPhysics.getConnection().send(new InitialState(from, networkedPhysics),from);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package NetworkedPhysics.Client;
 
 import NetworkedPhysics.Client.SyncActions.SyncAction;
+import NetworkedPhysics.Common.Protocol.GetInit;
 import NetworkedPhysics.Common.UpdateInputsCallback;
 import NetworkedPhysics.Network.ClientInput;
 import NetworkedPhysics.Common.NetworkedPhysics;
@@ -10,6 +11,7 @@ import NetworkedPhysics.Network.IncommingPacketHandlerClient;
 import NetworkedPhysics.Network.UdpSocket;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,20 +21,14 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
     private InetAddress inetAddress;
 
-    public NetworkedPhysicsClient(InetAddress inetAddress, int port, UpdateInputsCallback updateInputs) {
-        super(updateInputs);
-        this.inetAddress = inetAddress;
-        this.port = port;
-        connection = new UdpSocket(8080, new IncommingPacketHandlerClient());
+
+    public NetworkedPhysicsClient(InetSocketAddress socketAddress, UpdateInputsCallback updateInputsCallback) {
+        super(updateInputsCallback);
+        connection = new UdpSocket(new IncommingPacketHandlerClient(this));
+        connection.connect(new InetSocketAddress(socketAddress.getAddress(),socketAddress.getPort())).awaitUninterruptibly();
+        connection.send(new GetInit());
     }
 
-
-
-    private void initPhysicsEngine(int timesPassed) {
-        world = Util.getWorld();
-        startTime = System.currentTimeMillis()-timesPassed;
-        frame= (int) (1f/1000*timesPassed*stepsPerSecond);
-    }
 
     public void wishAddObject(NetworkedPhysicsObject o){
 
@@ -58,13 +54,17 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
 
     public void run() {
-        //getInitialValues
-        initPhysicsEngine(0);
         running=true;
 
         while(running){
             step();
             waitTilNextFrame();
         }
+    }
+
+    public void init(int timePassed, int stepsPerSecond) {
+        world = Util.getWorld();
+        startTime = System.currentTimeMillis()-timePassed;
+        frame= (int) (1f/1000*timePassed*stepsPerSecond);
     }
 }

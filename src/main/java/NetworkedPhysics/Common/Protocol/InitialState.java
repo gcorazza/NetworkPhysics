@@ -1,6 +1,8 @@
 package NetworkedPhysics.Common.Protocol;
 
+import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import com.google.gson.Gson;
 
 import java.net.InetSocketAddress;
@@ -9,10 +11,13 @@ public class InitialState extends PhysicsMessage {
     public static final byte COMMANDID=0;
     int timePassed;
     int stepsPerSecond;
-    long btSeed;
+
+    public InitialState() {
+    }
 
     public InitialState(InetSocketAddress from, NetworkedPhysics networkedPhysics) {
-        super(from, networkedPhysics);
+        timePassed= (int) (System.currentTimeMillis()-networkedPhysics.getStartTime());
+        stepsPerSecond= networkedPhysics.getStepsPerSecond();
     }
 
 
@@ -29,7 +34,12 @@ public class InitialState extends PhysicsMessage {
     }
 
     @Override
-    public void processMessage() {
+    public void processMessage(NetworkedPhysics networkedPhysics, InetSocketAddress from) {
+        ((NetworkedPhysicsClient) networkedPhysics).init(timePassed, stepsPerSecond);
+    }
 
+    @Override
+    public byte getMessageID() {
+        return COMMANDID;
     }
 }
