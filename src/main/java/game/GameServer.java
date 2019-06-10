@@ -1,11 +1,9 @@
 package game;
 
-import NetworkedPhysics.Common.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.NetworkedPhysicsObject;
-import NetworkedPhysics.Network.Messages.UdpClient;
+import NetworkedPhysics.Network.UdpConnection;
 import Rendering.PhysicsWorldRenderer;
 import NetworkedPhysics.Common.UpdateInputsCallback;
-import NetworkedPhysics.Network.Client;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.StaticPlaneShape;
@@ -27,11 +25,12 @@ public class GameServer {
 
     private final PhysicsWorldRenderer physicsWorldRenderer;
     private final NetworkedPhysicsServer networkedPhysicsServer;
+    private boolean running=true;
 
     public GameServer(int port) {
         networkedPhysicsServer = new NetworkedPhysicsServer(port, new UpdateInputsCallback() {
             @Override
-            public void updateInputs(DiscreteDynamicsWorld world, List<NetworkedPhysicsObject> objects,  Map<InetSocketAddress, UdpClient> clients) {
+            public void updateInputs(DiscreteDynamicsWorld world, List<NetworkedPhysicsObject> objects,  Map<InetSocketAddress, UdpConnection> clients) {
 
             }
         });
@@ -45,7 +44,9 @@ public class GameServer {
 
     private void run() {
         addCube();
-        networkedPhysicsServer.run();
+        while(running){
+            networkedPhysicsServer.update();
+        }
     }
 
     private void addCube(){

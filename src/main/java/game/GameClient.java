@@ -3,7 +3,7 @@ package game;
 import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkedPhysicsObject;
 import NetworkedPhysics.Common.UpdateInputsCallback;
-import NetworkedPhysics.Network.Messages.UdpClient;
+import NetworkedPhysics.Network.UdpConnection;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 
 import java.net.InetSocketAddress;
@@ -17,7 +17,7 @@ public class GameClient {
     public GameClient(InetSocketAddress socketAddress) {
         networkedPhysicsClient = new NetworkedPhysicsClient(socketAddress, new UpdateInputsCallback() {
             @Override
-            public void updateInputs(DiscreteDynamicsWorld world, List<NetworkedPhysicsObject> objects, Map<InetSocketAddress, UdpClient> clients) {
+            public void updateInputs(DiscreteDynamicsWorld world, List<NetworkedPhysicsObject> objects, Map<InetSocketAddress, UdpConnection> clients) {
 
             }
         });

@@ -1,6 +1,5 @@
 package NetworkedPhysics.Network;
 
-import NetworkedPhysics.Network.Messages.UdpClient;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -9,10 +8,10 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 
-public class IncomingPacketHandlerServer extends IncommingPacketHandler {
+public class IncomingPacketHandlerServer extends IncomingPacketHandler {
 
 
-    private final Map<InetSocketAddress, UdpClient> clients;
+    private final Map<InetSocketAddress, UdpConnection> clients;
 
 
 
@@ -25,22 +24,20 @@ public class IncomingPacketHandlerServer extends IncommingPacketHandler {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket packet) {
 
         InetSocketAddress inetSocketAddress = packet.sender();
-        UdpClient udpClient = clients.get(inetSocketAddress);
-        if (udpClient == null) {
-            udpClient = new UdpClient(inetSocketAddress);
-            clients.put(udpClient.inetSocketAddress, udpClient);
-            ((NetworkedPhysicsServer) networkedPhysics).newUDPClient(udpClient);
+        UdpConnection udpConnection = clients.get(inetSocketAddress);
+
+        if (udpConnection == null) {
+            udpConnection = new UdpConnection(inetSocketAddress);
+            clients.put(udpConnection.inetSocketAddress, udpConnection);
+            ((NetworkedPhysicsServer) networkedPhysics).newUDPClient(udpConnection);
         }
 
-        udpClient.updateTimeout(System.currentTimeMillis());
+        udpConnection.updateTimeout(System.currentTimeMillis());
 
-
-        processIncomingMessage(packet);
+        processIncomingMessage(udpConnection, packet);
         System.out.println("Inside incomming packet handler");
 
         //rcvPktProcessing(rcvPktBuf, rcvPktLength, srcAddr);
     }
-
-
 
 }

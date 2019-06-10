@@ -2,12 +2,14 @@ package NetworkedPhysics.Client;
 
 import NetworkedPhysics.Client.SyncActions.SyncAction;
 import NetworkedPhysics.Common.Protocol.GetInit;
+import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.UpdateInputsCallback;
 import NetworkedPhysics.Network.ClientInput;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.Util;
 import NetworkedPhysics.Common.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.IncommingPacketHandlerClient;
+import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 
 import java.net.InetAddress;
@@ -19,14 +21,15 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
     List<SyncAction> timeline= new ArrayList<SyncAction>();
 
-    private InetAddress inetAddress;
+    private UdpConnection serverConnection;
 
 
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, UpdateInputsCallback updateInputsCallback) {
         super(updateInputsCallback);
         connection = new UdpSocket(new IncommingPacketHandlerClient(this));
-        connection.connect(new InetSocketAddress(socketAddress.getAddress(),socketAddress.getPort())).awaitUninterruptibly();
-        connection.send(new GetInit());
+        connection.connect(socketAddress).awaitUninterruptibly();
+        serverConnection= new UdpConnection(socketAddress);
+        connection.send(new GetInit(serverConnection.getMessageStap()));
     }
 
 
@@ -57,8 +60,7 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
         running=true;
 
         while(running){
-            step();
-            waitTilNextFrame();
+            stepToActualFrame();
         }
     }
 
@@ -66,5 +68,18 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
         world = Util.getWorld();
         startTime = System.currentTimeMillis()-timePassed;
         frame= (int) (1f/1000*timePassed*stepsPerSecond);
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    public void send(PhysicsMessage physicsMessage) {
+        send(physicsMessage, serverConnection);
+    }
+
+    public UdpConnection getServerConnection() {
+        return serverConnection;
     }
 }

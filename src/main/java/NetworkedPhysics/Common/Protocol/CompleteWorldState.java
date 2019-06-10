@@ -1,17 +1,15 @@
 package NetworkedPhysics.Common.Protocol;
 
-import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkedPhysics;
-import NetworkedPhysics.Network.Client;
-
-import java.net.InetSocketAddress;
+import NetworkedPhysics.Network.UdpConnection;
 
 public class CompleteWorldState extends PhysicsMessage{
     public static final byte COMMANDID=1;
     int frame;
     long btSeed;
 
-    protected CompleteWorldState(InetSocketAddress from, NetworkedPhysics networkedPhysics) {
+    protected CompleteWorldState(NetworkedPhysics networkedPhysics, int stamp) {
+        super(stamp);
     }
 
     @Override
@@ -25,7 +23,8 @@ public class CompleteWorldState extends PhysicsMessage{
     }
 
     @Override
-    public void processMessage(NetworkedPhysics networkedPhysics, InetSocketAddress from) {
+    public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
+
     }
 
     @Override

@@ -10,12 +10,12 @@ import io.netty.channel.socket.DatagramPacket;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-public abstract class IncommingPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
+public abstract class IncomingPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     private static final Map<Byte, Class<? extends PhysicsMessage>> commandMap = Protocol.protocol;
     protected final NetworkedPhysics networkedPhysics;
 
-    protected IncommingPacketHandler(NetworkedPhysics networkedPhysics) {
+    protected IncomingPacketHandler(NetworkedPhysics networkedPhysics) {
         this.networkedPhysics = networkedPhysics;
     }
 
@@ -28,7 +28,7 @@ public abstract class IncommingPacketHandler extends SimpleChannelInboundHandler
         return rcvPktBuf;
     }
 
-    void processIncomingMessage(DatagramPacket packet) {
+    void processIncomingMessage(UdpConnection udpConnection, DatagramPacket packet) {
 
         final byte[] rcvPktBuf = readByteBuffer(packet);
 
@@ -44,7 +44,7 @@ public abstract class IncommingPacketHandler extends SimpleChannelInboundHandler
                     .getConstructor()
                     .newInstance()))
                     .fromBlob(packetObject);
-            instance.processMessage(networkedPhysics,packet.sender());
+            instance.processMessage(networkedPhysics,udpConnection);
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

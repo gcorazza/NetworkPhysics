@@ -72,8 +72,8 @@ public class UdpSocket {
         }
     }
 
-    public  void send(PhysicsMessage object, InetSocketAddress destination){
-        ByteBuf buffer = blobToByteBuf(object);
+    public  void send(PhysicsMessage msg, InetSocketAddress destination){
+        ByteBuf buffer = blobToByteBuf(msg);
         channel.writeAndFlush(new DatagramPacket(buffer,destination));
     }
 

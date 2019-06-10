@@ -1,14 +1,22 @@
 package NetworkedPhysics.Common.Protocol;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Network.UdpConnection;
 
 import java.net.InetSocketAddress;
 
 public abstract class PhysicsMessage {
 
+    public final int stamp;
+
+    protected PhysicsMessage(int stamp) {
+        this.stamp = stamp;
+    }
+
     public abstract byte[] toBlob();
     public abstract PhysicsMessage fromBlob(byte[] blob);
-    public abstract void processMessage(NetworkedPhysics networkedPhysics, InetSocketAddress from);
+    public abstract void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from);
+
     public abstract byte getMessageID();
 
     public byte[] toByteMessage(){

@@ -2,8 +2,8 @@ package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Manipulations.WorldManipulation;
-import NetworkedPhysics.Network.Client;
-import NetworkedPhysics.Network.Messages.UdpClient;
+import NetworkedPhysics.Common.Protocol.PhysicsMessage;
+import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NetworkedPhysics {
+public abstract class NetworkedPhysics {
 
     protected DiscreteDynamicsWorld world;
     List<NetworkedPhysicsObject> objects = new ArrayList<NetworkedPhysicsObject>();
-    Map<InetSocketAddress, UdpClient> clients = new HashMap<>();
+    Map<InetSocketAddress, UdpConnection> clients = new HashMap<>();
 
     UpdateInputsCallback updateInputs;
 
@@ -35,9 +35,6 @@ public class NetworkedPhysics {
     protected long startTime;
     protected boolean running = false;
 
-    public UdpSocket getConnection() {
-        return connection;
-    }
 
     protected UdpSocket connection;
 
@@ -70,12 +67,19 @@ public class NetworkedPhysics {
         }
     }
 
-    protected void step() {
+    protected void stepToActualFrame() {
         if (world == null) {
             return;
         }
-        waitTilNextFrame();
 
+        int shouldBeInFrame = shouldBeInFrame();
+
+        for (int frame = 0; frame < shouldBeInFrame; frame++) {
+            step();
+        }
+    }
+
+    private void step() {
         processManipulations();
 
         if (updateInputs != null)
@@ -83,7 +87,6 @@ public class NetworkedPhysics {
         world.stepSimulation(1000f/stepsPerSecond);
 
         frame++;
-        //FullSync
     }
 
     private void processManipulations() {
@@ -111,7 +114,7 @@ public class NetworkedPhysics {
         return objects;
     }
 
-    public Map<InetSocketAddress, UdpClient> getClients() {
+    public Map<InetSocketAddress, UdpConnection> getClients() {
         return clients;
     }
 
@@ -146,6 +149,14 @@ public class NetworkedPhysics {
     public boolean isRunning() {
         return running;
     }
+
+    public abstract void update();
+
+    public void send(PhysicsMessage message, UdpConnection udpConnection){
+        udpConnection.incrementMessageStamp();
+        udpSocket.send(message,udpConnection.inetSocketAddress);
+    }
+
 }
 
 /*

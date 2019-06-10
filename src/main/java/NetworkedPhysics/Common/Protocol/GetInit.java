@@ -1,11 +1,15 @@
 package NetworkedPhysics.Common.Protocol;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
-
-import java.net.InetSocketAddress;
+import NetworkedPhysics.Network.UdpConnection;
+import NetworkedPhysics.Server.NetworkedPhysicsServer;
 
 public class GetInit extends PhysicsMessage{
     public static final byte COMMANDID=2;
+
+    public GetInit(int stamp) {
+        super(stamp);
+    }
 
 
     @Override
@@ -18,8 +22,8 @@ public class GetInit extends PhysicsMessage{
     }
 
     @Override
-    public void processMessage(NetworkedPhysics networkedPhysics, InetSocketAddress from) {
-        networkedPhysics.getConnection().send(new InitialState(from, networkedPhysics),from);
+    public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
+        networkedPhysics.send(new InitPhysicsEngine(networkedPhysics, from.getMessageStap()),from);
     }
 
     @Override

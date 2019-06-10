@@ -1,12 +1,13 @@
 package NetworkedPhysics.Server;
 
+import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.UpdateInputsCallback;
 import NetworkedPhysics.Network.ClientInput;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.Util;
 import NetworkedPhysics.Common.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.IncomingPacketHandlerServer;
-import NetworkedPhysics.Network.Messages.UdpClient;
+import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
 
 public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable {
 
-    Map<InetSocketAddress, UdpClient> clients= new HashMap<>();
+    Map<InetSocketAddress, UdpConnection> clients= new HashMap<>();
 
     public NetworkedPhysicsServer(int port, UpdateInputsCallback updateInputs) {
         super(updateInputs);
@@ -24,8 +25,14 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
         world = Util.getWorld();
     }
 
-    public Map<InetSocketAddress, UdpClient> getClients() {
+    public Map<InetSocketAddress, UdpConnection> getClients() {
         return clients;
+    }
+
+    @Override
+    public void update() {
+        stepToActualFrame();
+
     }
 
     //calledByServer
@@ -33,7 +40,7 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
 
     }
 
-    public void newUDPClient(UdpClient udpClient) {
+    public void newUDPClient(UdpConnection udpConnection) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
     }
 
@@ -45,17 +52,13 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
 
     }
 
-
-
     public void run() {
         startTime= System.currentTimeMillis();
         running=true;
 
         while (running) {
-            step();
-            waitTilNextFrame();
+            stepToActualFrame();
         }
     }
-
 
 }
