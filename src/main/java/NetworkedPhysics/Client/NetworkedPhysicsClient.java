@@ -66,8 +66,9 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
     public void init(int timePassed, int stepsPerSecond) {
         world = Util.getWorld();
+        this.stepsPerSecond=stepsPerSecond;
         startTime = System.currentTimeMillis()-timePassed;
-        frame= (int) (1f/1000*timePassed*stepsPerSecond);
+        frame= shouldBeInFrame();
     }
 
     @Override
