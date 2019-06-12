@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 public class UdpConnection {
     public final InetSocketAddress inetSocketAddress;
     private int messageStamp=0;
+    private int remoteMessageStamp;
 
     public UdpConnection(InetSocketAddress inetSocketAddress) {
         this.inetSocketAddress = inetSocketAddress;
@@ -19,7 +20,7 @@ public class UdpConnection {
         messageStamp++;
     }
 
-    public int getMessageStap() {
+    public int getMessageStamp() {
         return messageStamp;
     }
 }

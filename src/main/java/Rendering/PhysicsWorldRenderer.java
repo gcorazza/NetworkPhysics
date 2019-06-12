@@ -12,7 +12,6 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -48,26 +47,22 @@ public class PhysicsWorldRenderer {
     private int uniformLocationView;
 
     private FloatBuffer mat4Buffer = BufferUtils.createFloatBuffer(16);
-    private Matrix4f identity;
+    //    private Matrix4f identity;
     private GLFWCursorPosCallback mousePosCallback;
     private double camLookXRad;
     private double camLookYRad;
     private Vector3f camPos = new Vector3f(0, 0, -10);
-    private double camSensivity = 200;
-    //    private WavefrontMeshLoader.Mesh ship;
-    private int shipPositionVbo;
-    private int shipNormalVbo;
+    private double camSensitivity = 200;
     private float camSpeed = 0.05f;
     private WorldEntity ship;
-    private WavefrontMeshLoader.Mesh shipObj;
 
-    public PhysicsWorldRenderer(NetworkedPhysics networkedPhysics) {
+    public PhysicsWorldRenderer(NetworkedPhysics networkedPhysics) throws Exception {
         this.networkedPhysics = networkedPhysics;
+        init();
     }
 
-    public void run() throws Exception {
+    public void run()  {
         try {
-            init();
             loop();
 
             // Release window and window callbacks
@@ -80,6 +75,7 @@ public class PhysicsWorldRenderer {
             // Terminate GLFW and release the GLFWerrorfun
             glfwTerminate();
             errorCallback.free();
+            networkedPhysics.shutDown();
         }
     }
 
@@ -140,8 +136,8 @@ public class PhysicsWorldRenderer {
                 glfwSetCursorPos(window, width / 2, height / 2);
                 double dx = width / 2 - x;
                 double dy = height / 2 - y;
-                camLookYRad -= dy / camSensivity;
-                camLookXRad += dx / camSensivity;
+                camLookYRad -= dy / camSensitivity;
+                camLookXRad += dx / camSensitivity;
 
                 if (camLookYRad > Math.PI / 2)
                     camLookYRad = Math.PI / 2 - 0.001;
@@ -165,27 +161,33 @@ public class PhysicsWorldRenderer {
 
         // Make the window visible
         glfwShowWindow(window);
+
+
+        GL.createCapabilities();
+        glEnable(GL_DEPTH_TEST);
+
+        debugProc = GLUtil.setupDebugMessageCallback();
+
+        // Set the clear color
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        shaderProgram = new ShaderProgram();
+        shaderProgram.createVertexShader(Utils.loadResource("/vertex.vs"));
+        shaderProgram.createFragmentShader(Utils.loadResource("/fragment.fs"));
+        shaderProgram.link();
+        shaderProgram.bind();
+
+        uniformLocationProjection = shaderProgram.getUniformLocation("proj");
+        uniformLocationView = shaderProgram.getUniformLocation("view");
+        uniformLocationModel = shaderProgram.getUniformLocation("model");
+        setPerspectiveProjection();
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+
+        ship = new WorldEntity(new BoundedObj(System.class.getResource("/dice.obj").openStream()));
+
     }
 
-
-    private void drawOBJ(BoundedObj obj) {
-
-        glBindBuffer(GL_ARRAY_BUFFER, obj.vboVert);
-        glVertexPointer(3, GL_FLOAT, 0, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glEnableClientState(GL_NORMAL_ARRAY);
-
-        glBindBuffer(GL_ARRAY_BUFFER, obj.vboNormal);
-        glNormalPointer(GL_FLOAT, 0, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.vboIndices);
-        int numFaces = obj.obj.getNumFaces();
-        glDrawElements(GL_TRIANGLES, numFaces * 3, GL_UNSIGNED_INT, 0);
-
-        glDisableClientState(GL_NORMAL_ARRAY);
-    }
 
     private void printVector(Vector3f vec) {
         System.out.format("LookAt: %f,%f,%f\n", vec.x, vec.y, vec.z);
@@ -199,6 +201,8 @@ public class PhysicsWorldRenderer {
     }
 
     private void updateControlls() {
+        glfwPollEvents();
+
         if (keyDown[GLFW_KEY_W]) {
             Vector3f direction = new Vector3f(0, 0, 1f);
             direction.rotateY((float) (camLookXRad));
@@ -227,75 +231,43 @@ public class PhysicsWorldRenderer {
         }
     }
 
-    private void loop() throws Exception {
-        // This line is critical for LWJGL's interoperation with GLFW's
-        // OpenGL context, or any context that is managed externally.
-        // LWJGL detects the context that is current in the current thread,
-        // creates the ContextCapabilities instance and makes the OpenGL
-        // bindings available for use.
-        GL.createCapabilities();
-        glEnable(GL_DEPTH_TEST);
+    public void renderAFrame(){
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+        glViewport(0, 0, width, height);
 
-        debugProc = GLUtil.setupDebugMessageCallback();
+        drawWorldEntity(ship);
+        glfwSwapBuffers(window); // swap the color buffers
+    }
 
-        // Set the clear color
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-        int vbo = glGenBuffers();
-        int ibo = glGenBuffers();
-        float[] vertices =
-                {-0.5f, -0.5f, -1f,
-                        0.5f, -0.5f, -1f,
-                        0.5f, 0.5f, -1f};
-
-        int[] indices = {0, 1, 2};
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, (FloatBuffer) BufferUtils.createFloatBuffer(vertices.length).put(vertices).flip(), GL_STATIC_DRAW);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (IntBuffer) BufferUtils.createIntBuffer(indices.length).put(indices).flip(), GL_STATIC_DRAW);
-        glVertexPointer(3, GL_FLOAT, 0, 0L);
-
-        shaderProgram = new ShaderProgram();
-        shaderProgram.createVertexShader(Utils.loadResource("/vertex.vs"));
-        shaderProgram.createFragmentShader(Utils.loadResource("/fragment.fs"));
-        shaderProgram.link();
-        shaderProgram.bind();
-
-        uniformLocationProjection = shaderProgram.getUniformLocation("proj");
-        uniformLocationView = shaderProgram.getUniformLocation("view");
-        uniformLocationModel = shaderProgram.getUniformLocation("model");
-
-        identity = new Matrix4f();
-        glUniformMatrix4fv(uniformLocationModel, false, identity.get(mat4Buffer));
-        ship = new WorldEntity(new BoundedObj(System.class.getResource("/dice.obj").openStream()));
-        //glfwSetCursorPos(window,width/2, height/2);
-
-        // Run the rendering loop until the user has attempted to close
-        // the window or has pressed the ESCAPE key.
-        printVector(getLookAtDirection());
-
+    private void loop() {
 
         while (!glfwWindowShouldClose(window)) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-            glViewport(0, 0, width, height);
-
             updateControlls();
-
-            setPerspectiveProjection();
             setCamera();
-
-//            drawShip();
-            drawOBJ(ship.boundedObj);
-            //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0L);
-
-            glfwSwapBuffers(window); // swap the color buffers
-
-            // Poll for window events. The key callback above will only be
-            // invoked during this call.
-            glfwPollEvents();
+            renderAFrame();
+            networkedPhysics.update();
         }
+    }
+
+    private void drawWorldEntity(WorldEntity worldEntity){
+        glUniformMatrix4fv(uniformLocationModel, false, worldEntity.getPosition().get(mat4Buffer));
+
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glBindBuffer(GL_ARRAY_BUFFER, worldEntity.boundedObj.vboVert);
+        glVertexPointer(3, GL_FLOAT, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+        glBindBuffer(GL_ARRAY_BUFFER, worldEntity.boundedObj.vboNormal);
+        glNormalPointer(GL_FLOAT, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldEntity.boundedObj.vboIndices);
+        int numFaces = worldEntity.boundedObj.obj.getNumFaces();
+        glDrawElements(GL_TRIANGLES, numFaces * 3, GL_UNSIGNED_INT, 0);
+
+        glDisableClientState(GL_NORMAL_ARRAY);
     }
 
     private void setCamera() {

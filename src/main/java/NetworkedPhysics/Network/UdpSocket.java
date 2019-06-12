@@ -41,7 +41,6 @@ public class UdpSocket {
                             ch.pipeline().addLast(datagramPacketInboundHandler);
                         }
                     });
-
             // Bind and start to accept incoming connections.
             System.out.printf("waiting for message %s\n", String.format(localSocketAddress.toString()));
             System.out.flush();
@@ -100,5 +99,9 @@ public class UdpSocket {
         UdpSocket udpSocket = new UdpSocket(8080, new_channel);
         UdpSocket udpSocket2 = new UdpSocket(new_channel);
         udpSocket2.connect(new InetSocketAddress("localhost",8080));
+    }
+
+    public void shutdown() {
+        bootstrap.config().group().shutdownGracefully();
     }
 }

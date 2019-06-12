@@ -45,4 +45,9 @@ public class BoundedObj {
     }
 
 
+    public void free() {
+        glDeleteBuffers(vboVert);
+        glDeleteBuffers(vboNormal);
+        glDeleteBuffers(vboVert);
+    }
 }

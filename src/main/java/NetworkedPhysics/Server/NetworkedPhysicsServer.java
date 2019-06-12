@@ -1,11 +1,10 @@
 package NetworkedPhysics.Server;
 
-import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.UpdateInputsCallback;
 import NetworkedPhysics.Network.ClientInput;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.Util;
-import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.IncomingPacketHandlerServer;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
@@ -23,6 +22,7 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
         super(updateInputs);
         connection= new UdpSocket(port, new IncomingPacketHandlerServer(this));
         world = Util.getWorld();
+        startTime= System.currentTimeMillis();
     }
 
     public Map<InetSocketAddress, UdpConnection> getClients() {
@@ -32,7 +32,6 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
     @Override
     public void update() {
         stepToActualFrame();
-
     }
 
     //calledByServer
@@ -53,7 +52,6 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
     }
 
     public void run() {
-        startTime= System.currentTimeMillis();
         running=true;
 
         while (running) {

@@ -7,12 +7,11 @@ import NetworkedPhysics.Common.UpdateInputsCallback;
 import NetworkedPhysics.Network.ClientInput;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.Util;
-import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.IncommingPacketHandlerClient;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
         connection = new UdpSocket(new IncommingPacketHandlerClient(this));
         connection.connect(socketAddress).awaitUninterruptibly();
         serverConnection= new UdpConnection(socketAddress);
-        connection.send(new GetInit(serverConnection.getMessageStap()));
+        connection.send(new GetInit(serverConnection.getMessageStamp()));
     }
 
 
@@ -73,7 +72,7 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
     @Override
     public void update() {
-
+        stepToActualFrame();
     }
 
     public void send(PhysicsMessage physicsMessage) {

@@ -41,8 +41,8 @@ public abstract class IncomingPacketHandler extends SimpleChannelInboundHandler<
             System.arraycopy(rcvPktBuf, 1, packetObject, 0, packetObject.length);
 
             PhysicsMessage instance = (((commandMap.get(commandCode))
-                    .getConstructor()
-                    .newInstance()))
+                    .getConstructor(int.class)
+                    .newInstance(0)))
                     .fromBlob(packetObject);
             instance.processMessage(networkedPhysics,udpConnection);
         } catch (InstantiationException e) {

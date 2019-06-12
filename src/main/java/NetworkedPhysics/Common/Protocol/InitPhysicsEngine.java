@@ -10,6 +10,9 @@ public class InitPhysicsEngine extends PhysicsMessage {
     int timePassed;
     int stepsPerSecond;
 
+    public InitPhysicsEngine(int stamp) {
+        super(stamp);
+    }
 
     public InitPhysicsEngine(NetworkedPhysics networkedPhysics, int messageStamp) {
         super(messageStamp);
@@ -25,7 +28,7 @@ public class InitPhysicsEngine extends PhysicsMessage {
     }
 
     @Override
-    public PhysicsMessage fromBlob(byte[] blob) {
+    public InitPhysicsEngine fromBlob(byte[] blob) {
         Gson gson = new Gson();
         return gson.fromJson(new String(blob), InitPhysicsEngine.class);
     }
@@ -36,7 +39,7 @@ public class InitPhysicsEngine extends PhysicsMessage {
     }
 
     @Override
-    public byte getMessageID() {
+    public byte getCommandID() {
         return COMMANDID;
     }
 }

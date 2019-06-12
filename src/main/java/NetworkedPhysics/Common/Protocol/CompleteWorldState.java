@@ -18,7 +18,7 @@ public class CompleteWorldState extends PhysicsMessage{
     }
 
     @Override
-    public PhysicsMessage fromBlob(byte[] blob) {
+    public CompleteWorldState fromBlob(byte[] blob) {
         return null;
     }
 
@@ -28,7 +28,7 @@ public class CompleteWorldState extends PhysicsMessage{
     }
 
     @Override
-    public byte getMessageID() {
+    public byte getCommandID() {
         return COMMANDID;
     }
 }

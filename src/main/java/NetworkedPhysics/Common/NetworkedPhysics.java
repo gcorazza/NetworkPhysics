@@ -1,8 +1,9 @@
 package NetworkedPhysics.Common;
 
-import NetworkedPhysics.Common.Manipulations.AddRigidBody;
-import NetworkedPhysics.Common.Manipulations.WorldManipulation;
+import NetworkedPhysics.Common.Protocol.Manipulations.AddRigidBody;
+import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
@@ -17,26 +18,25 @@ import java.util.Map;
 public abstract class NetworkedPhysics {
 
     protected DiscreteDynamicsWorld world;
-    List<NetworkedPhysicsObject> objects = new ArrayList<NetworkedPhysicsObject>();
+    List<NetworkedPhysicsObject> objects = new ArrayList<>();
+
     Map<InetSocketAddress, UdpConnection> clients = new HashMap<>();
 
     UpdateInputsCallback updateInputs;
 
-    protected UdpSocket udpSocket;
     protected Map<Integer, List<WorldManipulation>> manipulations= new HashMap<>();
 
-    public NetworkedPhysics(UpdateInputsCallback updateInputs) {
-        this.updateInputs = updateInputs;
-    }
-
     protected int frame;
+
     protected int port;
     protected int stepsPerSecond = 20;
     protected long startTime;
     protected boolean running = false;
-
-
     protected UdpSocket connection;
+
+    public NetworkedPhysics(UpdateInputsCallback updateInputs) {
+        this.updateInputs = updateInputs;
+    }
 
     protected int msPassedSiceStart() {
         return (int) (System.currentTimeMillis() - startTime);
@@ -48,7 +48,7 @@ public abstract class NetworkedPhysics {
 
     protected long timeForFrame(int frame) {
         int v = (int) (frame * (1000f / stepsPerSecond));
-        return (long) (startTime + v);
+        return (startTime + v);
     }
 
     protected int msToNextFrame() {
@@ -96,14 +96,15 @@ public abstract class NetworkedPhysics {
         }
     }
 
-    protected void addManipulation(WorldManipulation worldManipulation) {
-        List<WorldManipulation> stepManipulations = manipulations.computeIfAbsent(frame, k -> new ArrayList<>());
+    public void addManipulation(WorldManipulation worldManipulation) {
+        List<WorldManipulation> stepManipulations = manipulations.computeIfAbsent(worldManipulation.frame, k -> new ArrayList<>());
         stepManipulations.add(worldManipulation);
         //send to all
     }
 
-    public void addRigidBody(RigidBody rigidBody) {
-        addManipulation(new AddRigidBody(frame, rigidBody));
+    public void addRigidBody(NetworkedPhysicsObject physicsObject) {
+        objects.add(physicsObject);
+        world.addRigidBody(physicsObject.getRigidBody());
     }
 
     public DiscreteDynamicsWorld getWorld() {
@@ -122,8 +123,8 @@ public abstract class NetworkedPhysics {
         return updateInputs;
     }
 
-    public UdpSocket getUdpSocket() {
-        return udpSocket;
+    public UdpSocket getUdpConnection() {
+        return connection;
     }
 
     public Map<Integer, List<WorldManipulation>> getManipulations() {
@@ -154,9 +155,12 @@ public abstract class NetworkedPhysics {
 
     public void send(PhysicsMessage message, UdpConnection udpConnection){
         udpConnection.incrementMessageStamp();
-        udpSocket.send(message,udpConnection.inetSocketAddress);
+        connection.send(message,udpConnection.inetSocketAddress);
     }
 
+    public void shutDown(){
+        connection.shutdown();
+    }
 }
 
 /*
