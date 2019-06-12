@@ -283,7 +283,4 @@ public class PhysicsWorldRenderer {
         glUniformMatrix4fv(uniformLocationProjection, false, perspective.get(mat4Buffer));
     }
 
-    public static void main(String[] args) throws Exception {
-        new PhysicsWorldRenderer(null).run();
-    }
 }
