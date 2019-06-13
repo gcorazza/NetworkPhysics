@@ -5,6 +5,9 @@
 package Rendering;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Protocol.Shape;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -12,8 +15,12 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import javax.vecmath.Quat4f;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -54,7 +61,7 @@ public class PhysicsWorldRenderer {
     private Vector3f camPos = new Vector3f(0, 0, -10);
     private double camSensitivity = 200;
     private float camSpeed = 0.05f;
-    private WorldEntity ship;
+    private List<PhysicsWorldEntity> entities = new ArrayList<>();
 
     public PhysicsWorldRenderer(NetworkedPhysics networkedPhysics) throws Exception {
         this.networkedPhysics = networkedPhysics;
@@ -183,9 +190,10 @@ public class PhysicsWorldRenderer {
         setPerspectiveProjection();
 
         glEnableClientState(GL_VERTEX_ARRAY);
-
-        ship = new WorldEntity(new BoundedObj(System.class.getResource("/dice.obj").openStream()));
-
+        NetworkedPhysicsObjectDto physicsObjectDto= new NetworkedPhysicsObjectDto(0, Shape.CUBE, 1,1,1,0,0,0,
+                new javax.vecmath.Vector3f(0,0,0),new Quat4f(0,0,0,1 ));
+        PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(new NetworkedPhysicsObject(physicsObjectDto));
+        entities.add(physicsWorldEntity);
     }
 
 
@@ -234,9 +242,8 @@ public class PhysicsWorldRenderer {
     public void renderAFrame(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
         glViewport(0, 0, width, height);
-
-        drawWorldEntity(ship);
-        glfwSwapBuffers(window); // swap the color buffers
+        entities.forEach(this::drawWorldEntity);
+        glfwSwapBuffers(window);
     }
 
     private void loop() {
@@ -249,8 +256,8 @@ public class PhysicsWorldRenderer {
         }
     }
 
-    private void drawWorldEntity(WorldEntity worldEntity){
-        glUniformMatrix4fv(uniformLocationModel, false, worldEntity.getPosition().get(mat4Buffer));
+    private void drawWorldEntity(PhysicsWorldEntity worldEntity){
+        glUniformMatrix4fv(uniformLocationModel, false, worldEntity.getModel().get(mat4Buffer));
 
         glEnableClientState(GL_NORMAL_ARRAY);
 
@@ -281,6 +288,18 @@ public class PhysicsWorldRenderer {
         float aspect = (float) width / height;
         Matrix4f perspective = new Matrix4f().perspective(FOV, aspect, Z_NEAR, Z_FAR);
         glUniformMatrix4fv(uniformLocationProjection, false, perspective.get(mat4Buffer));
+    }
+
+    public void newObject(NetworkedPhysicsObject physicsObject) {
+        PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(physicsObject);
+        entities.add(physicsWorldEntity);
+    }
+
+
+    public void syncObjects(){
+        Collection<NetworkedPhysicsObject> objects = networkedPhysics.getObjects().values();
+        entities.removeAll(entities);
+        objects.forEach( physicsObject -> entities.add(new PhysicsWorldEntity(physicsObject)));
     }
 
 }

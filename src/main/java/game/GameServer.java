@@ -1,12 +1,10 @@
 package game;
 
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
-import NetworkedPhysics.Common.NetworkPhysicsListener;
+import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
+import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import Rendering.PhysicsWorldRenderer;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
-
-import java.util.Map;
 
 public class GameServer {
 
@@ -14,10 +12,10 @@ public class GameServer {
     private final NetworkedPhysicsServer networkedPhysicsServer;
 
     public GameServer(int port) throws Exception {
-        networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListener() {
+        networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
             @Override
-            public void updateInputs(DiscreteDynamicsWorld world, Map<Integer, NetworkedPhysicsObject> objects) {
-
+            public void newObject(NetworkedPhysicsObject networkedPhysicsObject) {
+                physicsWorldRenderer.newObject(networkedPhysicsObject);
             }
         });
         physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsServer);

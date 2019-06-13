@@ -7,14 +7,12 @@ import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.Util;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.IncommingPacketHandlerClient;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable{
@@ -30,11 +28,11 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
     }
 
 
-    public void wishAddObject(NetworkedPhysicsObject o){
+    public void wishAddObject(NetworkedPhysicsObjectDto o){
 
     }
 
-    public void wishDeleteObject(NetworkedPhysicsObject o){
+    public void wishDeleteObject(NetworkedPhysicsObjectDto o){
 
     }
 

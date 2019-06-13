@@ -12,12 +12,11 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
-import com.google.gson.Gson;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
-public class NetworkedPhysicsObject {
+public class NetworkedPhysicsObjectDto {
     public final int id;
     public final Shape shape;
     public final float a, b, c;
@@ -25,7 +24,10 @@ public class NetworkedPhysicsObject {
     public final float friction;
     public final float restitution;
 
-    public NetworkedPhysicsObject(int id, Shape shape, float a, float b, float c, float mass, float friction, float restitution, Vector3f position, Quat4f rotation) {
+    private Vector3f position;
+    private Quat4f rotation;
+
+    public NetworkedPhysicsObjectDto(int id, Shape shape, float a, float b, float c, float mass, float friction, float restitution, Vector3f position, Quat4f rotation) {
         this.id = id;
         this.shape = shape;
         this.a = a;
@@ -37,9 +39,6 @@ public class NetworkedPhysicsObject {
         this.position = position;
         this.rotation = rotation;
     }
-
-    private Vector3f position;
-    private Quat4f rotation;
 
     public RigidBody getRigidBody() {
         CollisionShape groundShape;

@@ -1,8 +1,8 @@
 package NetworkedPhysics.Common;
 
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
@@ -20,7 +20,7 @@ public abstract class NetworkedPhysics {
 
     NetworkPhysicsListener physicsListener;
 
-    protected Map<Integer, List<WorldManipulation>> manipulations= new HashMap<>();
+    protected Map<Integer, List<WorldManipulation>> manipulations = new HashMap<>();
 
 
     protected int frame;
@@ -79,8 +79,8 @@ public abstract class NetworkedPhysics {
     private void step() {
         processManipulations();
 
-        inputs.values().forEach(in -> physicsListener.stepInput(world,objects,in));
-        world.stepSimulation(1000f/stepsPerSecond);
+        inputs.values().forEach(in -> physicsListener.stepInput(world, objects, in));
+        world.stepSimulation(1000f / stepsPerSecond);
 
         frame++;
     }
@@ -98,9 +98,10 @@ public abstract class NetworkedPhysics {
         //send to all
     }
 
-    public void addRigidBody(NetworkedPhysicsObject physicsObject) {
-        objects.put(physicsObject.getId(),physicsObject);
-        world.addRigidBody(physicsObject.getRigidBody());
+    public void addRigidBody(NetworkedPhysicsObjectDto objectDto) {
+        NetworkedPhysicsObject physicsObject = new NetworkedPhysicsObject(objectDto);
+        objects.put(objectDto.getId(), physicsObject);
+        world.addRigidBody(physicsObject.getBody());
     }
 
     public DiscreteDynamicsWorld getWorld() {
@@ -110,7 +111,6 @@ public abstract class NetworkedPhysics {
     public Map<Integer, NetworkedPhysicsObject> getObjects() {
         return objects;
     }
-
 
     public NetworkPhysicsListener getPhysicsListener() {
         return physicsListener;
@@ -151,12 +151,12 @@ public abstract class NetworkedPhysics {
 //        connection.send(message,udpConnection.inetSocketAddress);
 //    }
 
-    public void sendTo(UdpConnection receiver, PhysicsMessage message){
-        message.stamp=receiver.nextStamp();
+    public void sendTo(UdpConnection receiver, PhysicsMessage message) {
+        message.stamp = receiver.nextStamp();
         connection.send(message, receiver.inetSocketAddress);
     }
 
-    public void shutDown(){
+    public void shutDown() {
         connection.shutdown();
     }
 
@@ -165,12 +165,17 @@ public abstract class NetworkedPhysics {
         if (physicsInput == null) {
             physicsListener.newInput(input);
         }
-        inputs.put(input.id,input);
+        inputs.put(input.id, input);
     }
 
-    private void rewind(int frame){
+    private void rewind(int toFrame) {
+        int lfs=findLastFullSyncFrom(toFrame);
+    }
 
-    }}
+    private int findLastFullSyncFrom(int toFrame) {
+        return 0;
+    }
+}
 
 /*
 

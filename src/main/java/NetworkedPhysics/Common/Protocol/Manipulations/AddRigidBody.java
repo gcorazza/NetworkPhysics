@@ -1,15 +1,15 @@
 package NetworkedPhysics.Common.Protocol.Manipulations;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.UdpConnection;
 import com.google.gson.Gson;
 
 public class AddRigidBody extends WorldManipulation {
 
-    private final NetworkedPhysicsObject physicsObject;
+    private final NetworkedPhysicsObjectDto physicsObject;
 
-    public AddRigidBody(int frame, NetworkedPhysicsObject rigidBody, int stamp) {
+    public AddRigidBody(int frame, NetworkedPhysicsObjectDto rigidBody, int stamp) {
         super(frame, stamp);
         this.physicsObject = rigidBody;
     }

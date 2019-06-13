@@ -1,13 +1,10 @@
 package game;
 
 import NetworkedPhysics.Client.NetworkedPhysicsClient;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
-import NetworkedPhysics.Common.NetworkPhysicsListener;
+import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
 import Rendering.PhysicsWorldRenderer;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 public class GameClient {
 
@@ -15,11 +12,7 @@ public class GameClient {
     private PhysicsWorldRenderer physicsWorldRenderer;
 
     public GameClient(InetSocketAddress socketAddress) throws Exception {
-        networkedPhysicsClient = new NetworkedPhysicsClient(socketAddress, new NetworkPhysicsListener() {
-            @Override
-            public void updateInputs(DiscreteDynamicsWorld world, Map<Integer, NetworkedPhysicsObject> objects) {
-
-            }
+        networkedPhysicsClient = new NetworkedPhysicsClient(socketAddress, new NetworkPhysicsListenerAdapter() {
         });
         physicsWorldRenderer= new PhysicsWorldRenderer(networkedPhysicsClient);
     }

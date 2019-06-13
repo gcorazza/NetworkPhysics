@@ -6,7 +6,7 @@ import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.Manipulations.SetInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Util;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.IncomingPacketHandlerServer;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
@@ -57,7 +57,7 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
         //sync with all
     }
 
-    public void addNetworkedPhysicsObject(NetworkedPhysicsObject networkedPhysicsObject) {
+    public void addNetworkedPhysicsObject(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
 
     }
 
