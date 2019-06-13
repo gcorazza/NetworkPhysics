@@ -1,10 +1,10 @@
 package NetworkedPhysics.Client;
 
-import NetworkedPhysics.Client.SyncActions.SyncAction;
+import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.Protocol.ClientInput;
 import NetworkedPhysics.Common.Protocol.GetInit;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
-import NetworkedPhysics.Common.UpdateInputsCallback;
-import NetworkedPhysics.Network.ClientInput;
+import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.Util;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
@@ -16,19 +16,17 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable{
 
-    List<SyncAction> timeline= new ArrayList<SyncAction>();
+public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable{
 
     private UdpConnection serverConnection;
 
-
-    public NetworkedPhysicsClient(InetSocketAddress socketAddress, UpdateInputsCallback updateInputsCallback) {
+    public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
         super(updateInputsCallback);
         connection = new UdpSocket(new IncommingPacketHandlerClient(this));
         connection.connect(socketAddress).awaitUninterruptibly();
         serverConnection= new UdpConnection(socketAddress);
-        connection.send(new GetInit(serverConnection.getMessageStamp()));
+        connection.send(new GetInit(serverConnection.nextStamp()));
     }
 
 
@@ -40,20 +38,9 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
     }
 
-    public void addSyncAction(SyncAction syncAction){
-        timeline.add(syncAction);
-        //rewind to syncAction.frame. / optimize simulation buffer
+    public void sendMyInput(PhysicsInput myInput) {
+        sendTo(new ClientInput(myInput));
     }
-
-    public void sendClientInput(ClientInput clientInput) {
-
-    }
-
-    private void rewind(int frame){
-
-    }
-
-
 
     public void run() {
         running=true;
@@ -75,8 +62,8 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
         stepToActualFrame();
     }
 
-    public void send(PhysicsMessage physicsMessage) {
-        send(physicsMessage, serverConnection);
+    public void sendTo(PhysicsMessage physicsMessage) {
+        sendTo(serverConnection, physicsMessage);
     }
 
     public UdpConnection getServerConnection() {

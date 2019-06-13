@@ -1,15 +1,12 @@
 package NetworkedPhysics.Common;
 
-import NetworkedPhysics.Common.Protocol.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
-import com.bulletphysics.dynamics.RigidBody;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,13 +15,13 @@ import java.util.Map;
 public abstract class NetworkedPhysics {
 
     protected DiscreteDynamicsWorld world;
-    List<NetworkedPhysicsObject> objects = new ArrayList<>();
+    Map<Integer, NetworkedPhysicsObject> objects = new HashMap<>();
+    Map<Integer, PhysicsInput> inputs = new HashMap<>();
 
-    Map<InetSocketAddress, UdpConnection> clients = new HashMap<>();
-
-    UpdateInputsCallback updateInputs;
+    NetworkPhysicsListener physicsListener;
 
     protected Map<Integer, List<WorldManipulation>> manipulations= new HashMap<>();
+
 
     protected int frame;
 
@@ -34,8 +31,8 @@ public abstract class NetworkedPhysics {
     protected boolean running = false;
     protected UdpSocket connection;
 
-    public NetworkedPhysics(UpdateInputsCallback updateInputs) {
-        this.updateInputs = updateInputs;
+    public NetworkedPhysics(NetworkPhysicsListener updateInputs) {
+        this.physicsListener = updateInputs;
     }
 
     protected int msPassedSiceStart() {
@@ -82,8 +79,7 @@ public abstract class NetworkedPhysics {
     private void step() {
         processManipulations();
 
-        if (updateInputs != null)
-            updateInputs.updateInputs(world, objects, clients);
+        inputs.values().forEach(in -> physicsListener.stepInput(world,objects,in));
         world.stepSimulation(1000f/stepsPerSecond);
 
         frame++;
@@ -92,7 +88,7 @@ public abstract class NetworkedPhysics {
     private void processManipulations() {
         List<WorldManipulation> worldManipulations = manipulations.get(frame);
         if (worldManipulations != null) {
-            //
+            worldManipulations.forEach(wm -> wm.manipulate(this));
         }
     }
 
@@ -103,7 +99,7 @@ public abstract class NetworkedPhysics {
     }
 
     public void addRigidBody(NetworkedPhysicsObject physicsObject) {
-        objects.add(physicsObject);
+        objects.put(physicsObject.getId(),physicsObject);
         world.addRigidBody(physicsObject.getRigidBody());
     }
 
@@ -111,16 +107,13 @@ public abstract class NetworkedPhysics {
         return world;
     }
 
-    public List<NetworkedPhysicsObject> getObjects() {
+    public Map<Integer, NetworkedPhysicsObject> getObjects() {
         return objects;
     }
 
-    public Map<InetSocketAddress, UdpConnection> getClients() {
-        return clients;
-    }
 
-    public UpdateInputsCallback getUpdateInputs() {
-        return updateInputs;
+    public NetworkPhysicsListener getPhysicsListener() {
+        return physicsListener;
     }
 
     public UdpSocket getUdpConnection() {
@@ -153,15 +146,31 @@ public abstract class NetworkedPhysics {
 
     public abstract void update();
 
-    public void send(PhysicsMessage message, UdpConnection udpConnection){
-        udpConnection.incrementMessageStamp();
-        connection.send(message,udpConnection.inetSocketAddress);
+//    public void send(PhysicsMessage message, UdpConnection udpConnection){
+//        udpConnection.incrementMessageStamp();
+//        connection.send(message,udpConnection.inetSocketAddress);
+//    }
+
+    public void sendTo(UdpConnection receiver, PhysicsMessage message){
+        message.stamp=receiver.nextStamp();
+        connection.send(message, receiver.inetSocketAddress);
     }
 
     public void shutDown(){
         connection.shutdown();
     }
-}
+
+    public void setInput(PhysicsInput input) {
+        PhysicsInput physicsInput = inputs.get(input.id);
+        if (physicsInput == null) {
+            physicsListener.newInput(input);
+        }
+        inputs.put(input.id,input);
+    }
+
+    private void rewind(int frame){
+
+    }}
 
 /*
 

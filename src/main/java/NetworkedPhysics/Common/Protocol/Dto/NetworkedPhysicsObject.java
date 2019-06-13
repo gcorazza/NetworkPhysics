@@ -18,12 +18,25 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 public class NetworkedPhysicsObject {
-    int id;
-    Shape shape;
-    float a, b, c;
-    float mass; //if mass = 0 -> is static
-    float friction;
-    float restitution;
+    public final int id;
+    public final Shape shape;
+    public final float a, b, c;
+    public final float mass; //if mass = 0 -> is static
+    public final float friction;
+    public final float restitution;
+
+    public NetworkedPhysicsObject(int id, Shape shape, float a, float b, float c, float mass, float friction, float restitution, Vector3f position, Quat4f rotation) {
+        this.id = id;
+        this.shape = shape;
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.mass = mass;
+        this.friction = friction;
+        this.restitution = restitution;
+        this.position = position;
+        this.rotation = rotation;
+    }
 
     private Vector3f position;
     private Quat4f rotation;
@@ -59,4 +72,7 @@ public class NetworkedPhysicsObject {
         return rigidBody;
     }
 
+    public int getId() {
+        return id;
+    }
 }

@@ -1,14 +1,16 @@
 package NetworkedPhysics.Common.Protocol;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 
-public class GetInit extends PhysicsMessage{
-    public static final byte COMMANDID=2;
+public class ClientInput extends PhysicsMessage {
 
-    public GetInit(int stamp) {
-        super(stamp);
+    PhysicsInput clientInput;
+
+    public ClientInput(PhysicsInput clientInput) {
+        this.clientInput = clientInput;
     }
 
     @Override
@@ -16,17 +18,18 @@ public class GetInit extends PhysicsMessage{
         return new byte[0];
     }
 
-    public GetInit fromBlob(byte[] blob) {
-        return this;
+    @Override
+    public PhysicsMessage fromBlob(byte[] blob) {
+        return null;
     }
 
     @Override
     public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
-        networkedPhysics.sendTo(from, new InitPhysicsEngine(networkedPhysics));
+        ((NetworkedPhysicsServer) networkedPhysics).setClientInput(clientInput);
     }
 
     @Override
     public byte getCommandID() {
-        return COMMANDID;
+        return 0;
     }
 }

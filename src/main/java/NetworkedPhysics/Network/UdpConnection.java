@@ -16,11 +16,7 @@ public class UdpConnection {
 
     }
 
-    public void incrementMessageStamp() {
-        messageStamp++;
-    }
-
-    public int getMessageStamp() {
-        return messageStamp;
+    public int nextStamp() {
+        return ++messageStamp;
     }
 }

@@ -14,8 +14,7 @@ public class InitPhysicsEngine extends PhysicsMessage {
         super(stamp);
     }
 
-    public InitPhysicsEngine(NetworkedPhysics networkedPhysics, int messageStamp) {
-        super(messageStamp);
+    public InitPhysicsEngine(NetworkedPhysics networkedPhysics) {
         timePassed= (int) (System.currentTimeMillis()-networkedPhysics.getStartTime());
         stepsPerSecond= networkedPhysics.getStepsPerSecond();
     }

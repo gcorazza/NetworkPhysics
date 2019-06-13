@@ -1,14 +1,11 @@
 package game;
 
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObject;
-import NetworkedPhysics.Common.UpdateInputsCallback;
-import NetworkedPhysics.Network.UdpConnection;
+import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import Rendering.PhysicsWorldRenderer;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 
-import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.Map;
 
 public class GameServer {
@@ -17,9 +14,9 @@ public class GameServer {
     private final NetworkedPhysicsServer networkedPhysicsServer;
 
     public GameServer(int port) throws Exception {
-        networkedPhysicsServer = new NetworkedPhysicsServer(port, new UpdateInputsCallback() {
+        networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListener() {
             @Override
-            public void updateInputs(DiscreteDynamicsWorld world, List<NetworkedPhysicsObject> objects, Map<InetSocketAddress, UdpConnection> clients) {
+            public void updateInputs(DiscreteDynamicsWorld world, Map<Integer, NetworkedPhysicsObject> objects) {
 
             }
         });

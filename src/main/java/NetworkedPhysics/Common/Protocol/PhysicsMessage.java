@@ -5,7 +5,9 @@ import NetworkedPhysics.Network.UdpConnection;
 
 public abstract class PhysicsMessage {
 
-    public final int stamp;
+    public int stamp;
+
+    protected PhysicsMessage(){}
 
     protected PhysicsMessage(int stamp) {
         this.stamp = stamp;
