@@ -6,7 +6,7 @@ import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import java.util.Map;
 
 public interface NetworkPhysicsListener {
-    public void newObject(NetworkedPhysicsObject networkedPhysicsObjectDto);
+    public void newObject(NetworkedPhysicsObject networkedPhysicsObject);
     public void deleteObject(int id);
     public void newInput(PhysicsInput input);
     public void deleteInput(int id);

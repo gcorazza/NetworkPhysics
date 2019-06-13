@@ -9,8 +9,8 @@ public class AddRigidBody extends WorldManipulation {
 
     private final NetworkedPhysicsObjectDto physicsObject;
 
-    public AddRigidBody(int frame, NetworkedPhysicsObjectDto rigidBody, int stamp) {
-        super(frame, stamp);
+    public AddRigidBody(int frame, NetworkedPhysicsObjectDto rigidBody) {
+        super(frame);
         this.physicsObject = rigidBody;
     }
 

@@ -3,8 +3,13 @@ package game;
 import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
 import NetworkedPhysics.Common.NetworkedPhysicsObject;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Protocol.Shape;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
+import Rendering.PhysicsWorldEntity;
 import Rendering.PhysicsWorldRenderer;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 public class GameServer {
 
@@ -18,8 +23,15 @@ public class GameServer {
                 physicsWorldRenderer.newObject(networkedPhysicsObject);
             }
         });
-        physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsServer);
+        Quat4f rotation = new Quat4f(0, 0, 0, 1);
+        NetworkedPhysicsObjectDto physicsObjectDto= new NetworkedPhysicsObjectDto(0, Shape.CUBE, 1,1,1,1,0,0,
+                new Vector3f(0,0,0), rotation);
+        NetworkedPhysicsObjectDto plane = new NetworkedPhysicsObjectDto(1, Shape.PLANE, 0, 1, 0, 0, 1, 0.1f,
+                new Vector3f(0, -5, 0), rotation);
 
+        networkedPhysicsServer.addNetworkedPhysicsObject(physicsObjectDto);
+        networkedPhysicsServer.addNetworkedPhysicsObject(plane);
+        physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsServer);
     }
 
     public static void main(String[] args) throws Exception {

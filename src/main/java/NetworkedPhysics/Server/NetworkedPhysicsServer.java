@@ -3,6 +3,7 @@ package NetworkedPhysics.Server;
 import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.Protocol.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Protocol.Manipulations.SetInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Util;
@@ -58,7 +59,9 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
     }
 
     public void addNetworkedPhysicsObject(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
-
+        AddRigidBody message = new AddRigidBody(frame + 1, networkedPhysicsObjectDto);
+        sendToAll(message);
+        addManipulation(message);
     }
 
     public void run() {

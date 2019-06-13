@@ -1,5 +1,6 @@
 package Rendering;
 
+import NetworkedPhysics.Common.NetworkedPhysicsObject;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import com.bulletphysics.linearmath.Transform;
 import org.joml.Matrix4f;
@@ -8,12 +9,13 @@ import org.joml.Vector3f;
 public class PhysicsWorldEntity {
 
     public final BoundedObj boundedObj;
-    private Matrix4f model;
     private Vector3f scale;
     private NetworkedPhysics.Common.NetworkedPhysicsObject physicsObject;
+    private ShaderProgram shader;
 
-    public PhysicsWorldEntity(NetworkedPhysics.Common.NetworkedPhysicsObject physicsObject) {
+    public PhysicsWorldEntity(NetworkedPhysicsObject physicsObject, ShaderProgram shader) {
         this.physicsObject = physicsObject;
+        this.shader = shader;
         NetworkedPhysicsObjectDto physicsObjectDto = physicsObject.getDto();
 
         switch (physicsObjectDto.shape) {
@@ -46,10 +48,14 @@ public class PhysicsWorldEntity {
         physicsObject.getBody().getMotionState().getWorldTransform(transform);
         float[] m = new float[16];
         transform.getOpenGLMatrix(m);
-        model = new Matrix4f();
+        Matrix4f model = new Matrix4f();
         model.set(m);
         model.scale(scale);
         return model;
+    }
+
+    public ShaderProgram getShader() {
+        return shader;
     }
 
     //pos

@@ -26,7 +26,7 @@ public abstract class NetworkedPhysics {
     protected int frame;
 
     protected int port;
-    protected int stepsPerSecond = 20;
+    protected int stepsPerSecond = 2;
     protected long startTime;
     protected boolean running = false;
     protected UdpSocket connection;
@@ -95,13 +95,13 @@ public abstract class NetworkedPhysics {
     public void addManipulation(WorldManipulation worldManipulation) {
         List<WorldManipulation> stepManipulations = manipulations.computeIfAbsent(worldManipulation.frame, k -> new ArrayList<>());
         stepManipulations.add(worldManipulation);
-        //send to all
     }
 
     public void addRigidBody(NetworkedPhysicsObjectDto objectDto) {
         NetworkedPhysicsObject physicsObject = new NetworkedPhysicsObject(objectDto);
         objects.put(objectDto.getId(), physicsObject);
         world.addRigidBody(physicsObject.getBody());
+        physicsListener.newObject(physicsObject);
     }
 
     public DiscreteDynamicsWorld getWorld() {

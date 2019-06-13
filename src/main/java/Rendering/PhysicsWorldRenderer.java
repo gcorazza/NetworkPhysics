@@ -6,8 +6,6 @@ package Rendering;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.NetworkedPhysicsObject;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
-import NetworkedPhysics.Common.Protocol.Shape;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -15,7 +13,6 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
-import javax.vecmath.Quat4f;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -26,6 +23,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class PhysicsWorldRenderer {
@@ -66,6 +64,7 @@ public class PhysicsWorldRenderer {
     public PhysicsWorldRenderer(NetworkedPhysics networkedPhysics) throws Exception {
         this.networkedPhysics = networkedPhysics;
         init();
+        syncObjects();
     }
 
     public void run()  {
@@ -190,10 +189,6 @@ public class PhysicsWorldRenderer {
         setPerspectiveProjection();
 
         glEnableClientState(GL_VERTEX_ARRAY);
-        NetworkedPhysicsObjectDto physicsObjectDto= new NetworkedPhysicsObjectDto(0, Shape.CUBE, 1,1,1,0,0,0,
-                new javax.vecmath.Vector3f(0,0,0),new Quat4f(0,0,0,1 ));
-        PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(new NetworkedPhysicsObject(physicsObjectDto));
-        entities.add(physicsWorldEntity);
     }
 
 
@@ -242,6 +237,8 @@ public class PhysicsWorldRenderer {
     public void renderAFrame(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
         glViewport(0, 0, width, height);
+        drawCoordinateSystem();
+        glFlush ();
         entities.forEach(this::drawWorldEntity);
         glfwSwapBuffers(window);
     }
@@ -257,6 +254,7 @@ public class PhysicsWorldRenderer {
     }
 
     private void drawWorldEntity(PhysicsWorldEntity worldEntity){
+        worldEntity.getShader().bind();
         glUniformMatrix4fv(uniformLocationModel, false, worldEntity.getModel().get(mat4Buffer));
 
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -273,8 +271,6 @@ public class PhysicsWorldRenderer {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldEntity.boundedObj.vboIndices);
         int numFaces = worldEntity.boundedObj.obj.getNumFaces();
         glDrawElements(GL_TRIANGLES, numFaces * 3, GL_UNSIGNED_INT, 0);
-
-        glDisableClientState(GL_NORMAL_ARRAY);
     }
 
     private void setCamera() {
@@ -291,7 +287,7 @@ public class PhysicsWorldRenderer {
     }
 
     public void newObject(NetworkedPhysicsObject physicsObject) {
-        PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(physicsObject);
+        PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(physicsObject, shaderProgram);
         entities.add(physicsWorldEntity);
     }
 
@@ -299,7 +295,54 @@ public class PhysicsWorldRenderer {
     public void syncObjects(){
         Collection<NetworkedPhysicsObject> objects = networkedPhysics.getObjects().values();
         entities.removeAll(entities);
-        objects.forEach( physicsObject -> entities.add(new PhysicsWorldEntity(physicsObject)));
+        objects.forEach( physicsObject -> entities.add(new PhysicsWorldEntity(physicsObject, shaderProgram)));
+    }
+
+    private void drawCoordinateSystem(){
+        glColor3f(1.0f,0.0f,0.0f); // red x
+        glBegin(GL_LINES);
+        // x aix
+
+        glVertex3f(-4.0f, 0.0f, 0.0f);
+        glVertex3f(4.0f, 0.0f, 0.0f);
+
+        // arrow
+        glVertex3f(4.0f, 0.0f, 0.0f);
+        glVertex3f(3.0f, 1.0f, 0.0f);
+
+        glVertex3f(4.0f, 0.0f, 0.0f);
+        glVertex3f(3.0f, -1.0f, 0.0f);
+        glEnd();
+
+
+
+        // y
+        glColor3f(0.0f,1.0f,0.0f); // green y
+        glBegin(GL_LINES);
+        glVertex3f(0.0f, -4.0f, 0.0f);
+        glVertex3f(0.0f, 4.0f, 0.0f);
+
+        // arrow
+        glVertex3f(0.0f, 4.0f, 0.0f);
+        glVertex3f(1.0f, 3.0f, 0.0f);
+
+        glVertex3f(0.0f, 4.0f, 0.0f);
+        glVertex3f(-1.0f, 3.0f, 0.0f);
+        glEnd();
+
+        // z
+        glColor3f(0.0f,0.0f,1.0f); // blue z
+        glBegin(GL_LINES);
+        glVertex3f(0.0f, 0.0f ,-4.0f );
+        glVertex3f(0.0f, 0.0f ,4.0f );
+
+        // arrow
+        glVertex3f(0.0f, 0.0f ,4.0f );
+        glVertex3f(0.0f, 1.0f ,3.0f );
+
+        glVertex3f(0.0f, 0.0f ,4.0f );
+        glVertex3f(0.0f, -1.0f ,3.0f );
+        glEnd();
     }
 
 }

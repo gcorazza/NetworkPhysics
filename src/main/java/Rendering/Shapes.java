@@ -3,9 +3,9 @@ package Rendering;
 import java.io.IOException;
 
 public class Shapes {
-    public  static BoundedObj cube;
-    public  static BoundedObj sphere;
-    public  static BoundedObj plane;
+    public static BoundedObj cube;
+    public static BoundedObj sphere;
+    public static BoundedObj plane;
 
     static {
         try {

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     @Override
-    public void newObject(NetworkedPhysicsObject networkedPhysicsObjectDto) {
+    public void newObject(NetworkedPhysicsObject networkedPhysicsObject) {
 
     }
 
