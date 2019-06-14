@@ -1,5 +1,6 @@
 package NetworkedPhysics.Common.Protocol.Manipulations;
 
+import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
@@ -14,7 +15,7 @@ public class SetInput extends WorldManipulation{
     }
 
     @Override
-    public void manipulate(NetworkedPhysics networkedPhysics) {
+    public void manipulate(NetworkPhysicsWorld networkedPhysics) {
         networkedPhysics.setInput(input);
     }
 

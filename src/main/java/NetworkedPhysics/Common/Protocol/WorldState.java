@@ -3,22 +3,15 @@ package NetworkedPhysics.Common.Protocol;
 import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Network.UdpConnection;
+import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import com.google.gson.Gson;
 
-public class InitPhysicsEngine extends PhysicsMessage {
+public class WorldState extends PhysicsMessage {
     public static final byte COMMANDID=0;
-    int timePassed;
-    int stepsPerSecond;
-
-    public InitPhysicsEngine(int stamp) {
-        super(stamp);
-    }
-
-    public InitPhysicsEngine(NetworkedPhysics networkedPhysics) {
-        timePassed= (int) (System.currentTimeMillis()-networkedPhysics.getStartTime());
-        stepsPerSecond= networkedPhysics.getStepsPerSecond();
-    }
-
+    public int timePassed;
+    public int stepsPerSecond;
+    public int frame;
+    public long btSeed;
 
     @Override
     public byte[] toBlob() {
@@ -27,9 +20,9 @@ public class InitPhysicsEngine extends PhysicsMessage {
     }
 
     @Override
-    public InitPhysicsEngine fromBlob(byte[] blob) {
+    public WorldState fromBlob(byte[] blob) {
         Gson gson = new Gson();
-        return gson.fromJson(new String(blob), InitPhysicsEngine.class);
+        return gson.fromJson(new String(blob), WorldState.class);
     }
 
     @Override

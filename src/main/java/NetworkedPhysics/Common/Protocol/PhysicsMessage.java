@@ -1,7 +1,10 @@
 package NetworkedPhysics.Common.Protocol;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.NetworkedPhysicsObject;
 import NetworkedPhysics.Network.UdpConnection;
+
+import java.util.Map;
 
 public abstract class PhysicsMessage {
 
@@ -26,4 +29,9 @@ public abstract class PhysicsMessage {
         System.arraycopy(message,0,packet,1,message.length);
         return packet;
     }
+
+    public Map<Integer, NetworkedPhysicsObject> getObjects(){
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -2,7 +2,7 @@ package NetworkedPhysics.Client;
 
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.ClientInput;
-import NetworkedPhysics.Common.Protocol.GetInit;
+import NetworkedPhysics.Common.Protocol.GetWorldState;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.NetworkedPhysics;
@@ -24,7 +24,7 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
         connection = new UdpSocket(new IncommingPacketHandlerClient(this));
         connection.connect(socketAddress).awaitUninterruptibly();
         serverConnection= new UdpConnection(socketAddress);
-        connection.send(new GetInit(serverConnection.nextStamp()));
+        connection.send(new GetWorldState(serverConnection.nextStamp()));
     }
 
 
@@ -49,10 +49,7 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
     }
 
     public void init(int timePassed, int stepsPerSecond) {
-        world = Util.getWorld();
-        this.stepsPerSecond=stepsPerSecond;
-        startTime = System.currentTimeMillis()-timePassed;
-        frame= shouldBeInFrame();
+
     }
 
     @Override

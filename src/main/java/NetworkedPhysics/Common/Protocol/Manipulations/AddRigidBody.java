@@ -1,5 +1,6 @@
 package NetworkedPhysics.Common.Protocol.Manipulations;
 
+import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.UdpConnection;
@@ -15,7 +16,7 @@ public class AddRigidBody extends WorldManipulation {
     }
 
     @Override
-    public void manipulate(NetworkedPhysics networkedPhysics) {
+    public void manipulate(NetworkPhysicsWorld networkedPhysics) {
         networkedPhysics.addRigidBody(physicsObject);
     }
 

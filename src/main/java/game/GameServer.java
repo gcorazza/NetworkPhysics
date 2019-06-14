@@ -5,7 +5,6 @@ import NetworkedPhysics.Common.NetworkedPhysicsObject;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.Shape;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
-import Rendering.PhysicsWorldEntity;
 import Rendering.PhysicsWorldRenderer;
 
 import javax.vecmath.Quat4f;
@@ -33,7 +32,7 @@ public class GameServer {
         NetworkedPhysicsObjectDto cube2= new NetworkedPhysicsObjectDto(0, Shape.CUBE, 0.5f,1,1,2,1.5f,0f,
                 new Vector3f(0.5f,7,1), rotation);
         NetworkedPhysicsObjectDto plane = new NetworkedPhysicsObjectDto(1, Shape.PLANE, 0, 1, 0, 0, 0.5f, 0.5f,
-                new Vector3f(0, -10, 0), rotation);
+                new Vector3f(0, -4, 0), rotation);
 
         networkedPhysicsServer.addNetworkedPhysicsObject(cube);
         networkedPhysicsServer.addNetworkedPhysicsObject(cube2);

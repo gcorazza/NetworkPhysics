@@ -1,6 +1,6 @@
 package NetworkedPhysics.Common.Protocol.Manipulations;
 
-import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 
 public abstract class WorldManipulation extends PhysicsMessage {
@@ -15,5 +15,5 @@ public abstract class WorldManipulation extends PhysicsMessage {
         this.frame = frame;
     }
 
-    public abstract void manipulate(NetworkedPhysics networkedPhysics);
+    public abstract void manipulate(NetworkPhysicsWorld networkedPhysics);
 }

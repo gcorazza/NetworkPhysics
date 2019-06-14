@@ -8,8 +8,7 @@ public class Protocol {
 
     static {
         protocol = new HashMap<>();
-        protocol.put(InitPhysicsEngine.COMMANDID, InitPhysicsEngine.class);
-        protocol.put(CompleteWorldState.COMMANDID, CompleteWorldState.class);
-        protocol.put(GetInit.COMMANDID, GetInit.class);
+        protocol.put(WorldState.COMMANDID, WorldState.class);
+        protocol.put(GetWorldState.COMMANDID, GetWorldState.class);
     }
 }
