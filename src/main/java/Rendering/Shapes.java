@@ -9,7 +9,7 @@ public class Shapes {
 
     static {
         try {
-            cube = new BoundedObj(System.class.getResource("/dice.obj").openStream());
+            cube = new BoundedObj(System.class.getResource("/cube.obj").openStream());
             sphere = new BoundedObj(System.class.getResource("/sphere.obj").openStream());
             plane = new BoundedObj(System.class.getResource("/plane.obj").openStream());
         } catch (IOException e) {

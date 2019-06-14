@@ -21,15 +21,22 @@ public class GameServer {
             @Override
             public void newObject(NetworkedPhysicsObject networkedPhysicsObject) {
                 physicsWorldRenderer.newObject(networkedPhysicsObject);
+                if (networkedPhysicsObject.getBody().isStaticObject())
+                    return;
+//                networkedPhysicsObject.getBody().setLinearVelocity(new Vector3f(1,20,1));
+//                networkedPhysicsObject.getBody().setAngularVelocity(new Vector3f(1,5,1));
             }
         });
-        Quat4f rotation = new Quat4f(0, 0, 0, 1);
-        NetworkedPhysicsObjectDto physicsObjectDto= new NetworkedPhysicsObjectDto(0, Shape.CUBE, 1,1,1,1,0,0,
-                new Vector3f(0,0,0), rotation);
-        NetworkedPhysicsObjectDto plane = new NetworkedPhysicsObjectDto(1, Shape.PLANE, 0, 1, 0, 0, 1, 0.1f,
-                new Vector3f(0, -5, 0), rotation);
+        Quat4f rotation = new Quat4f(0, 0, 1, 10);
+        NetworkedPhysicsObjectDto cube= new NetworkedPhysicsObjectDto(0, Shape.SPHERE, 0.5f,1,1,1,1.5f,0f,
+                new Vector3f(0,1,0), rotation);
+        NetworkedPhysicsObjectDto cube2= new NetworkedPhysicsObjectDto(0, Shape.CUBE, 0.5f,1,1,2,1.5f,0f,
+                new Vector3f(0.5f,7,1), rotation);
+        NetworkedPhysicsObjectDto plane = new NetworkedPhysicsObjectDto(1, Shape.PLANE, 0, 1, 0, 0, 0.5f, 0.5f,
+                new Vector3f(0, -10, 0), rotation);
 
-        networkedPhysicsServer.addNetworkedPhysicsObject(physicsObjectDto);
+        networkedPhysicsServer.addNetworkedPhysicsObject(cube);
+        networkedPhysicsServer.addNetworkedPhysicsObject(cube2);
         networkedPhysicsServer.addNetworkedPhysicsObject(plane);
         physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsServer);
     }

@@ -11,7 +11,6 @@ uniform mat4 proj;
 varying vec3 worldNormal;
 
 void main(void) {
-    worldNormal = gl_Normal;
+    worldNormal = vec3(model * vec4(gl_Normal, 0));
     gl_Position = proj * view * model * gl_Vertex;
-  //gl_Position = gl_Vertex * proj * view;
 }

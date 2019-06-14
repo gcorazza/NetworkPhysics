@@ -41,18 +41,18 @@ public class NetworkedPhysicsObjectDto {
     }
 
     public RigidBody getRigidBody() {
-        CollisionShape groundShape;
-        switch (shape) {
+        CollisionShape shape;
+        switch (this.shape) {
             case PLANE: {
-                groundShape = new StaticPlaneShape(new Vector3f(a, b, c), 0.25f /* m */);
+                shape = new StaticPlaneShape(new Vector3f(a, b, c), 0.25f /* m */);
                 break;
             }
             case CUBE: {
-                groundShape = new BoxShape(new Vector3f(a, b, c));
+                shape = new BoxShape(new Vector3f(a, b, c));
                 break;
             }
             case SPHERE: {
-                groundShape = new SphereShape(a);
+                shape = new SphereShape(a);
                 break;
             }
             default:
@@ -64,10 +64,14 @@ public class NetworkedPhysicsObjectDto {
         transform.origin.set(position);
         transform.setRotation(rotation);
         MotionState groundMotionState = new DefaultMotionState(transform);
-        RigidBodyConstructionInfo bodyConstructionInfo = new RigidBodyConstructionInfo(mass, groundMotionState, groundShape, new javax.vecmath.Vector3f(0, 0, 0));
-        bodyConstructionInfo.restitution = restitution;
-        bodyConstructionInfo.friction = friction;
+        Vector3f localInertia = new Vector3f(0, 0, 0);
+        shape.calculateLocalInertia(mass, localInertia);
+        RigidBodyConstructionInfo bodyConstructionInfo = new RigidBodyConstructionInfo(mass, groundMotionState, shape, localInertia);
         RigidBody rigidBody = new RigidBody(bodyConstructionInfo);
+        rigidBody.setRestitution(restitution);
+        rigidBody.setFriction(friction);
+        rigidBody.setDamping(0,0);
+
         return rigidBody;
     }
 

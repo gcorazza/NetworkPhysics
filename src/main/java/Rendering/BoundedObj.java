@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
 import static org.lwjgl.opengl.GL15.*;
 
@@ -20,13 +19,17 @@ public class BoundedObj {
     public final int vboIndices;
     public final int vboVert;
     public final Obj obj;
+    public final int faceIndicesCount;
 
     public BoundedObj(InputStream objInputStream) throws IOException {
         obj = ObjUtils.convertToRenderable(ObjReader.read(objInputStream));
+
         IntBuffer faceVertexIndices = ObjData.getFaceVertexIndices(obj);
         FloatBuffer vertices = ObjData.getVertices(obj);
-        FloatBuffer texCoords = ObjData.getTexCoords(obj, 2);
+        //FloatBuffer texCoords = ObjData.getTexCoords(obj, 2);
         FloatBuffer normals = ObjData.getNormals(obj);
+        faceIndicesCount = faceVertexIndices.capacity();
+//        FloatBuffer texCoords = ObjData.getTexCoords(obj, 2);
 
         vboVert = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboVert);

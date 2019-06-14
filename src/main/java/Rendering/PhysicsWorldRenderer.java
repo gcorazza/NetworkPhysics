@@ -56,10 +56,12 @@ public class PhysicsWorldRenderer {
     private GLFWCursorPosCallback mousePosCallback;
     private double camLookXRad;
     private double camLookYRad;
-    private Vector3f camPos = new Vector3f(0, 0, -10);
+    private Vector3f camPos = new Vector3f(0, 0, -20);
     private double camSensitivity = 200;
-    private float camSpeed = 0.05f;
+    private float camSpeed = 0.10f;
     private List<PhysicsWorldEntity> entities = new ArrayList<>();
+
+    private FPS fps= new FPS();
 
     public PhysicsWorldRenderer(NetworkedPhysics networkedPhysics) throws Exception {
         this.networkedPhysics = networkedPhysics;
@@ -86,8 +88,6 @@ public class PhysicsWorldRenderer {
     }
 
     private void init() throws Exception {
-
-
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
@@ -102,6 +102,7 @@ public class PhysicsWorldRenderer {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+        glfwWindowHint(GLFW_SAMPLES, 4);
 
         int WIDTH = 600;
         int HEIGHT = 600;
@@ -171,11 +172,12 @@ public class PhysicsWorldRenderer {
 
         GL.createCapabilities();
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
 
         debugProc = GLUtil.setupDebugMessageCallback();
 
         // Set the clear color
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(66f/255f, 134f/255f, 244f/255f,1f);
 
         shaderProgram = new ShaderProgram();
         shaderProgram.createVertexShader(Utils.loadResource("/vertex.vs"));
@@ -241,6 +243,7 @@ public class PhysicsWorldRenderer {
         glFlush ();
         entities.forEach(this::drawWorldEntity);
         glfwSwapBuffers(window);
+        fps.tick();
     }
 
     private void loop() {
@@ -263,14 +266,13 @@ public class PhysicsWorldRenderer {
         glVertexPointer(3, GL_FLOAT, 0, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
         glBindBuffer(GL_ARRAY_BUFFER, worldEntity.boundedObj.vboNormal);
         glNormalPointer(GL_FLOAT, 0, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldEntity.boundedObj.vboIndices);
-        int numFaces = worldEntity.boundedObj.obj.getNumFaces();
-        glDrawElements(GL_TRIANGLES, numFaces * 3, GL_UNSIGNED_INT, 0);
+        int faceIndicesCount = worldEntity.boundedObj.faceIndicesCount;
+        glDrawElements(GL_TRIANGLES, faceIndicesCount , GL_UNSIGNED_INT, 0);
     }
 
     private void setCamera() {
@@ -299,6 +301,7 @@ public class PhysicsWorldRenderer {
     }
 
     private void drawCoordinateSystem(){
+        glUniformMatrix4fv(uniformLocationModel, false, new Matrix4f().get(mat4Buffer));
         glColor3f(1.0f,0.0f,0.0f); // red x
         glBegin(GL_LINES);
         // x aix

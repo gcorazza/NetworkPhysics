@@ -26,7 +26,7 @@ public abstract class NetworkedPhysics {
     protected int frame;
 
     protected int port;
-    protected int stepsPerSecond = 2;
+    protected int stepsPerSecond = 60;
     protected long startTime;
     protected boolean running = false;
     protected UdpSocket connection;
@@ -40,7 +40,8 @@ public abstract class NetworkedPhysics {
     }
 
     protected int shouldBeInFrame() {
-        return (int) (((float) (System.currentTimeMillis() - startTime)) / 1000 * stepsPerSecond);
+        int i = (int) (((float) (System.currentTimeMillis() - startTime)) / 1000 * stepsPerSecond);
+        return i;
     }
 
     protected long timeForFrame(int frame) {
@@ -71,7 +72,7 @@ public abstract class NetworkedPhysics {
 
         int shouldBeInFrame = shouldBeInFrame();
 
-        for (int frame = 0; frame < shouldBeInFrame; frame++) {
+        while (this.frame < shouldBeInFrame) {
             step();
         }
     }
@@ -80,7 +81,7 @@ public abstract class NetworkedPhysics {
         processManipulations();
 
         inputs.values().forEach(in -> physicsListener.stepInput(world, objects, in));
-        world.stepSimulation(1000f / stepsPerSecond);
+        world.stepSimulation(1f / stepsPerSecond,0);
 
         frame++;
     }
