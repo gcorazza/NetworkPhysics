@@ -30,8 +30,5 @@ public abstract class PhysicsMessage {
         return packet;
     }
 
-    public Map<Integer, NetworkedPhysicsObject> getObjects(){
-        throw new UnsupportedOperationException();
-    }
 
 }

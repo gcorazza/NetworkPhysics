@@ -10,9 +10,9 @@ public class AddRigidBody extends WorldManipulation {
 
     private final NetworkedPhysicsObjectDto physicsObject;
 
-    public AddRigidBody(int frame, NetworkedPhysicsObjectDto rigidBody) {
+    public AddRigidBody(int frame, NetworkedPhysicsObjectDto physicsObjectDto) {
         super(frame);
-        this.physicsObject = rigidBody;
+        this.physicsObject = physicsObjectDto;
     }
 
     @Override

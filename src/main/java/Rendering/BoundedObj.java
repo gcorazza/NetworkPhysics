@@ -26,10 +26,10 @@ public class BoundedObj {
 
         IntBuffer faceVertexIndices = ObjData.getFaceVertexIndices(obj);
         FloatBuffer vertices = ObjData.getVertices(obj);
-        //FloatBuffer texCoords = ObjData.getTexCoords(obj, 2);
+        //FloatBuffer texCoords = ObjData.getTexCoords(objectMap, 2);
         FloatBuffer normals = ObjData.getNormals(obj);
         faceIndicesCount = faceVertexIndices.capacity();
-//        FloatBuffer texCoords = ObjData.getTexCoords(obj, 2);
+//        FloatBuffer texCoords = ObjData.getTexCoords(objectMap, 2);
 
         vboVert = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboVert);

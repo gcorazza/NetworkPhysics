@@ -4,6 +4,7 @@ import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.WorldState;
 import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,17 +22,18 @@ public class NetworkPhysicsWorld {
 
     public NetworkPhysicsWorld(NetworkPhysicsListener physicsListener) {
         this.physicsListener = physicsListener;
-        world= Util.getWorld();
-        startTime= System.currentTimeMillis();
+        world = Util.getWorld();
+        startTime = System.currentTimeMillis();
     }
 
     public NetworkPhysicsWorld(WorldState worldState, NetworkPhysicsListener physicsListener) {
         this.physicsListener = physicsListener;
         world = Util.getWorld();
-        this.stepsPerSecond=worldState.stepsPerSecond;
-        startTime = System.currentTimeMillis()-worldState.timePassed;
+        this.stepsPerSecond = worldState.stepsPerSecond;
+        startTime = System.currentTimeMillis() - worldState.timePassed;
         frame = worldState.frame;
-        objects = worldState.getObjects();
+//        objects = worldState.getObjects();
+        ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).setRandSeed(worldState.btSeed);
     }
 
     protected int msPassedSiceStart() {
@@ -67,10 +69,10 @@ public class NetworkPhysicsWorld {
 
     public void step(List<WorldManipulation> worldManipulations) {
         if (worldManipulations != null) {
-            worldManipulations.forEach( wm -> wm.manipulate(this));
+            worldManipulations.forEach(wm -> wm.manipulate(this));
         }
         inputs.values().forEach(in -> physicsListener.stepInput(world, objects, in));
-        world.stepSimulation(1f / stepsPerSecond,0);
+        world.stepSimulation(1f / stepsPerSecond, 0);
 
         frame++;
     }
@@ -105,5 +107,25 @@ public class NetworkPhysicsWorld {
             physicsListener.newInput(input);
         }
         inputs.put(input.id, input);
+    }
+
+    public WorldState getState() {
+        WorldState worldState = new WorldState();
+        worldState.stepsPerSecond = stepsPerSecond;
+        worldState.timePassed = (int) (System.currentTimeMillis() - startTime);
+        worldState.frame = frame;
+        worldState.btSeed = ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).getRandSeed();
+        Map<Integer, NetworkedPhysicsObject> objectsCopy = new HashMap<>();
+        objects.values().forEach(npo -> {
+                    objectsCopy.put(npo.id,new NetworkedPhysicsObject(npo.bodyToDto()));
+                }
+        );
+        worldState.objectMap = objectsCopy;
+        Map<Integer, PhysicsInput> inputsCopy= new HashMap<>();
+        inputs.values().forEach(in -> {
+            inputsCopy.put(in.id,in.copy());
+        });
+        worldState.inputs=inputsCopy;
+        return worldState;
     }
 }

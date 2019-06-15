@@ -74,7 +74,7 @@ public abstract class NetworkedPhysics {
 
 
     public WorldState getWorldState() {
-        return null;
+        return networkWorld.getState();
     }
 
 

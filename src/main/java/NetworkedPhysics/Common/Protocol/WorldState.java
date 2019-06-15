@@ -2,9 +2,13 @@ package NetworkedPhysics.Common.Protocol;
 
 import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import com.google.gson.Gson;
+
+import java.util.Map;
 
 public class WorldState extends PhysicsMessage {
     public static final byte COMMANDID=0;
@@ -12,6 +16,8 @@ public class WorldState extends PhysicsMessage {
     public int stepsPerSecond;
     public int frame;
     public long btSeed;
+    public Map<Integer, NetworkedPhysicsObject> objectMap;
+    public Map<Integer, PhysicsInput> inputs;
 
     @Override
     public byte[] toBlob() {

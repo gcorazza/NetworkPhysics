@@ -1,6 +1,7 @@
 package NetworkedPhysics.Common.Protocol.Dto;
 
 import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.ObjectState;
 import NetworkedPhysics.Common.Protocol.Shape;
 import NetworkedPhysics.Network.UdpConnection;
 import com.bulletphysics.collision.shapes.BoxShape;
@@ -23,11 +24,9 @@ public class NetworkedPhysicsObjectDto {
     public final float mass; //if mass = 0 -> is static
     public final float friction;
     public final float restitution;
+    private ObjectState objectState;
 
-    private Vector3f position;
-    private Quat4f rotation;
-
-    public NetworkedPhysicsObjectDto(int id, Shape shape, float a, float b, float c, float mass, float friction, float restitution, Vector3f position, Quat4f rotation) {
+    public NetworkedPhysicsObjectDto(int id, Shape shape, float a, float b, float c, float mass, float friction, float restitution, ObjectState objectState) {
         this.id = id;
         this.shape = shape;
         this.a = a;
@@ -36,8 +35,7 @@ public class NetworkedPhysicsObjectDto {
         this.mass = mass;
         this.friction = friction;
         this.restitution = restitution;
-        this.position = position;
-        this.rotation = rotation;
+        this.objectState = objectState;
     }
 
     public RigidBody getRigidBody() {
@@ -61,8 +59,8 @@ public class NetworkedPhysicsObjectDto {
 
         Transform transform = new Transform();
         transform.setIdentity();
-        transform.origin.set(position);
-        transform.setRotation(rotation);
+        transform.origin.set(objectState.getOrigin());
+        transform.setRotation(objectState.getRotation());
         MotionState groundMotionState = new DefaultMotionState(transform);
         Vector3f localInertia = new Vector3f(0, 0, 0);
         shape.calculateLocalInertia(mass, localInertia);
