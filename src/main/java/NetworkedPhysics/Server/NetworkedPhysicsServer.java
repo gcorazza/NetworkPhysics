@@ -30,6 +30,9 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
 
     @Override
     public void update() {
+        if (networkWorld.getFrame()==60*5){
+            rewindtoLastState();
+        }
         stepToActualFrame();
     }
 

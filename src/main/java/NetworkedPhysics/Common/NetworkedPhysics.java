@@ -22,6 +22,7 @@ public abstract class NetworkedPhysics {
     protected int port;
     protected boolean running = false;
     protected UdpSocket connection;
+    private WorldState lastWorldState;
 
     public NetworkedPhysics(NetworkPhysicsListener updateInputs) {
         this.physicsListener = updateInputs;
@@ -63,15 +64,13 @@ public abstract class NetworkedPhysics {
         connection.shutdown();
     }
 
-    private void rewind(int toFrame) {
-        int lfs=findLastFullSyncFrom(toFrame);
-
+    public void rewindtoLastState() {
+        if (lastWorldState==null){
+            networkWorld= new NetworkPhysicsWorld(physicsListener);
+        }else{
+            networkWorld= new NetworkPhysicsWorld(lastWorldState,physicsListener);
+        }
     }
-
-    private int findLastFullSyncFrom(int toFrame) {
-        return 0;
-    }
-
 
     public WorldState getWorldState() {
         return networkWorld.getState();

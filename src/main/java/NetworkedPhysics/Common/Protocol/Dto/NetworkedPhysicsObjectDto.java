@@ -24,7 +24,7 @@ public class NetworkedPhysicsObjectDto {
     public final float mass; //if mass = 0 -> is static
     public final float friction;
     public final float restitution;
-    private ObjectState objectState;
+    public ObjectState objectState;
 
     public NetworkedPhysicsObjectDto(int id, Shape shape, float a, float b, float c, float mass, float friction, float restitution, ObjectState objectState) {
         this.id = id;
