@@ -8,6 +8,8 @@ import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.IncomingPacketHandlerServer;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
+import io.netty.util.concurrent.Future;
+
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +71,7 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
         }
     }
 
-    public void shutDown() {
-        connection.shutdown();
+    public Future<?> shutDown() {
+        return connection.shutdown();
     }
 }
