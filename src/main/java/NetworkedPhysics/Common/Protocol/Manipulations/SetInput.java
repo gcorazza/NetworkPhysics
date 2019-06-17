@@ -1,7 +1,7 @@
 package NetworkedPhysics.Common.Protocol.Manipulations;
 
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
-import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Network.UdpConnection;
@@ -30,8 +30,8 @@ public class SetInput extends WorldManipulation{
     }
 
     @Override
-    public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
-        networkedPhysics.addManipulation(this);
+    public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
+        rewindablePhysicsWorld.addManipulation(this);
     }
 
     @Override

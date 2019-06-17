@@ -1,7 +1,7 @@
 package game;
 
 import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
-import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.ObjectState;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.Shape;
@@ -19,12 +19,12 @@ public class GameServer {
     public GameServer(int port) throws Exception {
         networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
             @Override
-            public void newObject(NetworkedPhysicsObject networkedPhysicsObject) {
-                physicsWorldRenderer.newObject(networkedPhysicsObject);
-                if (networkedPhysicsObject.getBody().isStaticObject())
+            public void newObject(PhysicsObject physicsObject) {
+                physicsWorldRenderer.newObject(physicsObject);
+                if (physicsObject.getBody().isStaticObject())
                     return;
-                networkedPhysicsObject.getBody().setLinearVelocity(new Vector3f(-1,0,-1));
-                networkedPhysicsObject.getBody().setAngularVelocity(new Vector3f(1,5,1));
+                physicsObject.getBody().setLinearVelocity(new Vector3f(-1,0,-1));
+                physicsObject.getBody().setAngularVelocity(new Vector3f(1,5,1));
             }
         });
         Quat4f rotation = new Quat4f(0, 0, 0, 10);
@@ -48,6 +48,7 @@ public class GameServer {
 
     private void run() {
         physicsWorldRenderer.run();
+        networkedPhysicsServer.shutDown();
     }
 
 }

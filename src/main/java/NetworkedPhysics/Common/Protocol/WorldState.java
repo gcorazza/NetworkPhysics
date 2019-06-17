@@ -1,11 +1,10 @@
 package NetworkedPhysics.Common.Protocol;
 
 import NetworkedPhysics.Client.NetworkedPhysicsClient;
-import NetworkedPhysics.Common.NetworkedPhysics;
-import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
+import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Network.UdpConnection;
-import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import com.google.gson.Gson;
 
 import java.util.Map;
@@ -16,7 +15,7 @@ public class WorldState extends PhysicsMessage {
     public int stepsPerSecond;
     public int frame;
     public long btSeed;
-    public Map<Integer, NetworkedPhysicsObject> objectMap;
+    public Map<Integer, PhysicsObject> objectMap;
     public Map<Integer, PhysicsInput> inputs;
 
     @Override
@@ -32,8 +31,8 @@ public class WorldState extends PhysicsMessage {
     }
 
     @Override
-    public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
-        ((NetworkedPhysicsClient) networkedPhysics).init(timePassed, stepsPerSecond);
+    public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
+        ((NetworkedPhysicsClient) rewindablePhysicsWorld).init(timePassed, stepsPerSecond);
     }
 
     @Override

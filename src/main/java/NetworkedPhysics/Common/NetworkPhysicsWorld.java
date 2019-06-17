@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class NetworkPhysicsWorld {
     protected DiscreteDynamicsWorld world;
-    Map<Integer, NetworkedPhysicsObject> objects = new HashMap<>();
+    Map<Integer, PhysicsObject> objects = new HashMap<>();
     Map<Integer, PhysicsInput> inputs = new HashMap<>();
     protected int frame;
     protected int stepsPerSecond = 60;
@@ -79,7 +79,7 @@ public class NetworkPhysicsWorld {
 
 
     public void addRigidBody(NetworkedPhysicsObjectDto objectDto) {
-        NetworkedPhysicsObject physicsObject = new NetworkedPhysicsObject(objectDto);
+        PhysicsObject physicsObject = new PhysicsObject(objectDto);
         objects.put(objectDto.getId(), physicsObject);
         world.addRigidBody(physicsObject.getBody());
         physicsListener.newObject(physicsObject);
@@ -115,9 +115,9 @@ public class NetworkPhysicsWorld {
         worldState.timePassed = (int) (System.currentTimeMillis() - startTime);
         worldState.frame = frame;
         worldState.btSeed = ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).getRandSeed();
-        Map<Integer, NetworkedPhysicsObject> objectsCopy = new HashMap<>();
+        Map<Integer, PhysicsObject> objectsCopy = new HashMap<>();
         objects.values().forEach(npo -> {
-                    objectsCopy.put(npo.id,new NetworkedPhysicsObject(npo.bodyToDto()));
+                    objectsCopy.put(npo.id,new PhysicsObject(npo.bodyToDto()));
                 }
         );
         worldState.objectMap = objectsCopy;

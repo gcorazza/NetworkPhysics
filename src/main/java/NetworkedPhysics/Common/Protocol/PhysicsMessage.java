@@ -1,10 +1,7 @@
 package NetworkedPhysics.Common.Protocol;
 
-import NetworkedPhysics.Common.NetworkedPhysics;
-import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Network.UdpConnection;
-
-import java.util.Map;
 
 public abstract class PhysicsMessage {
 
@@ -18,7 +15,7 @@ public abstract class PhysicsMessage {
 
     public abstract byte[] toBlob();
     public abstract PhysicsMessage fromBlob(byte[] blob);
-    public abstract void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from);
+    public abstract void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from);
 
     public abstract byte getCommandID();
 

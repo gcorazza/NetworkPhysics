@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NetworkedPhysics {
+public class RewindablePhysicsWorld {
 
 
     private final NetworkPhysicsListener physicsListener;
@@ -23,13 +23,18 @@ public class NetworkedPhysics {
 
     protected int port;
     protected boolean running = false;
-    protected UdpSocket connection;
+    //protected UdpSocket connection;
     protected WorldState lastWorldState;
 
-    public NetworkedPhysics(NetworkPhysicsListener updateInputs) {
+    public RewindablePhysicsWorld(NetworkPhysicsListener updateInputs) {
         this.physicsListener = updateInputs;
+        networkWorld= new NetworkPhysicsWorld(updateInputs);
     }
 
+    public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener, WorldState worldState) {
+        this.physicsListener = physicsListener;
+        networkWorld = new NetworkPhysicsWorld(worldState, physicsListener);
+    }
 
     public void stepToActualFrame() {
         int shouldBeInFrame = networkWorld.shouldBeInFrame();
@@ -66,14 +71,14 @@ public class NetworkedPhysics {
 //        connection.send(message,udpConnection.inetSocketAddress);
 //    }
 
-    public void sendTo(UdpConnection receiver, PhysicsMessage message) {
-        message.stamp = receiver.nextStamp();
-        connection.send(message, receiver.inetSocketAddress);
-    }
-
-    public void shutDown() {
-        connection.shutdown();
-    }
+//    public void sendToServer(UdpConnection receiver, PhysicsMessage message) {
+//        message.stamp = receiver.nextStamp();
+//        connection.send(message, receiver.inetSocketAddress);
+//    }
+//
+//    public void shutDown() {
+//        connection.shutdown();
+//    }
 
     protected void rewindToLastState() {
         if (lastWorldState==null){
@@ -89,7 +94,7 @@ public class NetworkedPhysics {
     }
 
 
-    public Map<Integer, NetworkedPhysicsObject> getObjects() {
+    public Map<Integer, PhysicsObject> getObjects() {
         return networkWorld.objects;
     }
 }

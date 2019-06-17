@@ -1,7 +1,7 @@
 package NetworkedPhysics.Common.Protocol.Manipulations;
 
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
-import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.UdpConnection;
 import com.google.gson.Gson;
@@ -31,8 +31,8 @@ public class AddRigidBody extends WorldManipulation {
     }
 
     @Override
-    public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
-        networkedPhysics.addManipulation(this);
+    public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
+        rewindablePhysicsWorld.addManipulation(this);
     }
 
     @Override

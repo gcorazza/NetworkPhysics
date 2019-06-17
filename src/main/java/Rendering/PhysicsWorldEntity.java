@@ -1,6 +1,6 @@
 package Rendering;
 
-import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import com.bulletphysics.linearmath.Transform;
 import org.joml.Matrix4f;
@@ -10,10 +10,10 @@ public class PhysicsWorldEntity {
 
     public final BoundedObj boundedObj;
     private Vector3f scale;
-    private NetworkedPhysics.Common.NetworkedPhysicsObject physicsObject;
+    private PhysicsObject physicsObject;
     private ShaderProgram shader;
 
-    public PhysicsWorldEntity(NetworkedPhysicsObject physicsObject, ShaderProgram shader) {
+    public PhysicsWorldEntity(PhysicsObject physicsObject, ShaderProgram shader) {
         this.physicsObject = physicsObject;
         this.shader = shader;
         NetworkedPhysicsObjectDto physicsObjectDto = physicsObject.getDto();

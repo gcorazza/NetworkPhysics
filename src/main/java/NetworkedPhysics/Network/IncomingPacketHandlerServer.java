@@ -29,7 +29,7 @@ public class IncomingPacketHandlerServer extends IncomingPacketHandler {
         if (udpConnection == null) {
             udpConnection = new UdpConnection(inetSocketAddress);
             clients.put(udpConnection.inetSocketAddress, udpConnection);
-            ((NetworkedPhysicsServer) networkedPhysics).newUDPClient(udpConnection);
+            ((NetworkedPhysicsServer) rewindablePhysicsWorld).newUDPClient(udpConnection);
         }
 
         udpConnection.updateTimeout(System.currentTimeMillis());

@@ -1,6 +1,6 @@
-//package NetworkedPhysics.Common.Protocol.Manipulations;
+//package RewindablePhysicsWorld.Common.Protocol.Manipulations;
 //
-//import NetworkedPhysics.Common.NetworkedPhysics;
+//import RewindablePhysicsWorld.Common.RewindablePhysicsWorld;
 //
 //public class Wind extends WorldManipulation {
 //
@@ -9,7 +9,7 @@
 //    }
 //
 //    @Override
-//    public void manipulate(NetworkedPhysics networkedPhysics) {
+//    public void manipulate(RewindablePhysicsWorld rewindablePhysicsWorld) {
 //
 //    }
 //}

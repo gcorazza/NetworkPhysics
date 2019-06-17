@@ -5,8 +5,7 @@ import NetworkedPhysics.Common.Protocol.ClientInput;
 import NetworkedPhysics.Common.Protocol.GetWorldState;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.NetworkPhysicsListener;
-import NetworkedPhysics.Common.NetworkedPhysics;
-import NetworkedPhysics.Common.Util;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.IncommingPacketHandlerClient;
 import NetworkedPhysics.Network.UdpConnection;
@@ -15,9 +14,10 @@ import NetworkedPhysics.Network.UdpSocket;
 import java.net.InetSocketAddress;
 
 
-public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable{
+public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable{
 
     private UdpConnection serverConnection;
+    private UdpSocket connection;
 
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
         super(updateInputsCallback);
@@ -37,7 +37,7 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
     }
 
     public void sendMyInput(PhysicsInput myInput) {
-        sendTo(new ClientInput(myInput));
+        sendToServer(new ClientInput(myInput));
     }
 
     public void run() {
@@ -52,7 +52,12 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
     }
 
-    public void sendTo(PhysicsMessage physicsMessage) {
+    public void sendTo(UdpConnection receiver, PhysicsMessage message) {
+        message.stamp = receiver.nextStamp();
+        connection.send(message, receiver.inetSocketAddress);
+    }
+
+    public void sendToServer(PhysicsMessage physicsMessage) {
         sendTo(serverConnection, physicsMessage);
     }
 

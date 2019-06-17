@@ -8,12 +8,12 @@ import com.bulletphysics.linearmath.Transform;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
-public class NetworkedPhysicsObject {
+public class PhysicsObject {
     NetworkedPhysicsObjectDto dto;
     RigidBody body;
     public final int id;
 
-    public NetworkedPhysicsObject(NetworkedPhysicsObjectDto dto) {
+    public PhysicsObject(NetworkedPhysicsObjectDto dto) {
         this.dto = dto;
         body= dto.getRigidBody();
         id= dto.id;

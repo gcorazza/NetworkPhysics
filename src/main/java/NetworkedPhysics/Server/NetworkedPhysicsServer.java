@@ -14,13 +14,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable {
+public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Runnable {
 
-    Map<InetSocketAddress, UdpConnection> clients= new HashMap<>();
+    Map<InetSocketAddress, UdpConnection> clients = new HashMap<>();
+    private UdpSocket connection;
 
     public NetworkedPhysicsServer(int port, NetworkPhysicsListener networkPhysicsListener) {
         super(networkPhysicsListener);
-        this.networkWorld = new NetworkPhysicsWorld(networkPhysicsListener);
         connection= new UdpSocket(port, new IncomingPacketHandlerServer(this));
     }
 
@@ -69,4 +69,7 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
         }
     }
 
+    public void shutDown() {
+        connection.shutdown();
+    }
 }

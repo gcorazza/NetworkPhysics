@@ -1,6 +1,6 @@
 package NetworkedPhysics.Network;
 
-import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Protocol.Protocol;
 import io.netty.buffer.ByteBuf;
@@ -13,10 +13,10 @@ import java.util.Map;
 public abstract class IncomingPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     private static final Map<Byte, Class<? extends PhysicsMessage>> commandMap = Protocol.protocol;
-    protected final NetworkedPhysics networkedPhysics;
+    protected final RewindablePhysicsWorld rewindablePhysicsWorld;
 
-    protected IncomingPacketHandler(NetworkedPhysics networkedPhysics) {
-        this.networkedPhysics = networkedPhysics;
+    protected IncomingPacketHandler(RewindablePhysicsWorld rewindablePhysicsWorld) {
+        this.rewindablePhysicsWorld = rewindablePhysicsWorld;
     }
 
 
@@ -44,7 +44,7 @@ public abstract class IncomingPacketHandler extends SimpleChannelInboundHandler<
                     .getConstructor(int.class)
                     .newInstance(0)))
                     .fromBlob(packetObject);
-            instance.processMessage(networkedPhysics,udpConnection);
+            instance.processMessage(rewindablePhysicsWorld,udpConnection);
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

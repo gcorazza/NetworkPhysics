@@ -4,8 +4,8 @@
  */
 package Rendering;
 
-import NetworkedPhysics.Common.NetworkedPhysics;
-import NetworkedPhysics.Common.NetworkedPhysicsObject;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
+import NetworkedPhysics.Common.PhysicsObject;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -23,7 +23,6 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class PhysicsWorldRenderer {
@@ -38,7 +37,7 @@ public class PhysicsWorldRenderer {
     private long window;
     private int width, height;
 
-    private NetworkedPhysics networkedPhysics;
+    private RewindablePhysicsWorld rewindablePhysicsWorld;
     private ShaderProgram shaderProgram;
     private Matrix4f cam = new Matrix4f();
     private boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
@@ -63,8 +62,8 @@ public class PhysicsWorldRenderer {
 
     private FPS fps= new FPS();
 
-    public PhysicsWorldRenderer(NetworkedPhysics networkedPhysics) throws Exception {
-        this.networkedPhysics = networkedPhysics;
+    public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
+        this.rewindablePhysicsWorld = rewindablePhysicsWorld;
         init();
         syncObjects();
     }
@@ -83,7 +82,6 @@ public class PhysicsWorldRenderer {
             // Terminate GLFW and release the GLFWerrorfun
             glfwTerminate();
             errorCallback.free();
-            networkedPhysics.shutDown();
         }
     }
 
@@ -252,7 +250,7 @@ public class PhysicsWorldRenderer {
             updateControlls();
             setCamera();
             renderAFrame();
-            networkedPhysics.update();
+            rewindablePhysicsWorld.update();
         }
     }
 
@@ -288,14 +286,14 @@ public class PhysicsWorldRenderer {
         glUniformMatrix4fv(uniformLocationProjection, false, perspective.get(mat4Buffer));
     }
 
-    public void newObject(NetworkedPhysicsObject physicsObject) {
+    public void newObject(PhysicsObject physicsObject) {
         PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(physicsObject, shaderProgram);
         entities.add(physicsWorldEntity);
     }
 
 
     public void syncObjects(){
-        Collection<NetworkedPhysicsObject> objects = networkedPhysics.getObjects().values();
+        Collection<PhysicsObject> objects = rewindablePhysicsWorld.getObjects().values();
         entities.removeAll(entities);
         objects.forEach( physicsObject -> entities.add(new PhysicsWorldEntity(physicsObject, shaderProgram)));
     }

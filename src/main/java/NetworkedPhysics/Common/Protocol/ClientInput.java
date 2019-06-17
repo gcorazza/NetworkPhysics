@@ -1,6 +1,6 @@
 package NetworkedPhysics.Common.Protocol;
 
-import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
@@ -24,8 +24,8 @@ public class ClientInput extends PhysicsMessage {
     }
 
     @Override
-    public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
-        ((NetworkedPhysicsServer) networkedPhysics).setClientInput(clientInput);
+    public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
+        ((NetworkedPhysicsServer) rewindablePhysicsWorld).setClientInput(clientInput);
     }
 
     @Override

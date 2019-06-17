@@ -1,6 +1,7 @@
 package NetworkedPhysics.Common.Protocol;
 
-import NetworkedPhysics.Common.NetworkedPhysics;
+import NetworkedPhysics.Client.NetworkedPhysicsClient;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 
@@ -21,8 +22,8 @@ public class GetWorldState extends PhysicsMessage{
     }
 
     @Override
-    public void processMessage(NetworkedPhysics networkedPhysics, UdpConnection from) {
-        networkedPhysics.sendTo(from, networkedPhysics.getWorldState());
+    public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
+        ((NetworkedPhysicsClient) rewindablePhysicsWorld).sendTo(from, rewindablePhysicsWorld.getWorldState());
     }
 
     @Override

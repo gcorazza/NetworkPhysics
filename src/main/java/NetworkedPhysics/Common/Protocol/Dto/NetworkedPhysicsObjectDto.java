@@ -1,9 +1,7 @@
 package NetworkedPhysics.Common.Protocol.Dto;
 
-import NetworkedPhysics.Common.NetworkedPhysics;
 import NetworkedPhysics.Common.ObjectState;
 import NetworkedPhysics.Common.Protocol.Shape;
-import NetworkedPhysics.Network.UdpConnection;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.SphereShape;
@@ -14,11 +12,10 @@ import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 public class NetworkedPhysicsObjectDto {
-    public final int id;
+    public int id;
     public final Shape shape;
     public final float a, b, c;
     public final float mass; //if mass = 0 -> is static
@@ -40,6 +37,10 @@ public class NetworkedPhysicsObjectDto {
 
     public NetworkedPhysicsObjectDto(int id, Shape shape, float a, float b, float c, ObjectState objectState) {
         this(id,shape,a,b,c,1,0.5f,0.5f, objectState);
+    }
+
+    public NetworkedPhysicsObjectDto(Shape shape, float a, float b, float c, ObjectState objectState){
+        this(0,shape,a,b,c,objectState);
     }
 
     public RigidBody getRigidBody() {
