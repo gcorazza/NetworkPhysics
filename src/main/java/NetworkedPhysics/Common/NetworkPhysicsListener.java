@@ -10,6 +10,6 @@ public interface NetworkPhysicsListener {
     public void deleteObject(int id);
     public void newInput(PhysicsInput input);
     public void deleteInput(int id);
-
     public void stepInput(DiscreteDynamicsWorld world, Map<Integer, NetworkedPhysicsObject> objects, PhysicsInput in);
+    public void rewinded();
 }

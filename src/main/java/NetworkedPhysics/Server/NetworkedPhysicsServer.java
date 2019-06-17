@@ -28,14 +28,6 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
         return clients;
     }
 
-    @Override
-    public void update() {
-        if (networkWorld.getFrame()==60*5){
-            rewindtoLastState();
-        }
-        stepToActualFrame();
-    }
-
     public int getStepsPerSecond() {
         return networkWorld.getStepsPerSecond();
     }
@@ -63,7 +55,7 @@ public class NetworkedPhysicsServer extends NetworkedPhysics implements Runnable
         //sync with all
     }
 
-    public void addNetworkedPhysicsObject(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
+    public void addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
         AddRigidBody message = new AddRigidBody(networkWorld.getFrame() + 1, networkedPhysicsObjectDto);
         sendToAll(message);
         addManipulation(message);

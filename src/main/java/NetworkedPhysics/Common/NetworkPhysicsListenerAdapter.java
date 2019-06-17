@@ -30,4 +30,10 @@ public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     public void stepInput(DiscreteDynamicsWorld world, Map<Integer, NetworkedPhysicsObject> objects, PhysicsInput in) {
 
     }
+
+    @Override
+    public void rewinded() {
+
+    }
+
 }

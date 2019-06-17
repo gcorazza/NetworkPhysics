@@ -1,5 +1,7 @@
 package NetworkedPhysics.Common;
 
+import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Protocol.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Protocol.WorldState;
@@ -11,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class NetworkedPhysics {
+public class NetworkedPhysics {
 
 
     private final NetworkPhysicsListener physicsListener;
@@ -22,15 +24,14 @@ public abstract class NetworkedPhysics {
     protected int port;
     protected boolean running = false;
     protected UdpSocket connection;
-    private WorldState lastWorldState;
+    protected WorldState lastWorldState;
 
     public NetworkedPhysics(NetworkPhysicsListener updateInputs) {
         this.physicsListener = updateInputs;
     }
 
 
-    protected void stepToActualFrame() {
-
+    public void stepToActualFrame() {
         int shouldBeInFrame = networkWorld.shouldBeInFrame();
 
         while (networkWorld.getFrame() < shouldBeInFrame) {
@@ -38,17 +39,27 @@ public abstract class NetworkedPhysics {
         }
     }
 
+    public void step(){
+        networkWorld.step(manipulations.get(networkWorld.getFrame()));
+    }
+
     public void addManipulation(WorldManipulation worldManipulation) {
         List<WorldManipulation> stepManipulations = manipulations.computeIfAbsent(worldManipulation.frame, k -> new ArrayList<>());
         stepManipulations.add(worldManipulation);
     }
 
+    public void addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
+        AddRigidBody message = new AddRigidBody(networkWorld.getFrame() + 1, networkedPhysicsObjectDto);
+        addManipulation(message);
+    }
 
     public boolean isRunning() {
         return running;
     }
 
-    public abstract void update();
+    public void update() {
+        stepToActualFrame();
+    }
 
 //    public void send(PhysicsMessage message, UdpConnection udpConnection){
 //        udpConnection.incrementMessageStamp();
@@ -64,12 +75,13 @@ public abstract class NetworkedPhysics {
         connection.shutdown();
     }
 
-    public void rewindtoLastState() {
+    protected void rewindToLastState() {
         if (lastWorldState==null){
             networkWorld= new NetworkPhysicsWorld(physicsListener);
         }else{
             networkWorld= new NetworkPhysicsWorld(lastWorldState,physicsListener);
         }
+        physicsListener.rewinded();
     }
 
     public WorldState getWorldState() {

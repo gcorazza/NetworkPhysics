@@ -38,6 +38,10 @@ public class NetworkedPhysicsObjectDto {
         this.objectState = objectState;
     }
 
+    public NetworkedPhysicsObjectDto(int id, Shape shape, float a, float b, float c, ObjectState objectState) {
+        this(id,shape,a,b,c,1,0.5f,0.5f, objectState);
+    }
+
     public RigidBody getRigidBody() {
         CollisionShape shape;
         switch (this.shape) {

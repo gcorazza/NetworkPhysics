@@ -9,6 +9,13 @@ public class ObjectState {
     private Vector3f angularVelocity;
     private Vector3f linearVelocity;
 
+    public ObjectState() {
+        origin= new Vector3f();
+        rotation= new Quat4f(0,0,0,1);
+        angularVelocity= new Vector3f();
+        linearVelocity= new Vector3f();
+    }
+
     public ObjectState(Vector3f origin, Quat4f rotation, Vector3f angularVelocity, Vector3f linearVelocity) {
         this.origin = origin;
         this.rotation = rotation;

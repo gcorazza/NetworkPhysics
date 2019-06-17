@@ -36,9 +36,9 @@ public class GameServer {
         NetworkedPhysicsObjectDto cube2= new NetworkedPhysicsObjectDto(0, Shape.CUBE, 0.5f,1,1,2,1.5f,0f, objectStateCube);
         NetworkedPhysicsObjectDto plane = new NetworkedPhysicsObjectDto(1, Shape.PLANE, 0, 1, 0, 0, 0.5f, 0.5f, objectStatePlane);
 
-        networkedPhysicsServer.addNetworkedPhysicsObject(cube);
-        networkedPhysicsServer.addNetworkedPhysicsObject(cube2);
-        networkedPhysicsServer.addNetworkedPhysicsObject(plane);
+        networkedPhysicsServer.addNetworkedPhysicsObjectNow(cube);
+        networkedPhysicsServer.addNetworkedPhysicsObjectNow(cube2);
+        networkedPhysicsServer.addNetworkedPhysicsObjectNow(plane);
         physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsServer);
     }
 

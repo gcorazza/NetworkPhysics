@@ -52,11 +52,6 @@ public class NetworkedPhysicsClient extends NetworkedPhysics implements Runnable
 
     }
 
-    @Override
-    public void update() {
-        stepToActualFrame();
-    }
-
     public void sendTo(PhysicsMessage physicsMessage) {
         sendTo(serverConnection, physicsMessage);
     }
