@@ -1,8 +1,8 @@
 package game;
 
 import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
-import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.ObjectState;
+import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.Shape;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
@@ -19,7 +19,8 @@ public class GameServer {
     public GameServer(int port) throws Exception {
         networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
             @Override
-            public void newObject(PhysicsObject physicsObject) {
+            public void newObject(int physicsObjectId) {
+                PhysicsObject physicsObject= networkedPhysicsServer.getObject(physicsObjectId);
                 physicsWorldRenderer.newObject(physicsObject);
                 if (physicsObject.getBody().isStaticObject())
                     return;

@@ -4,9 +4,12 @@ import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.Util;
 import NetworkedPhysics.Network.UdpConnection;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.SerializationUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class WorldState extends PhysicsMessage {
@@ -20,14 +23,12 @@ public class WorldState extends PhysicsMessage {
 
     @Override
     public byte[] toBlob() {
-        Gson gson = new Gson();
-        return gson.toJson(this).getBytes();
+        return Util.gson.toJson(this).getBytes();
     }
 
     @Override
     public WorldState fromBlob(byte[] blob) {
-        Gson gson = new Gson();
-        return gson.fromJson(new String(blob), WorldState.class);
+        return Util.gson.fromJson(new String(blob), WorldState.class);
     }
 
     @Override
@@ -38,5 +39,21 @@ public class WorldState extends PhysicsMessage {
     @Override
     public byte getCommandID() {
         return COMMANDID;
+    }
+
+    public Map<Integer, PhysicsObject> getObjectsCopy() {
+        Map<Integer, PhysicsObject> copy = new HashMap<>();
+        objectMap.values().forEach(o -> {
+            copy.put(o.id, SerializationUtils.clone(o));
+        });
+        return copy;
+    }
+
+    public Map<Integer, PhysicsInput> getInputsCopy() {
+        Map<Integer, PhysicsInput> copy = new HashMap<>();
+        inputs.values().forEach(i -> {
+            copy.put(i.id, SerializationUtils.clone(i));
+        });
+        return copy;
     }
 }

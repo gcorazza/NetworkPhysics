@@ -13,8 +13,9 @@ import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 
 import javax.vecmath.Vector3f;
+import java.io.Serializable;
 
-public class NetworkedPhysicsObjectDto {
+public class NetworkedPhysicsObjectDto implements Serializable {
     public int id;
     public final Shape shape;
     public final float a, b, c;
@@ -36,11 +37,11 @@ public class NetworkedPhysicsObjectDto {
     }
 
     public NetworkedPhysicsObjectDto(int id, Shape shape, float a, float b, float c, ObjectState objectState) {
-        this(id,shape,a,b,c,1,0.5f,0.5f, objectState);
+        this(id, shape, a, b, c, 1, 0.5f, 0.5f, objectState);
     }
 
-    public NetworkedPhysicsObjectDto(Shape shape, float a, float b, float c, ObjectState objectState){
-        this(0,shape,a,b,c,objectState);
+    public NetworkedPhysicsObjectDto(Shape shape, float a, float b, float c, ObjectState objectState) {
+        this(0, shape, a, b, c, objectState);
     }
 
     public RigidBody getRigidBody() {
@@ -73,8 +74,9 @@ public class NetworkedPhysicsObjectDto {
         RigidBody rigidBody = new RigidBody(bodyConstructionInfo);
         rigidBody.setRestitution(restitution);
         rigidBody.setFriction(friction);
-        rigidBody.setDamping(0,0);
-
+        rigidBody.setDamping(0, 0);
+        rigidBody.setLinearVelocity(objectState.getLinearVelocity());
+        rigidBody.setAngularVelocity(objectState.getAngularVelocity());
         return rigidBody;
     }
 

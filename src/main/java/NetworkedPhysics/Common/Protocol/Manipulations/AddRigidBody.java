@@ -3,6 +3,7 @@ package NetworkedPhysics.Common.Protocol.Manipulations;
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Util;
 import NetworkedPhysics.Network.UdpConnection;
 import com.google.gson.Gson;
 
@@ -22,7 +23,7 @@ public class AddRigidBody extends WorldManipulation {
 
     @Override
     public byte[] toBlob() {
-        return new Gson().toJson(this).getBytes();
+        return Util.gson.toJson(this).getBytes();
     }
 
     @Override

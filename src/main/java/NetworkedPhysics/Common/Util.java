@@ -5,6 +5,8 @@ import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javax.vecmath.Vector3f;
 
@@ -24,5 +26,6 @@ public class Util {
 
         return dynamicWorld;
     }
-
+    public static Gson gson = new Gson();
+    public static Gson gsonPretty = new GsonBuilder().setPrettyPrinting().create();
 }

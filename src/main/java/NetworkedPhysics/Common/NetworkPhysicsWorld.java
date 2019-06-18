@@ -5,12 +5,14 @@ import NetworkedPhysics.Common.Protocol.WorldState;
 import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class NetworkPhysicsWorld {
+
     protected DiscreteDynamicsWorld world;
     Map<Integer, PhysicsObject> objects = new HashMap<>();
     Map<Integer, PhysicsInput> inputs = new HashMap<>();
@@ -32,8 +34,10 @@ public class NetworkPhysicsWorld {
         this.stepsPerSecond = worldState.stepsPerSecond;
         startTime = System.currentTimeMillis() - worldState.timePassed;
         frame = worldState.frame;
-//        objects = worldState.getObjects();
+        objects = worldState.getObjectsCopy();
+        inputs = worldState.getInputsCopy();
         ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).setRandSeed(worldState.btSeed);
+        objects.values().forEach( o -> world.addRigidBody( o.getBody()));
     }
 
     protected int msPassedSiceStart() {
@@ -80,9 +84,9 @@ public class NetworkPhysicsWorld {
 
     public void addRigidBody(NetworkedPhysicsObjectDto objectDto) {
         PhysicsObject physicsObject = new PhysicsObject(objectDto);
-        objects.put(objectDto.getId(), physicsObject);
+        objects.put(objectDto.id, physicsObject);
         world.addRigidBody(physicsObject.getBody());
-        physicsListener.newObject(physicsObject);
+        physicsListener.newObject(objectDto.id);
     }
 
     public int getStepsPerSecond() {
@@ -117,15 +121,19 @@ public class NetworkPhysicsWorld {
         worldState.btSeed = ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).getRandSeed();
         Map<Integer, PhysicsObject> objectsCopy = new HashMap<>();
         objects.values().forEach(npo -> {
-                    objectsCopy.put(npo.id,new PhysicsObject(npo.bodyToDto()));
+                    objectsCopy.put(npo.id, new PhysicsObject(npo.bodyToDto()));
                 }
         );
         worldState.objectMap = objectsCopy;
-        Map<Integer, PhysicsInput> inputsCopy= new HashMap<>();
+        Map<Integer, PhysicsInput> inputsCopy = new HashMap<>();
         inputs.values().forEach(in -> {
-            inputsCopy.put(in.id,in.copy());
+            inputsCopy.put(in.id, SerializationUtils.clone(in));
         });
-        worldState.inputs=inputsCopy;
+        worldState.inputs = inputsCopy;
         return worldState;
+    }
+
+    public PhysicsObject getObject(int objId) {
+        return objects.get(objId);
     }
 }

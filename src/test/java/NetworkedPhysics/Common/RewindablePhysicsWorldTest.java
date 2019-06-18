@@ -2,27 +2,68 @@ package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.Shape;
+import NetworkedPhysics.Common.Protocol.WorldState;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 
 class RewindablePhysicsWorldTest {
 
     @Test
     public void testRewindOnStateIfItIsDeterministic() {
-        final PhysicsObject[] cube = new PhysicsObject[1];
-        RewindablePhysicsWorld world = new RewindablePhysicsWorld(new NetworkPhysicsListenerAdapter() {
-            @Override
-            public void newObject(PhysicsObject physicsObject) {
-                cube[0] = physicsObject;
-            }
-        });
-        ObjectState objectState = new ObjectState();
-        NetworkedPhysicsObjectDto body = new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, objectState);
+        NetworkPhysicsListenerAdapter updateInputs = new NetworkPhysicsListenerAdapter() {
+        };
+        RewindablePhysicsWorld world = new RewindablePhysicsWorld(updateInputs);
+
+        NetworkedPhysicsObjectDto body = lameCube();
         world.addNetworkedPhysicsObjectNow(body);
-        for (int i = 0; i < 100; i++) {
+        stepWorld100Times(world,12);
+
+        WorldState worldState = world.getWorldState();
+        stepWorld100Times(world,0);
+        System.out.println(Util.gson.toJson(world.getObject(0).bodyToDto()));
+        world.restore(worldState);
+        stepWorld100Times(world,0);
+        System.out.println(Util.gson.toJson(world.getObject(0).bodyToDto()));
+    }
+
+    private NetworkedPhysicsObjectDto lameCube() {
+        ObjectState objectState = new ObjectState();
+        return new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, objectState);
+    }
+
+    private void stepWorld100Times(RewindablePhysicsWorld world, int id) {
+        for (int i = 0; i < 2; i++) {
             world.step();
-            if (cube[0] != null)
-                System.out.println(cube[0].bodyToDto().objectState.getOrigin());
+            PhysicsObject object = world.getObject(id);
+            if (object != null) {
+                System.out.println(i+ " " + object.bodyToDto().objectState.getOrigin());
+            }
         }
     }
 
+    @Test
+    void testRestore() {
+        RewindablePhysicsWorld world = new RewindablePhysicsWorld(new NetworkPhysicsListenerAdapter(){
+            @Override
+            public void newObject(int physicsObject) {
+                System.out.println("new object");
+            }
+        });
+        world.addNetworkedPhysicsObjectNow(lameCube());
+        world.step();
+        System.out.println("----STart----");
+        world.getObject(0).print();
+        WorldState worldState = world.getWorldState();
+
+        System.out.println("----stepped----");
+        world.step(); //
+        world.getObject(0).print();
+
+        world.restore(worldState);
+        System.out.println("--restored");
+        world.getObject(0).print();
+        world.step();  //
+        world.getObject(0).print();
+
+    }
 }

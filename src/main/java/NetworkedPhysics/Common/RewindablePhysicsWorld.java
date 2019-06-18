@@ -3,10 +3,7 @@ package NetworkedPhysics.Common;
 import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
-import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Protocol.WorldState;
-import NetworkedPhysics.Network.UdpConnection;
-import NetworkedPhysics.Network.UdpSocket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +51,7 @@ public class RewindablePhysicsWorld {
     }
 
     public void addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
-        AddRigidBody message = new AddRigidBody(networkWorld.getFrame() + 1, networkedPhysicsObjectDto);
+        AddRigidBody message = new AddRigidBody(networkWorld.getFrame() , networkedPhysicsObjectDto);
         addManipulation(message);
     }
 
@@ -84,7 +81,7 @@ public class RewindablePhysicsWorld {
         if (lastWorldState==null){
             networkWorld= new NetworkPhysicsWorld(physicsListener);
         }else{
-            networkWorld= new NetworkPhysicsWorld(lastWorldState,physicsListener);
+            restore(lastWorldState);
         }
         physicsListener.rewinded();
     }
@@ -93,9 +90,17 @@ public class RewindablePhysicsWorld {
         return networkWorld.getState();
     }
 
+    public void restore(WorldState worldState){
+        networkWorld= new NetworkPhysicsWorld(worldState, physicsListener);
+    }
+
 
     public Map<Integer, PhysicsObject> getObjects() {
         return networkWorld.objects;
+    }
+
+    public PhysicsObject getObject(int physicsObjectId) {
+        return networkWorld.objects.get(physicsObjectId);
     }
 }
 

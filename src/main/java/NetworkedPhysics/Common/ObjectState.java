@@ -2,8 +2,9 @@ package NetworkedPhysics.Common;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.io.Serializable;
 
-public class ObjectState {
+public class ObjectState implements Serializable {
     private Vector3f origin;
     private Quat4f rotation;
     private Vector3f angularVelocity;

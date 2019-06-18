@@ -1,13 +1,34 @@
 package NetworkedPhysics.Common;
 
-public class PhysicsInput {
-    int id;
-    boolean click;
+import javax.vecmath.Vector3f;
+import java.io.Serializable;
 
-    public PhysicsInput copy() {
-        PhysicsInput physicsInput = new PhysicsInput();
-        physicsInput.id=id;
-        physicsInput.click=click;
-        return physicsInput;
+public class PhysicsInput implements Serializable {
+    public final int id;
+    int objId;
+
+    public PhysicsInput(int id, int objId) {
+        this.id = id;
+        this.objId = objId;
+    }
+
+    boolean click;
+    transient boolean lastClicked;
+
+    public void update(NetworkPhysicsWorld physicsWorld){
+        PhysicsObject object = physicsWorld.getObject(objId);
+        if (object == null) {
+            return;
+        }
+
+        if (click){
+            if(!lastClicked){
+                lastClicked=true;
+                object.getBody().setLinearVelocity(new Vector3f(10,-10,10));
+            }
+        }else{
+            lastClicked=false;
+        }
+
     }
 }
