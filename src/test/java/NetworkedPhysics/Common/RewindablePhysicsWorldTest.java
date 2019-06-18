@@ -32,7 +32,7 @@ class RewindablePhysicsWorldTest {
     }
 
     private void stepWorld100Times(RewindablePhysicsWorld world, int id) {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 10; i++) {
             world.step();
             PhysicsObject object = world.getObject(id);
             if (object != null) {

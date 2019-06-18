@@ -36,7 +36,7 @@ public class PhysicsObject implements Serializable {
     }
 
     public NetworkedPhysicsObjectDto bodyToDto() {
-        Transform worldTransform = body.getMotionState().getWorldTransform(new Transform());
+        Transform worldTransform = body.getWorldTransform(new Transform());
         Vector3f angularVelocity = body.getAngularVelocity(new Vector3f());
         Vector3f linearVelocity = body.getLinearVelocity(new Vector3f());
         ObjectState objectState = new ObjectState(worldTransform.origin, worldTransform.getRotation(new Quat4f()), angularVelocity, linearVelocity);

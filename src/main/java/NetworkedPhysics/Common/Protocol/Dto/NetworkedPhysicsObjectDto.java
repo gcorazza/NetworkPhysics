@@ -67,16 +67,16 @@ public class NetworkedPhysicsObjectDto implements Serializable {
         transform.setIdentity();
         transform.origin.set(objectState.getOrigin());
         transform.setRotation(objectState.getRotation());
-        MotionState groundMotionState = new DefaultMotionState(transform);
         Vector3f localInertia = new Vector3f(0, 0, 0);
         shape.calculateLocalInertia(mass, localInertia);
-        RigidBodyConstructionInfo bodyConstructionInfo = new RigidBodyConstructionInfo(mass, groundMotionState, shape, localInertia);
+        RigidBodyConstructionInfo bodyConstructionInfo = new RigidBodyConstructionInfo(mass, new DefaultMotionState(transform), shape, localInertia);
         RigidBody rigidBody = new RigidBody(bodyConstructionInfo);
         rigidBody.setRestitution(restitution);
         rigidBody.setFriction(friction);
         rigidBody.setDamping(0, 0);
         rigidBody.setLinearVelocity(objectState.getLinearVelocity());
         rigidBody.setAngularVelocity(objectState.getAngularVelocity());
+        rigidBody.setWorldTransform(transform);
         return rigidBody;
     }
 
