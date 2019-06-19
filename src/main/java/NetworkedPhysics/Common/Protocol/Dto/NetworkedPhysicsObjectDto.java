@@ -1,6 +1,7 @@
 package NetworkedPhysics.Common.Protocol.Dto;
 
 import NetworkedPhysics.Common.ObjectState;
+import NetworkedPhysics.Common.PhysicsObjectDescription;
 import NetworkedPhysics.Common.Protocol.Shape;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
@@ -9,7 +10,6 @@ import com.bulletphysics.collision.shapes.StaticPlaneShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 
 import javax.vecmath.Vector3f;
@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 public class NetworkedPhysicsObjectDto implements Serializable {
     public int id;
+    public final PhysicsObjectDescription pod;
     public final Shape shape;
     public final float a, b, c;
     public final float mass; //if mass = 0 -> is static
@@ -45,7 +46,7 @@ public class NetworkedPhysicsObjectDto implements Serializable {
     }
 
     public RigidBody getRigidBody() {
-        CollisionShape shape;
+        CollisionShape shape=null;
         switch (this.shape) {
             case PLANE: {
                 shape = new StaticPlaneShape(new Vector3f(a, b, c), 0.25f /* m */);
@@ -59,8 +60,6 @@ public class NetworkedPhysicsObjectDto implements Serializable {
                 shape = new SphereShape(a);
                 break;
             }
-            default:
-                return null;
         }
 
         Transform transform = new Transform();

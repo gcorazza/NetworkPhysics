@@ -38,7 +38,7 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
 
     //calledByServer
     public void setClientInput(PhysicsInput clientInput) {
-        SetInput setInput = new SetInput(networkWorld.getFrame() + 1, clientInput);
+        SetInput setInput = new SetInput(networkWorld.getStep() + 1, clientInput);
         super.addManipulation(setInput);
         sendToAll(setInput);
     }
@@ -56,7 +56,7 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     }
 
     public void addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
-        AddRigidBody message = new AddRigidBody(networkWorld.getFrame() + 1, networkedPhysicsObjectDto);
+        AddRigidBody message = new AddRigidBody(networkWorld.getStep() + 1, networkedPhysicsObjectDto);
         sendToAll(message);
         addManipulation(message);
     }

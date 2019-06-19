@@ -54,6 +54,8 @@ class RewindablePhysicsWorldTest {
         System.out.println("----STart----");
         world.getObject(0).print();
         WorldState worldState = world.getWorldState();
+        System.out.println(new String(worldState.toBlob()));
+
 
         System.out.println("----stepped----");
         world.step(); //

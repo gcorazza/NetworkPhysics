@@ -34,15 +34,15 @@ public class RewindablePhysicsWorld {
     }
 
     public void stepToActualFrame() {
-        int shouldBeInFrame = networkWorld.shouldBeInFrame();
+        int shouldBeInFrame = networkWorld.shouldBeInStep();
 
-        while (networkWorld.getFrame() < shouldBeInFrame) {
-            networkWorld.step(manipulations.get(networkWorld.getFrame()));
+        while (networkWorld.getStep() < shouldBeInFrame) {
+            networkWorld.step(manipulations.get(networkWorld.getStep()));
         }
     }
 
     public void step(){
-        networkWorld.step(manipulations.get(networkWorld.getFrame()));
+        networkWorld.step(manipulations.get(networkWorld.getStep()));
     }
 
     public void addManipulation(WorldManipulation worldManipulation) {
@@ -51,7 +51,7 @@ public class RewindablePhysicsWorld {
     }
 
     public void addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
-        AddRigidBody message = new AddRigidBody(networkWorld.getFrame() , networkedPhysicsObjectDto);
+        AddRigidBody message = new AddRigidBody(networkWorld.getStep() , networkedPhysicsObjectDto);
         addManipulation(message);
     }
 

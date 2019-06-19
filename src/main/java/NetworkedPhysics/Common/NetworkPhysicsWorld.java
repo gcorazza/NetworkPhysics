@@ -16,24 +16,22 @@ public class NetworkPhysicsWorld {
     protected DiscreteDynamicsWorld world;
     Map<Integer, PhysicsObject> objects = new HashMap<>();
     Map<Integer, PhysicsInput> inputs = new HashMap<>();
-    protected int frame;
+    protected int step;
     protected int stepsPerSecond = 60;
     protected long startTime;
-    final NetworkPhysicsListener physicsListener;
+    //final NetworkPhysicsListener physicsListener;
 
 
     public NetworkPhysicsWorld(NetworkPhysicsListener physicsListener) {
-        this.physicsListener = physicsListener;
         world = Util.getWorld();
         startTime = System.currentTimeMillis();
     }
 
     public NetworkPhysicsWorld(WorldState worldState, NetworkPhysicsListener physicsListener) {
-        this.physicsListener = physicsListener;
         world = Util.getWorld();
         this.stepsPerSecond = worldState.stepsPerSecond;
         startTime = System.currentTimeMillis() - worldState.timePassed;
-        frame = worldState.frame;
+        step = worldState.step;
         objects = worldState.getObjectsCopy();
         inputs = worldState.getInputsCopy();
         ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).setRandSeed(worldState.btSeed);
@@ -44,25 +42,25 @@ public class NetworkPhysicsWorld {
         return (int) (System.currentTimeMillis() - startTime);
     }
 
-    protected int shouldBeInFrame() {
+    protected int shouldBeInStep() {
         int i = (int) (((float) (System.currentTimeMillis() - startTime)) / 1000 * stepsPerSecond);
         return i;
     }
 
-    protected long timeForFrame(int frame) {
-        int v = (int) (frame * (1000f / stepsPerSecond));
+    protected long timeForStep(int step) {
+        int v = (int) (step * (1000f / stepsPerSecond));
         return (startTime + v);
     }
 
-    protected int msToNextFrame() {
+    protected int msToNextStep() {
         long l = System.currentTimeMillis();
-        long tff = timeForFrame(frame + 1);
+        long tff = timeForStep(step + 1);
         return (int) (tff - l);
     }
 
-    protected void waitTilNextFrame() {
+    protected void waitTilNextStep() {
         try {
-            int i = msToNextFrame();
+            int i = msToNextStep();
             if (i > 0)
                 Thread.sleep(i);
         } catch (InterruptedException e) {
@@ -75,10 +73,10 @@ public class NetworkPhysicsWorld {
         if (worldManipulations != null) {
             worldManipulations.forEach(wm -> wm.manipulate(this));
         }
-        inputs.values().forEach(in -> physicsListener.stepInput(world, objects, in));
+        inputs.values().forEach(in -> in.update(this));
         world.stepSimulation(1f / stepsPerSecond, 0);
 
-        frame++;
+        step++;
     }
 
 
@@ -86,7 +84,14 @@ public class NetworkPhysicsWorld {
         PhysicsObject physicsObject = new PhysicsObject(objectDto);
         objects.put(objectDto.id, physicsObject);
         world.addRigidBody(physicsObject.getBody());
-        physicsListener.newObject(objectDto.id);
+    }
+
+    public int addRigidBody(PhysicsObjectDescription pod){
+        return 0;
+    }
+
+    public void addRigidBody(PhysicsObjectDescription pod, int id){
+        return;
     }
 
     public int getStepsPerSecond() {
@@ -97,19 +102,11 @@ public class NetworkPhysicsWorld {
         return startTime;
     }
 
-    public int getFrame() {
-        return frame;
-    }
-
-    public NetworkPhysicsListener getPhysicsListener() {
-        return physicsListener;
+    public int getStep() {
+        return step;
     }
 
     public void setInput(PhysicsInput input) {
-        PhysicsInput physicsInput = inputs.get(input.id);
-        if (physicsInput == null) {
-            physicsListener.newInput(input);
-        }
         inputs.put(input.id, input);
     }
 
@@ -117,7 +114,7 @@ public class NetworkPhysicsWorld {
         WorldState worldState = new WorldState();
         worldState.stepsPerSecond = stepsPerSecond;
         worldState.timePassed = (int) (System.currentTimeMillis() - startTime);
-        worldState.frame = frame;
+        worldState.step = step;
         worldState.btSeed = ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).getRandSeed();
         Map<Integer, PhysicsObject> objectsCopy = new HashMap<>();
         objects.values().forEach(npo -> {

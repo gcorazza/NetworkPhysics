@@ -4,8 +4,8 @@
 //
 //public class Wind extends WorldManipulation {
 //
-//    public Wind(int frame) {
-//        super(frame, stamp);
+//    public Wind(int step) {
+//        super(step, stamp);
 //    }
 //
 //    @Override

@@ -16,7 +16,7 @@ public class WorldState extends PhysicsMessage {
     public static final byte COMMANDID=0;
     public int timePassed;
     public int stepsPerSecond;
-    public int frame;
+    public int step;
     public long btSeed;
     public Map<Integer, PhysicsObject> objectMap;
     public Map<Integer, PhysicsInput> inputs;

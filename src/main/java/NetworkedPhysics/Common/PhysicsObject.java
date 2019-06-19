@@ -10,7 +10,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
-import static NetworkedPhysics.Common.Util.gson;
 import static NetworkedPhysics.Common.Util.gsonPretty;
 
 public class PhysicsObject implements Serializable {
