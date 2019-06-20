@@ -75,7 +75,7 @@ public class GameServer {
 
     public void run() {
         physicsWorldRenderer.run();
-        networkedPhysicsServer.shutDown();
+        networkedPhysicsServer.shutDown().awaitUninterruptibly();
     }
 
     private NetworkedPhysicsObjectDto playerCube() {

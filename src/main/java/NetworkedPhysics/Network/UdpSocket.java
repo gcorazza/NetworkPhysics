@@ -8,6 +8,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.concurrent.Future;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -101,7 +102,7 @@ public class UdpSocket {
         udpSocket2.connect(new InetSocketAddress("localhost",8080));
     }
 
-    public void shutdown() {
-        bootstrap.config().group().shutdownGracefully();
+    public Future<?> shutdown() {
+        return bootstrap.config().group().shutdownGracefully();
     }
 }
