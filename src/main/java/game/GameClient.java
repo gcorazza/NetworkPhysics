@@ -13,6 +13,15 @@ public class GameClient {
 
     public GameClient(InetSocketAddress socketAddress) throws Exception {
         networkedPhysicsClient = new NetworkedPhysicsClient(socketAddress, new NetworkPhysicsListenerAdapter() {
+            @Override
+            public void newObject(int physicsObject) {
+                physicsWorldRenderer.newObject(networkedPhysicsClient.getObject(physicsObject));
+            }
+
+            @Override
+            public void rewinded() {
+                physicsWorldRenderer.syncObjects();
+            }
         });
         physicsWorldRenderer= new PhysicsWorldRenderer(networkedPhysicsClient);
     }
@@ -21,7 +30,7 @@ public class GameClient {
         new GameClient(new InetSocketAddress("localhost",8080)).run();
     }
 
-    private void run() {
+    public void run() {
         physicsWorldRenderer.run();
     }
 }

@@ -1,14 +1,17 @@
 package NetworkedPhysics.Common;
 
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import NetworkedPhysics.Network.UdpConnection;
 
-import java.util.Map;
+import java.net.InetSocketAddress;
 
 public interface NetworkPhysicsListener {
     public void newObject(int physicsObject);
+
     public void deleteObject(int id);
-    public void newInput(PhysicsInput input);
-    public void deleteInput(int id);
-    public void stepInput(DiscreteDynamicsWorld world, Map<Integer, PhysicsObject> objects, PhysicsInput in);
+
+    public void newClient(InetSocketAddress id);
+
     public void rewinded();
+
+    void clientInput(PhysicsInput clientInput, InetSocketAddress from);
 }

@@ -3,7 +3,6 @@ package NetworkedPhysics.Common.Protocol;
 import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Network.UdpConnection;
-import NetworkedPhysics.Server.NetworkedPhysicsServer;
 
 public class GetWorldState extends PhysicsMessage{
     public static final byte COMMANDID=2;
@@ -23,7 +22,7 @@ public class GetWorldState extends PhysicsMessage{
 
     @Override
     public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
-        ((NetworkedPhysicsClient) rewindablePhysicsWorld).sendTo(from, rewindablePhysicsWorld.getWorldState());
+        ((NetworkedPhysicsClient) rewindablePhysicsWorld).sendTo(from, rewindablePhysicsWorld.saveState());
     }
 
     @Override

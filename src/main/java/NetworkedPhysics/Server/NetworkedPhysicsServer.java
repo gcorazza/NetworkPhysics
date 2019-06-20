@@ -1,13 +1,14 @@
 package NetworkedPhysics.Server;
 
-import NetworkedPhysics.Common.*;
-import NetworkedPhysics.Common.Protocol.Manipulations.AddRigidBody;
-import NetworkedPhysics.Common.Protocol.Manipulations.SetInput;
+import NetworkedPhysics.Common.NetworkPhysicsListener;
+import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Network.IncomingPacketHandlerServer;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;
+
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,11 +38,11 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     }
 
     //calledByServer
-    public void setClientInput(PhysicsInput clientInput) {
-        SetInput setInput = new SetInput(networkWorld.getStep() + 1, clientInput);
-        super.addManipulation(setInput);
-        sendToAll(setInput);
-    }
+//    public void setClientInput(PhysicsInput clientInput) {
+//        SetInput setInput = new SetInput(networkWorld.getStep() + 1, clientInput);
+//        super.addManipulation(setInput);
+//        sendToAll(setInput);
+//    }
 
     private void sendToAll(PhysicsMessage message) {
         clients.keySet().forEach( c -> connection.send(message, c));
@@ -49,16 +50,18 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
 
     public void newUDPClient(UdpConnection udpConnection) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
+        clients.put(udpConnection.inetSocketAddress,udpConnection);
+        physicsListener.newClient(udpConnection.inetSocketAddress);
     }
 
     public void setStepsPerSecound(int stepsPerSecound) {
         //sync with all
     }
 
-    public void addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
-        AddRigidBody message = new AddRigidBody(networkWorld.getStep() + 1, networkedPhysicsObjectDto);
-        sendToAll(message);
-        addManipulation(message);
+    @Override
+    public void addManipulation(WorldManipulation worldManipulation) {
+        sendToAll(worldManipulation);
+        super.addManipulation(worldManipulation);
     }
 
     public void run() {
@@ -71,5 +74,9 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
 
     public void shutDown() {
         connection.shutdown();
+    }
+
+    public void clientInput(PhysicsInput clientInput, UdpConnection from) {
+        physicsListener.clientInput(clientInput, from.inetSocketAddress);
     }
 }

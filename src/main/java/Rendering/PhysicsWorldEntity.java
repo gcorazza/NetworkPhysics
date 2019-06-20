@@ -1,7 +1,7 @@
 package Rendering;
 
 import NetworkedPhysics.Common.PhysicsObject;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import com.bulletphysics.linearmath.Transform;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

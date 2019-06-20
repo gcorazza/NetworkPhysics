@@ -1,9 +1,8 @@
 package NetworkedPhysics.Common;
 
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.linearmath.Transform;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.SerializationUtils;
 
 import javax.vecmath.Quat4f;
@@ -18,9 +17,9 @@ public class PhysicsObject implements Serializable {
     private transient RigidBody body;
     public final int id;
 
-    public PhysicsObject(NetworkedPhysicsObjectDto dto) {
+    public PhysicsObject(NetworkedPhysicsObjectDto dto, int id) {
         this.dto = dto;
-        id = dto.id;
+        this.id = id;
     }
 
     public RigidBody getBody() {

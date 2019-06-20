@@ -6,6 +6,7 @@ import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 
 public class ClientInput extends PhysicsMessage {
+    public static final byte COMMANDID=3;
 
     PhysicsInput clientInput;
 
@@ -25,11 +26,11 @@ public class ClientInput extends PhysicsMessage {
 
     @Override
     public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
-        ((NetworkedPhysicsServer) rewindablePhysicsWorld).setClientInput(clientInput);
+        ((NetworkedPhysicsServer) rewindablePhysicsWorld).clientInput(clientInput, from);
     }
 
     @Override
     public byte getCommandID() {
-        return 0;
+        return COMMANDID;
     }
 }

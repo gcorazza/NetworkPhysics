@@ -4,6 +4,7 @@
  */
 package Rendering;
 
+import NetworkedPhysics.Common.Protocol.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsObject;
 import org.joml.Matrix4f;
@@ -60,7 +61,8 @@ public class PhysicsWorldRenderer {
     private float camSpeed = 0.10f;
     private List<PhysicsWorldEntity> entities = new ArrayList<>();
 
-    private FPS fps= new FPS();
+    private FPS fps = new FPS();
+    private WorldState ws;
 
     public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
         this.rewindablePhysicsWorld = rewindablePhysicsWorld;
@@ -68,7 +70,7 @@ public class PhysicsWorldRenderer {
         syncObjects();
     }
 
-    public void run()  {
+    public void run() {
         try {
             loop();
 
@@ -175,7 +177,7 @@ public class PhysicsWorldRenderer {
         debugProc = GLUtil.setupDebugMessageCallback();
 
         // Set the clear color
-        glClearColor(66f/255f, 134f/255f, 244f/255f,1f);
+        glClearColor(66f / 255f, 134f / 255f, 244f / 255f, 1f);
 
         shaderProgram = new ShaderProgram();
         shaderProgram.createVertexShader(Utils.loadResource("/vertex.vs"));
@@ -234,11 +236,11 @@ public class PhysicsWorldRenderer {
         }
     }
 
-    public void renderAFrame(){
+    public void renderAFrame() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
         glViewport(0, 0, width, height);
         drawCoordinateSystem();
-        glFlush ();
+        glFlush();
         entities.forEach(this::drawWorldEntity);
         glfwSwapBuffers(window);
         fps.tick();
@@ -250,11 +252,27 @@ public class PhysicsWorldRenderer {
             updateControlls();
             setCamera();
             renderAFrame();
-            rewindablePhysicsWorld.update();
+            int step = rewindablePhysicsWorld.update();
+//            rewindAtStep300to100();
         }
     }
 
-    private void drawWorldEntity(PhysicsWorldEntity worldEntity){
+    private void rewindAtStep300to100() {
+        int step= rewindablePhysicsWorld.getStep();
+        //            int step=rewindablePhysicsWorld.step();
+        if (step > 100 && ws == null) {
+            ws= new WorldState();
+            rewindablePhysicsWorld.saveState();
+            System.out.println("saved world state");
+        }
+
+        if (step > 300) {
+            rewindablePhysicsWorld.rewindToLastState();
+            System.out.println("restored world??");
+        }
+    }
+
+    private void drawWorldEntity(PhysicsWorldEntity worldEntity) {
         worldEntity.getShader().bind();
         glUniformMatrix4fv(uniformLocationModel, false, worldEntity.getModel().get(mat4Buffer));
 
@@ -270,7 +288,7 @@ public class PhysicsWorldRenderer {
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldEntity.boundedObj.vboIndices);
         int faceIndicesCount = worldEntity.boundedObj.faceIndicesCount;
-        glDrawElements(GL_TRIANGLES, faceIndicesCount , GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, faceIndicesCount, GL_UNSIGNED_INT, 0);
     }
 
     private void setCamera() {
@@ -292,15 +310,15 @@ public class PhysicsWorldRenderer {
     }
 
 
-    public void syncObjects(){
+    public void syncObjects() {
         Collection<PhysicsObject> objects = rewindablePhysicsWorld.getObjects().values();
         entities.removeAll(entities);
-        objects.forEach( physicsObject -> entities.add(new PhysicsWorldEntity(physicsObject, shaderProgram)));
+        objects.forEach(physicsObject -> entities.add(new PhysicsWorldEntity(physicsObject, shaderProgram)));
     }
 
-    private void drawCoordinateSystem(){
+    private void drawCoordinateSystem() {
         glUniformMatrix4fv(uniformLocationModel, false, new Matrix4f().get(mat4Buffer));
-        glColor3f(1.0f,0.0f,0.0f); // red x
+        glColor3f(1.0f, 0.0f, 0.0f); // red x
         glBegin(GL_LINES);
         // x aix
 
@@ -316,9 +334,8 @@ public class PhysicsWorldRenderer {
         glEnd();
 
 
-
         // y
-        glColor3f(0.0f,1.0f,0.0f); // green y
+        glColor3f(0.0f, 1.0f, 0.0f); // green y
         glBegin(GL_LINES);
         glVertex3f(0.0f, -4.0f, 0.0f);
         glVertex3f(0.0f, 4.0f, 0.0f);
@@ -332,17 +349,17 @@ public class PhysicsWorldRenderer {
         glEnd();
 
         // z
-        glColor3f(0.0f,0.0f,1.0f); // blue z
+        glColor3f(0.0f, 0.0f, 1.0f); // blue z
         glBegin(GL_LINES);
-        glVertex3f(0.0f, 0.0f ,-4.0f );
-        glVertex3f(0.0f, 0.0f ,4.0f );
+        glVertex3f(0.0f, 0.0f, -4.0f);
+        glVertex3f(0.0f, 0.0f, 4.0f);
 
         // arrow
-        glVertex3f(0.0f, 0.0f ,4.0f );
-        glVertex3f(0.0f, 1.0f ,3.0f );
+        glVertex3f(0.0f, 0.0f, 4.0f);
+        glVertex3f(0.0f, 1.0f, 3.0f);
 
-        glVertex3f(0.0f, 0.0f ,4.0f );
-        glVertex3f(0.0f, -1.0f ,3.0f );
+        glVertex3f(0.0f, 0.0f, 4.0f);
+        glVertex3f(0.0f, -1.0f, 3.0f);
         glEnd();
     }
 

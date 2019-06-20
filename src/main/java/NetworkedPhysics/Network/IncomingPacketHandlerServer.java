@@ -10,19 +10,13 @@ import java.util.Map;
 
 public class IncomingPacketHandlerServer extends IncomingPacketHandler {
 
-
-    private final Map<InetSocketAddress, UdpConnection> clients;
-
-
-
     public IncomingPacketHandlerServer(NetworkedPhysicsServer networkedPhysicsServer) {
         super(networkedPhysicsServer);
-        clients = networkedPhysicsServer.getClients();
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket packet) {
-
+        Map<InetSocketAddress, UdpConnection> clients = ((NetworkedPhysicsServer) rewindablePhysicsWorld).getClients();
         InetSocketAddress inetSocketAddress = packet.sender();
         UdpConnection udpConnection = clients.get(inetSocketAddress);
 

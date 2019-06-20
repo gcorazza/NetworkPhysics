@@ -6,7 +6,7 @@ import NetworkedPhysics.Common.Protocol.GetWorldState;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.IncommingPacketHandlerClient;
 import NetworkedPhysics.Network.UdpConnection;
 import NetworkedPhysics.Network.UdpSocket;

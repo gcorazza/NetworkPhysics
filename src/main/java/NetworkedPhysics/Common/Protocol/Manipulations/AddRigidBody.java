@@ -2,23 +2,25 @@ package NetworkedPhysics.Common.Protocol.Manipulations;
 
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Util;
 import NetworkedPhysics.Network.UdpConnection;
 import com.google.gson.Gson;
 
 public class AddRigidBody extends WorldManipulation {
-
+    public static final byte COMMANDID=5;
+    private final int id;
     private final NetworkedPhysicsObjectDto physicsObject;
 
-    public AddRigidBody(int frame, NetworkedPhysicsObjectDto physicsObjectDto) {
-        super(frame);
+    public AddRigidBody(int step, int id, NetworkedPhysicsObjectDto physicsObjectDto) {
+        super(step);
+        this.id = id;
         this.physicsObject = physicsObjectDto;
     }
 
     @Override
     public void manipulate(NetworkPhysicsWorld networkedPhysics) {
-        networkedPhysics.addRigidBody(physicsObject);
+        networkedPhysics.addRigidBody(physicsObject, id);
     }
 
     @Override
@@ -38,6 +40,6 @@ public class AddRigidBody extends WorldManipulation {
 
     @Override
     public byte getCommandID() {
-        return 0;
+        return COMMANDID;
     }
 }

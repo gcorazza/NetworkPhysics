@@ -1,9 +1,8 @@
 package NetworkedPhysics.Common;
 
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
-import NetworkedPhysics.Common.Protocol.Shape;
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Dto.Shape;
 import NetworkedPhysics.Common.Protocol.WorldState;
-import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 
 class RewindablePhysicsWorldTest {
@@ -18,7 +17,7 @@ class RewindablePhysicsWorldTest {
         world.addNetworkedPhysicsObjectNow(body);
         stepWorld100Times(world,12);
 
-        WorldState worldState = world.getWorldState();
+        WorldState worldState = world.saveState();
         stepWorld100Times(world,0);
         System.out.println(Util.gson.toJson(world.getObject(0).bodyToDto()));
         world.restore(worldState);
@@ -49,23 +48,23 @@ class RewindablePhysicsWorldTest {
                 System.out.println("new object");
             }
         });
-        world.addNetworkedPhysicsObjectNow(lameCube());
+        int physicsObjectId = world.addNetworkedPhysicsObjectNow(lameCube());
         world.step();
         System.out.println("----STart----");
-        world.getObject(0).print();
-        WorldState worldState = world.getWorldState();
+        world.getObject(physicsObjectId).print();
+        WorldState worldState = world.saveState();
         System.out.println(new String(worldState.toBlob()));
 
 
         System.out.println("----stepped----");
         world.step(); //
-        world.getObject(0).print();
+        world.getObject(physicsObjectId).print();
 
         world.restore(worldState);
         System.out.println("--restored");
-        world.getObject(0).print();
+        world.getObject(physicsObjectId).print();
         world.step();  //
-        world.getObject(0).print();
+        world.getObject(physicsObjectId).print();
 
     }
 }

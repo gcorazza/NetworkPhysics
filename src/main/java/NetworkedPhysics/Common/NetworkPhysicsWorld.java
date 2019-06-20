@@ -1,6 +1,6 @@
 package NetworkedPhysics.Common;
 
-import NetworkedPhysics.Common.Protocol.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Protocol.WorldState;
 import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
@@ -19,15 +19,17 @@ public class NetworkPhysicsWorld {
     protected int step;
     protected int stepsPerSecond = 60;
     protected long startTime;
-    //final NetworkPhysicsListener physicsListener;
+    final NetworkPhysicsListener physicsListener;
 
 
     public NetworkPhysicsWorld(NetworkPhysicsListener physicsListener) {
+        this.physicsListener = physicsListener;
         world = Util.getWorld();
         startTime = System.currentTimeMillis();
     }
 
     public NetworkPhysicsWorld(WorldState worldState, NetworkPhysicsListener physicsListener) {
+        this.physicsListener = physicsListener;
         world = Util.getWorld();
         this.stepsPerSecond = worldState.stepsPerSecond;
         startTime = System.currentTimeMillis() - worldState.timePassed;
@@ -47,26 +49,26 @@ public class NetworkPhysicsWorld {
         return i;
     }
 
-    protected long timeForStep(int step) {
-        int v = (int) (step * (1000f / stepsPerSecond));
-        return (startTime + v);
-    }
+//    protected long timeForStep(int step) {
+//        int v = (int) (step * (1000f / stepsPerSecond));
+//        return (startTime + v);
+//    }
 
-    protected int msToNextStep() {
-        long l = System.currentTimeMillis();
-        long tff = timeForStep(step + 1);
-        return (int) (tff - l);
-    }
+//    protected int msToNextStep() {
+//        long l = System.currentTimeMillis();
+//        long tff = timeForStep(step + 1);
+//        return (int) (tff - l);
+//    }
 
-    protected void waitTilNextStep() {
-        try {
-            int i = msToNextStep();
-            if (i > 0)
-                Thread.sleep(i);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+//    protected void waitTilNextStep() {
+//        try {
+//            int i = msToNextStep();
+//            if (i > 0)
+//                Thread.sleep(i);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     public void step(List<WorldManipulation> worldManipulations) {
@@ -79,19 +81,16 @@ public class NetworkPhysicsWorld {
         step++;
     }
 
-
-    public void addRigidBody(NetworkedPhysicsObjectDto objectDto) {
-        PhysicsObject physicsObject = new PhysicsObject(objectDto);
-        objects.put(objectDto.id, physicsObject);
+    public void addRigidBody(NetworkedPhysicsObjectDto objectDto, int id) {
+        PhysicsObject physicsObject = new PhysicsObject(objectDto, id);
+        if (objects.get(id)!=null){
+            throw new RuntimeException("ID:"+id +" already exists");
+        }
+        objects.put(id, physicsObject);
         world.addRigidBody(physicsObject.getBody());
-    }
-
-    public int addRigidBody(PhysicsObjectDescription pod){
-        return 0;
-    }
-
-    public void addRigidBody(PhysicsObjectDescription pod, int id){
-        return;
+        if (physicsListener != null) {
+            physicsListener.newObject(id);
+        }
     }
 
     public int getStepsPerSecond() {
@@ -106,8 +105,8 @@ public class NetworkPhysicsWorld {
         return step;
     }
 
-    public void setInput(PhysicsInput input) {
-        inputs.put(input.id, input);
+    public void setInput(PhysicsInput input, int id) {
+        inputs.put(id, input);
     }
 
     public WorldState getState() {
@@ -118,13 +117,13 @@ public class NetworkPhysicsWorld {
         worldState.btSeed = ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).getRandSeed();
         Map<Integer, PhysicsObject> objectsCopy = new HashMap<>();
         objects.values().forEach(npo -> {
-                    objectsCopy.put(npo.id, new PhysicsObject(npo.bodyToDto()));
+                    objectsCopy.put(npo.id, new PhysicsObject(npo.bodyToDto(), npo.id));
                 }
         );
         worldState.objectMap = objectsCopy;
         Map<Integer, PhysicsInput> inputsCopy = new HashMap<>();
-        inputs.values().forEach(in -> {
-            inputsCopy.put(in.id, SerializationUtils.clone(in));
+        inputs.entrySet().forEach( e -> {
+            inputsCopy.put(e.getKey(), SerializationUtils.clone(e.getValue()));
         });
         worldState.inputs = inputsCopy;
         return worldState;

@@ -1,8 +1,6 @@
 package NetworkedPhysics.Common;
 
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
-
-import java.util.Map;
+import java.net.InetSocketAddress;
 
 public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     @Override
@@ -16,22 +14,17 @@ public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     }
 
     @Override
-    public void newInput(PhysicsInput input) {
-
-    }
-
-    @Override
-    public void deleteInput(int id) {
-
-    }
-
-    @Override
-    public void stepInput(DiscreteDynamicsWorld world, Map<Integer, PhysicsObject> objects, PhysicsInput in) {
+    public void newClient(InetSocketAddress id) {
 
     }
 
     @Override
     public void rewinded() {
+
+    }
+
+    @Override
+    public void clientInput(PhysicsInput clientInput, InetSocketAddress from) {
 
     }
 

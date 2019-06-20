@@ -4,11 +4,9 @@ import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
 public class PhysicsInput implements Serializable {
-    public final int id;
     int objId;
 
-    public PhysicsInput(int id, int objId) {
-        this.id = id;
+    public PhysicsInput(int objId) {
         this.objId = objId;
     }
 

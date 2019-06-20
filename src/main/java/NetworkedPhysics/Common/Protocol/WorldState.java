@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WorldState extends PhysicsMessage {
-    public static final byte COMMANDID=0;
+    public static final byte COMMANDID=1;
     public int timePassed;
     public int stepsPerSecond;
     public int step;
@@ -51,8 +51,8 @@ public class WorldState extends PhysicsMessage {
 
     public Map<Integer, PhysicsInput> getInputsCopy() {
         Map<Integer, PhysicsInput> copy = new HashMap<>();
-        inputs.values().forEach(i -> {
-            copy.put(i.id, SerializationUtils.clone(i));
+        inputs.entrySet().forEach( e ->{
+            copy.put(e.getKey(),SerializationUtils.clone(e.getValue()));
         });
         return copy;
     }
