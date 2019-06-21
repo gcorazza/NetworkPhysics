@@ -1,10 +1,10 @@
 package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
-import NetworkedPhysics.Common.Protocol.Manipulations.AddRigidBody;
-import NetworkedPhysics.Common.Protocol.Manipulations.SetInput;
-import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
-import NetworkedPhysics.Common.Protocol.WorldState;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBody;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.SetInput;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,8 +1,8 @@
 package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
-import NetworkedPhysics.Common.Protocol.WorldState;
-import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import org.apache.commons.lang3.SerializationUtils;
@@ -10,6 +10,8 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static Util.Utils.getWorld;
 
 public class NetworkPhysicsWorld {
 
@@ -24,13 +26,13 @@ public class NetworkPhysicsWorld {
 
     public NetworkPhysicsWorld(NetworkPhysicsListener physicsListener) {
         this.physicsListener = physicsListener;
-        world = Util.getWorld();
+        world = getWorld();
         startTime = System.currentTimeMillis();
     }
 
     public NetworkPhysicsWorld(WorldState worldState, NetworkPhysicsListener physicsListener) {
         this.physicsListener = physicsListener;
-        world = Util.getWorld();
+        world = getWorld();
         this.stepsPerSecond = worldState.stepsPerSecond;
         startTime = System.currentTimeMillis() - worldState.timePassed;
         step = worldState.step;

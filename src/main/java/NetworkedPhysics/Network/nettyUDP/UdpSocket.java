@@ -1,6 +1,6 @@
-package NetworkedPhysics.Network;
+package NetworkedPhysics.Network.nettyUDP;
 
-import NetworkedPhysics.Common.Protocol.PhysicsMessage;
+import NetworkedPhysics.Network.Message;
 import io.netty.bootstrap.Bootstrap;
 
 import io.netty.buffer.ByteBuf;
@@ -63,23 +63,24 @@ public class UdpSocket {
         return channel;
     }
 
-    public void send(PhysicsMessage message){
+    public void send(Message message){
         if (channel.isConnected()){
-            ByteBuf buffer = blobToByteBuf(message);
+            ByteBuf buffer = messageToByteBuf(message);
             channel.writeAndFlush(new DatagramPacket(buffer,channel.remoteAddress()));
         }else{
             throw new RuntimeException("Not Connected: give a destination");
         }
     }
 
-    public  void send(PhysicsMessage msg, InetSocketAddress destination){
-        ByteBuf buffer = blobToByteBuf(msg);
+    public  void send(Message msg, InetSocketAddress destination){
+        ByteBuf buffer = messageToByteBuf(msg);
         channel.writeAndFlush(new DatagramPacket(buffer,destination));
     }
 
-    private ByteBuf blobToByteBuf(PhysicsMessage message) {
-        byte[] bytes = message.toByteMessage();
-        ByteBuf buffer = channel.alloc().buffer(bytes.length);
+    private ByteBuf messageToByteBuf(Message message) {
+        byte[] bytes = message.getPacket();
+        ByteBuf buffer = channel.alloc().buffer(bytes.length+1);
+        buffer.writeByte(message.getCommandCode());
         buffer.writeBytes(bytes);
         return buffer;
     }

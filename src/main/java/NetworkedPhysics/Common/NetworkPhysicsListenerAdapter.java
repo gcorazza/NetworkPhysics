@@ -1,7 +1,5 @@
 package NetworkedPhysics.Common;
 
-import java.net.InetSocketAddress;
-
 public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     @Override
     public void newObject(int physicsObject) {
@@ -14,7 +12,7 @@ public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     }
 
     @Override
-    public void newClient(InetSocketAddress id) {
+    public void newClient(int id) {
 
     }
 
@@ -24,7 +22,7 @@ public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     }
 
     @Override
-    public void clientInput(PhysicsInput clientInput, InetSocketAddress from) {
+    public void clientInput(PhysicsInput clientInput, int from) {
 
     }
 

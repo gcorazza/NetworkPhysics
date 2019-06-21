@@ -2,32 +2,28 @@ package NetworkedPhysics.Server;
 
 import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.PhysicsInput;
-import NetworkedPhysics.Common.Protocol.Manipulations.WorldManipulation;
-import NetworkedPhysics.Common.Protocol.PhysicsMessage;
+import NetworkedPhysics.Common.Protocol.ServerCommand;
+import NetworkedPhysics.Common.Protocol.UserCommand;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
-import NetworkedPhysics.Network.IncomingPacketHandlerServer;
-import NetworkedPhysics.Network.UdpConnection;
-import NetworkedPhysics.Network.UdpSocket;
-import io.netty.util.concurrent.Future;
+import NetworkedPhysics.Network.Message;
+import NetworkedPhysics.Network.UDPServer;
+import NetworkedPhysics.Network.UDPServerListener;
+import NetworkedPhysics.Network.nettyUDP.NettyUDPServer;
 
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Runnable {
+import static NetworkedPhysics.Common.Protocol.Protocol.userCommands;
 
-    Map<InetSocketAddress, UdpConnection> clients = new HashMap<>();
-    private UdpSocket connection;
+public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Runnable, UDPServerListener {
+
+    private UDPServer udpServer = new NettyUDPServer();
 
     public NetworkedPhysicsServer(int port, NetworkPhysicsListener networkPhysicsListener) {
         super(networkPhysicsListener);
-        connection= new UdpSocket(port, new IncomingPacketHandlerServer(this));
-    }
-
-    public Map<InetSocketAddress, UdpConnection> getClients() {
-        return clients;
+        udpServer.setListener(this);
+        udpServer.start(port);
     }
 
     public int getStepsPerSecond() {
@@ -45,39 +41,58 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
 //        sendToAll(setInput);
 //    }
 
-    private void sendToAll(PhysicsMessage message) {
-        clients.keySet().forEach( c -> connection.send(message, c));
-    }
-
-    public void newUDPClient(UdpConnection udpConnection) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
-        clients.put(udpConnection.inetSocketAddress,udpConnection);
-        physicsListener.newClient(udpConnection.inetSocketAddress);
-    }
-
-    public void setStepsPerSecound(int stepsPerSecound) {
-        //sync with all
-    }
 
     @Override
     public void addManipulation(WorldManipulation worldManipulation) {
-        sendToAll(worldManipulation);
+        udpServer.sendToAll(worldManipulation);
         super.addManipulation(worldManipulation);
     }
 
     public void run() {
-        running=true;
+        running = true;
 
         while (running) {
             stepToActualFrame();
         }
     }
 
-    public Future<?> shutDown() {
-        return connection.shutdown();
+    public void clientInput(PhysicsInput clientInput, int from) {
+        physicsListener.clientInput(clientInput, from);
     }
 
-    public void clientInput(PhysicsInput clientInput, UdpConnection from) {
-        physicsListener.clientInput(clientInput, from.inetSocketAddress);
+    public void sendTo(int id, ServerCommand command) {
+        udpServer.send(id, command);
+    }
+
+    @Override
+    public void newClient(int id) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
+        physicsListener.newClient(id);
+    }
+
+    @Override
+    public void disconnected(int id) {
+
+    }
+
+    @Override
+    public void newMessage(int fromId, Message message) {
+        Class<? extends UserCommand> aClass = userCommands.get(message.getCommandCode());
+        if (aClass == null) {
+            Logger.getGlobal().log(Level.INFO, "No Protocol entry found for: " + message.getCommandCode());
+            return;
+        }
+        try {
+            UserCommand userCommand = ((UserCommand) aClass.newInstance().fromBlob(message.getPacket()));
+            userCommand.processMessage(this, fromId);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void shutDown() {
+        udpServer.stop();
     }
 }

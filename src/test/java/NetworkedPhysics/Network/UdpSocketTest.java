@@ -1,22 +1,18 @@
 package NetworkedPhysics.Network;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+import NetworkedPhysics.Network.nettyUDP.UdpSocket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.socket.DatagramPacket;
-import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.handler.codec.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
-import java.util.List;
 
 class UdpSocketTest {
 
-    UdpSocket  udpSocket;
+    UdpSocket udpSocket;
 
     @BeforeEach
     public void before(){

@@ -1,11 +1,11 @@
-package NetworkedPhysics.Common.Protocol.Manipulations;
+package NetworkedPhysics.Common.Protocol.serverCommands.Manipulations;
 
+import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
-import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
-import NetworkedPhysics.Common.Util;
-import NetworkedPhysics.Network.UdpConnection;
+
+import static Util.Utils.gson;
 
 public class SetInput extends WorldManipulation{
     public static final byte COMMANDID=4;
@@ -23,23 +23,24 @@ public class SetInput extends WorldManipulation{
         networkedPhysics.setInput(input, id);
     }
 
-    @Override
-    public byte[] toBlob() {
-        return Util.gson.toJson(this).getBytes();
-    }
 
     @Override
     public PhysicsMessage fromBlob(byte[] blob) {
-        return Util.gson.fromJson(new String(blob), SetInput.class);
+        return gson.fromJson(new String(blob), SetInput.class);
     }
 
     @Override
-    public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
-        rewindablePhysicsWorld.addManipulation(this);
-    }
-
-    @Override
-    public byte getCommandID() {
+    public byte getCommandCode() {
         return COMMANDID;
+    }
+
+    @Override
+    public byte[] getPacket() {
+        return gson.toJson(this).getBytes();
+    }
+
+    @Override
+    public void processMessage(NetworkedPhysicsClient physicsClient) {
+        physicsClient.addManipulation(this);
     }
 }

@@ -1,30 +1,28 @@
 package NetworkedPhysics.Client;
 
 import NetworkedPhysics.Common.PhysicsInput;
-import NetworkedPhysics.Common.Protocol.ClientInput;
-import NetworkedPhysics.Common.Protocol.GetWorldState;
-import NetworkedPhysics.Common.Protocol.PhysicsMessage;
+import NetworkedPhysics.Common.Protocol.clientCommands.ClientInput;
+import NetworkedPhysics.Common.Protocol.clientCommands.GetWorldState;
 import NetworkedPhysics.Common.NetworkPhysicsListener;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
-import NetworkedPhysics.Network.IncommingPacketHandlerClient;
-import NetworkedPhysics.Network.UdpConnection;
-import NetworkedPhysics.Network.UdpSocket;
+import NetworkedPhysics.Network.Message;
+import NetworkedPhysics.Network.UDPClient;
+import NetworkedPhysics.Network.UDPClientListener;
+import NetworkedPhysics.Network.nettyUDP.NettyUDPClient;
 
 import java.net.InetSocketAddress;
 
 
-public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable{
+public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable, UDPClientListener {
 
-    private UdpConnection serverConnection;
-    private UdpSocket connection;
+    UDPClient clientSocket= new NettyUDPClient();
 
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
         super(updateInputsCallback);
-        connection = new UdpSocket(new IncommingPacketHandlerClient(this));
-        connection.connect(socketAddress).awaitUninterruptibly();
-        serverConnection= new UdpConnection(socketAddress);
-        connection.send(new GetWorldState(serverConnection.nextStamp()));
+        clientSocket.connect(socketAddress);
+        clientSocket.send(new GetWorldState());
     }
 
 
@@ -37,7 +35,7 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
     }
 
     public void sendMyInput(PhysicsInput myInput) {
-        sendToServer(new ClientInput(myInput));
+        clientSocket.send(new ClientInput(myInput));
     }
 
     public void run() {
@@ -48,20 +46,12 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
         }
     }
 
-    public void init(int timePassed, int stepsPerSecond) {
+    @Override
+    public void newMessage(Message message) {
 
     }
 
-    public void sendTo(UdpConnection receiver, PhysicsMessage message) {
-        message.stamp = receiver.nextStamp();
-        connection.send(message, receiver.inetSocketAddress);
-    }
+    public void setWorldState(WorldState worldState) {
 
-    public void sendToServer(PhysicsMessage physicsMessage) {
-        sendTo(serverConnection, physicsMessage);
-    }
-
-    public UdpConnection getServerConnection() {
-        return serverConnection;
     }
 }

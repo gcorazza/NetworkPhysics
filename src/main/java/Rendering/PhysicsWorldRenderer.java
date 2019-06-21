@@ -4,9 +4,10 @@
  */
 package Rendering;
 
-import NetworkedPhysics.Common.Protocol.WorldState;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsObject;
+import Util.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;

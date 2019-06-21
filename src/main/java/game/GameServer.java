@@ -1,17 +1,16 @@
 package game;
 
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Dto.Shape;
 import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
 import NetworkedPhysics.Common.ObjectState;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.PhysicsObject;
-import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
-import NetworkedPhysics.Common.Dto.Shape;
 import NetworkedPhysics.Server.NetworkedPhysicsServer;
 import Rendering.PhysicsWorldRenderer;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -21,7 +20,7 @@ public class GameServer {
     private PhysicsWorldRenderer physicsWorldRenderer;
     private final NetworkedPhysicsServer networkedPhysicsServer;
 
-    Map<InetSocketAddress, Integer> inputMapping = new HashMap();
+    Map<Integer, Integer> inputMapping = new HashMap();
 
     public GameServer(int port) throws Exception {
         networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
@@ -36,14 +35,14 @@ public class GameServer {
             }
 
             @Override
-            public void newClient(InetSocketAddress id) {
+            public void newClient(int id) {
                 int playerCubeId = networkedPhysicsServer.addNetworkedPhysicsObjectNow(playerCube());
                 int inId = networkedPhysicsServer.addInputNow(new PhysicsInput(playerCubeId));
                 inputMapping.put(id, inId);
             }
 
             @Override
-            public void clientInput(PhysicsInput clientInput, InetSocketAddress from) {
+            public void clientInput(PhysicsInput clientInput, int from) {
                 int inputId = inputMapping.get(from);
                 networkedPhysicsServer.setInput(clientInput,inputId);
             }
@@ -74,7 +73,7 @@ public class GameServer {
 
     public void run() {
         physicsWorldRenderer.run();
-        networkedPhysicsServer.shutDown().awaitUninterruptibly();
+        networkedPhysicsServer.shutDown();
     }
 
     private NetworkedPhysicsObjectDto playerCube() {

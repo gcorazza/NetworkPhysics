@@ -2,8 +2,10 @@ package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Dto.Shape;
-import NetworkedPhysics.Common.Protocol.WorldState;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import org.junit.jupiter.api.Test;
+
+import static Util.Utils.gson;
 
 class RewindablePhysicsWorldTest {
 
@@ -19,10 +21,10 @@ class RewindablePhysicsWorldTest {
 
         WorldState worldState = world.saveState();
         stepWorld100Times(world,0);
-        System.out.println(Util.gson.toJson(world.getObject(0).bodyToDto()));
+        System.out.println(gson.toJson(world.getObject(0).bodyToDto()));
         world.restore(worldState);
         stepWorld100Times(world,0);
-        System.out.println(Util.gson.toJson(world.getObject(0).bodyToDto()));
+        System.out.println(gson.toJson(world.getObject(0).bodyToDto()));
     }
 
     private NetworkedPhysicsObjectDto lameCube() {
@@ -53,7 +55,7 @@ class RewindablePhysicsWorldTest {
         System.out.println("----STart----");
         world.getObject(physicsObjectId).print();
         WorldState worldState = world.saveState();
-        System.out.println(new String(worldState.toBlob()));
+        System.out.println(new String(worldState.getPacket()));
 
 
         System.out.println("----stepped----");

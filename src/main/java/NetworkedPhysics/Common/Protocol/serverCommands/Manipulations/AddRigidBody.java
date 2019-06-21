@@ -1,11 +1,11 @@
-package NetworkedPhysics.Common.Protocol.Manipulations;
+package NetworkedPhysics.Common.Protocol.serverCommands.Manipulations;
 
-import NetworkedPhysics.Common.NetworkPhysicsWorld;
-import NetworkedPhysics.Common.RewindablePhysicsWorld;
+import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
-import NetworkedPhysics.Common.Util;
-import NetworkedPhysics.Network.UdpConnection;
+import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import com.google.gson.Gson;
+
+import static Util.Utils.gson;
 
 public class AddRigidBody extends WorldManipulation {
     public static final byte COMMANDID=5;
@@ -24,22 +24,23 @@ public class AddRigidBody extends WorldManipulation {
     }
 
     @Override
-    public byte[] toBlob() {
-        return Util.gson.toJson(this).getBytes();
-    }
-
-    @Override
     public AddRigidBody fromBlob(byte[] blob) {
         return new Gson().fromJson(new String(blob), AddRigidBody.class);
     }
 
+
     @Override
-    public void processMessage(RewindablePhysicsWorld rewindablePhysicsWorld, UdpConnection from) {
-        rewindablePhysicsWorld.addManipulation(this);
+    public void processMessage(NetworkedPhysicsClient physicsClient) {
+        physicsClient.addManipulation(this);
     }
 
     @Override
-    public byte getCommandID() {
+    public byte getCommandCode() {
         return COMMANDID;
+    }
+
+    @Override
+    public byte[] getPacket() {
+        return gson.toJson(this).getBytes();
     }
 }
