@@ -21,7 +21,7 @@ public class GameServer {
     private PhysicsWorldRenderer physicsWorldRenderer;
     private final NetworkedPhysicsServer networkedPhysicsServer;
 
-    Map<InetSocketAddress, Player> players = new HashMap();
+    Map<InetSocketAddress, Integer> inputMapping = new HashMap();
 
     public GameServer(int port) throws Exception {
         networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
@@ -39,13 +39,12 @@ public class GameServer {
             public void newClient(InetSocketAddress id) {
                 int playerCubeId = networkedPhysicsServer.addNetworkedPhysicsObjectNow(playerCube());
                 int inId = networkedPhysicsServer.addInputNow(new PhysicsInput(playerCubeId));
-                Player player = new Player(inId);
-                players.put(id, player);
+                inputMapping.put(id, inId);
             }
 
             @Override
             public void clientInput(PhysicsInput clientInput, InetSocketAddress from) {
-                int inputId = players.get(from).getInputId();
+                int inputId = inputMapping.get(from);
                 networkedPhysicsServer.setInput(clientInput,inputId);
             }
 

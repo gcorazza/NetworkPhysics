@@ -249,6 +249,7 @@ public class PhysicsWorldRenderer {
     private void loop() {
 
         while (!glfwWindowShouldClose(window)) {
+            glfwMakeContextCurrent(window);
             updateControlls();
             setCamera();
             renderAFrame();
