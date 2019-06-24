@@ -9,13 +9,13 @@ import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.Message;
 import NetworkedPhysics.Network.UDPClient;
-import NetworkedPhysics.Network.UDPClientListener;
+import NetworkedPhysics.Network.UDPConnectionListener;
 import NetworkedPhysics.Network.nettyUDP.NettyUDPClient;
 
 import java.net.InetSocketAddress;
 
 
-public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable, UDPClientListener {
+public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable, UDPConnectionListener {
 
     UDPClient clientSocket= new NettyUDPClient();
 
@@ -46,12 +46,17 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
         }
     }
 
-    @Override
-    public void newMessage(Message message) {
+    public void setWorldState(WorldState worldState) {
 
     }
 
-    public void setWorldState(WorldState worldState) {
+    @Override
+    public void newMessage(int fromId, Message message) {
+
+    }
+
+    @Override
+    public void disconnected(int id) {
 
     }
 }

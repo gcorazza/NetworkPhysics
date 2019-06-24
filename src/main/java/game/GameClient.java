@@ -23,11 +23,11 @@ public class GameClient {
                 physicsWorldRenderer.syncObjects();
             }
         });
-        physicsWorldRenderer= new PhysicsWorldRenderer(networkedPhysicsClient);
+        physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsClient);
     }
 
     public static void main(String[] args) throws Exception {
-        new GameClient(new InetSocketAddress("localhost",8080)).run();
+        new GameClient(new InetSocketAddress("localhost", 8080)).run();
     }
 
     public void run() {

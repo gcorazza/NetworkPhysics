@@ -9,10 +9,15 @@ class ConnectionMapper {
     private Map<Integer, UdpConnection> idMap= new HashMap<>();
     private Map<InetSocketAddress, UdpConnection> iNetMap= new HashMap<>();
     private int clientIdCounter;
+    private final UdpSocket udpSocket;
+
+    ConnectionMapper(UdpSocket udpSocket) {
+        this.udpSocket = udpSocket;
+    }
 
     public UdpConnection newConnection(InetSocketAddress address){
         int id = newClientId();
-        UdpConnection connection = new UdpConnection(address, id);
+        UdpConnection connection = new UdpConnection(address, id, udpSocket);
         idMap.put(id,connection);
         iNetMap.put(address, connection);
         return connection;

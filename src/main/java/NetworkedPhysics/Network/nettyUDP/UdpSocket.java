@@ -9,10 +9,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.concurrent.Future;
+import javafx.util.Pair;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.charset.Charset;
 
 
 public class UdpSocket {
@@ -55,52 +55,52 @@ public class UdpSocket {
         return channel.connect(socketAddress);
     }
 
-    public int getLocalPort() {
-        return channel.localAddress().getPort();
-    }
-
     public NioDatagramChannel getChannel() {
         return channel;
     }
 
-    public void send(Message message){
-        if (channel.isConnected()){
-            ByteBuf buffer = messageToByteBuf(message);
-            channel.writeAndFlush(new DatagramPacket(buffer,channel.remoteAddress()));
-        }else{
+    public void send(Message msg, int stamp) {
+        if (channel.isConnected()) {
+            ByteBuf buffer = messageToByteBuf(msg, stamp);
+            channel.writeAndFlush(new DatagramPacket(buffer, channel.remoteAddress()));
+        } else {
             throw new RuntimeException("Not Connected: give a destination");
         }
     }
 
-    public  void send(Message msg, InetSocketAddress destination){
-        ByteBuf buffer = messageToByteBuf(msg);
-        channel.writeAndFlush(new DatagramPacket(buffer,destination));
+    public void send(Message msg, int stamp, InetSocketAddress destination) {
+        ByteBuf buffer = messageToByteBuf(msg, stamp);
+        channel.writeAndFlush(new DatagramPacket(buffer, destination));
     }
 
-    private ByteBuf messageToByteBuf(Message message) {
-        byte[] bytes = message.getPacket();
-        ByteBuf buffer = channel.alloc().buffer(bytes.length+1);
-        buffer.writeByte(message.getCommandCode());
+    private ByteBuf messageToByteBuf(Message msg, int stamp) {
+        byte[] bytes = msg.getPacket();
+        ByteBuf buffer = channel.alloc().buffer(bytes.length + 2);
+        buffer.writeByte(stamp);
+        buffer.writeByte(msg.getCommandCode());
         buffer.writeBytes(bytes);
         return buffer;
     }
 
-    public static void main(String[] args) {
-        SimpleChannelInboundHandler<DatagramPacket> new_channel = new SimpleChannelInboundHandler<DatagramPacket>() {
+    static Pair<Message, Byte> packetToMessage(DatagramPacket packet) {
+        final ByteBuf buf = packet.content();
+        final int rcvPktLength = buf.readableBytes();
+        final byte[] payload = new byte[rcvPktLength - 2];
+        byte stamp = buf.readByte();
+        byte code = buf.readByte();
+        buf.readBytes(payload);
+        Message message = new Message() {
+            @Override
+            public byte getCommandCode() {
+                return code;
+            }
 
             @Override
-            protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-                System.out.println("got msg");
-                String string = ((DatagramPacket) msg).content().toString(Charset.defaultCharset());
-                System.out.print(string);
-                ByteBuf buffer = ctx.alloc().buffer(string.getBytes().length);
-                buffer.writeBytes(string.toUpperCase().getBytes());
-                ctx.writeAndFlush(new DatagramPacket(buffer, ((DatagramPacket) msg).sender()));
+            public byte[] getPacket() {
+                return payload;
             }
         };
-        UdpSocket udpSocket = new UdpSocket(8080, new_channel);
-        UdpSocket udpSocket2 = new UdpSocket(new_channel);
-        udpSocket2.connect(new InetSocketAddress("localhost",8080));
+        return new Pair<>(message, Byte.valueOf(stamp));
     }
 
     public Future<?> shutdown() {

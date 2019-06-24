@@ -1,7 +1,5 @@
 package NetworkedPhysics.Network;
 
-public interface UDPServerListener {
+public interface UDPServerListener extends UDPConnectionListener {
     void newClient(int id);
-    void disconnected(int id);
-    void newMessage(int fromId, Message message);
 }

@@ -2,7 +2,7 @@ package NetworkedPhysics.Network.nettyUDP;
 
 import NetworkedPhysics.Network.Message;
 import NetworkedPhysics.Network.UDPClient;
-import NetworkedPhysics.Network.UDPClientListener;
+import NetworkedPhysics.Network.UDPConnectionListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
@@ -11,30 +11,48 @@ import java.net.InetSocketAddress;
 
 public class NettyUDPClient implements UDPClient {
 
-    UDPClientListener listener;
+    UDPConnectionListener listener;
+    private UdpSocket udpSocket;
+    private UdpConnection connection;
+
+    private static Message disconnect = new Message() {
+        @Override
+        public byte getCommandCode() {
+            return Byte.MIN_VALUE;
+        }
+
+        @Override
+        public byte[] getPacket() {
+            return new byte[0];
+        }
+    };
 
     @Override
     public void connect(InetSocketAddress socketAddress) {
-        new UdpSocket(0, new SimpleChannelInboundHandler<DatagramPacket>() {
+        udpSocket = new UdpSocket(0, new SimpleChannelInboundHandler<DatagramPacket>() {
             @Override
-            protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-                //listener.newMessage();
+            protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) {
+                connection.receiveMessage(msg, listener);
             }
         });
+        udpSocket.connect(socketAddress);
+        connection = new UdpConnection(socketAddress, 0, udpSocket);
     }
 
     @Override
     public void disconnect() {
-
+        send(disconnect);
     }
 
     @Override
     public void send(Message message) {
-
+        connection.send(message);
     }
 
     @Override
-    public void setListener(UDPClientListener listener) {
-
+    public void setListener(UDPConnectionListener listener) {
+        this.listener = listener;
     }
+
+
 }
