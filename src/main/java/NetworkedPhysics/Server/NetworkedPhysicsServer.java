@@ -23,7 +23,7 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     public NetworkedPhysicsServer(int port, NetworkPhysicsListener networkPhysicsListener) {
         super(networkPhysicsListener);
         udpServer.setListener(this);
-        udpServer.start(port);
+        udpServer.startOn(port);
     }
 
     public int getStepsPerSecond() {

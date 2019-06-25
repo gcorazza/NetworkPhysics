@@ -42,7 +42,7 @@ public class UdpSocket {
                             ch.pipeline().addLast(datagramPacketInboundHandler);
                         }
                     });
-            // Bind and start to accept incoming connections.
+            // Bind and startOn to accept incoming connections.
             System.out.printf("waiting for message %s\n", String.format(localSocketAddress.toString()));
             System.out.flush();
             channel = (NioDatagramChannel) bootstrap.bind(localSocketAddress).sync().channel();

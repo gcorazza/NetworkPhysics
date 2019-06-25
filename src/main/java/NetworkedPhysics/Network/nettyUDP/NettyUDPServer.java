@@ -20,7 +20,7 @@ public class NettyUDPServer implements UDPServer {
     }
 
     @Override
-    public void start(int port) {
+    public void startOn(int port) {
         serverSocket = new UdpSocket(port, new SimpleChannelInboundHandler<DatagramPacket>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) {

@@ -55,4 +55,7 @@ public class NettyUDPClient implements UDPClient {
     }
 
 
+    public ConnectionStatistics getStatistics() {
+        return connection.getStats();
+    }
 }
