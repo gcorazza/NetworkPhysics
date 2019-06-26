@@ -14,6 +14,10 @@ public class NettyUDPServer implements UDPServer {
 
     private ConnectionMapper connectionMapper;
 
+    public NettyUDPServer(UDPServerListener listener) {
+        this.listener = listener;
+    }
+
     @Override
     public void setListener(UDPServerListener listener) {
         this.listener = listener;
@@ -28,7 +32,8 @@ public class NettyUDPServer implements UDPServer {
 
                 if (connection == null) {
                     connection = connectionMapper.newConnection(msg.sender());
-                    listener.newClient(connection.id);
+                    if (listener != null)
+                        listener.newClient(connection.id);
                 }
 
                 connection.receiveMessage(msg, listener);
@@ -55,5 +60,13 @@ public class NettyUDPServer implements UDPServer {
     @Override
     public void sendToAll(Message message) {
         connectionMapper.connections().forEach(udpConnection -> serverSocket.send(message, udpConnection.nextStamp(), udpConnection.inetSocketAddress));
+    }
+
+    public ConnectionStatistics getStatistics(int id) {
+        UdpConnection udpConnection = connectionMapper.get(id);
+        if (udpConnection != null) {
+            return udpConnection.getStats();
+        }
+        return null;
     }
 }

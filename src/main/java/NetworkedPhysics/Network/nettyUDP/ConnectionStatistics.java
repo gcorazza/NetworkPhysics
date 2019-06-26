@@ -11,32 +11,46 @@ public class ConnectionStatistics {
     ArrayList<TimeStamped> stamps = new ArrayList<>();
 
     public double getPacketLossOver(int period) {
-        int indexInPeriod = getStartIndex(period);
-
-        List<TimeStamped> inTimeStamps = stamps.subList(indexInPeriod, stamps.size());
-
+        List<TimeStamped> inTimeStamps = allPacketsReceivedIn(period);
         return packetLoss(inTimeStamps);
     }
 
+    public int howManyPacketsReceivedIn(int period){
+        List<TimeStamped> timeStampeds = allPacketsReceivedIn(period);
+        return timeStampeds.size();
+    }
+    private List<TimeStamped> allPacketsReceivedIn(int period){
+        return stamps.subList(getStartIndex(period), stamps.size());
+    }
+
+
     private float packetLoss(List<TimeStamped> stamps) {
+        if (stamps.isEmpty())
+            return 0;
+
         int lowerStamp = stamps.get(0).stamp;
         int highestStamp = stamps.get(stamps.size() - 1).stamp;
 
         int r = howManyRounds(stamps);
-        int shouldBeIn= r*255-lowerStamp+highestStamp;
+        int shouldStampSize = r * 255 - lowerStamp + highestStamp + 1;
 
-        return ((float)stamps.size())/shouldBeIn;
+        return 1f-((float) stamps.size()) / shouldStampSize;
     }
 
     private int howManyRounds(List<TimeStamped> stamps) {
-        int lastStamp=stamps.get(0).stamp;
-        int rounds=0;
+        int lastStamp = stamps.get(0).stamp;
+        int rounds = 0;
         for (int i = 1; i < stamps.size(); i++) {
             int actual = stamps.get(i).stamp;
-            if(lastStamp-actual>230) {
+
+            if(lastStamp+1!=actual){
+                System.out.println("not correct");
+            }
+
+            if (lastStamp - actual > 230) {
                 rounds++;
             }
-            lastStamp= actual;
+            lastStamp = actual;
         }
         return rounds;
     }

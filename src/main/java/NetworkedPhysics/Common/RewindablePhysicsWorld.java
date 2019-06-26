@@ -30,7 +30,7 @@ public class RewindablePhysicsWorld {
 
     public RewindablePhysicsWorld(NetworkPhysicsListener updateInputs) {
         this.physicsListener = updateInputs;
-        networkWorld= new NetworkPhysicsWorld(updateInputs);
+        networkWorld = new NetworkPhysicsWorld(updateInputs);
     }
 
     public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener, WorldState worldState) {
@@ -46,7 +46,7 @@ public class RewindablePhysicsWorld {
         }
     }
 
-    public int step(){
+    public int step() {
         networkWorld.step(manipulations.get(networkWorld.getStep()));
         return networkWorld.getStep();
     }
@@ -58,18 +58,18 @@ public class RewindablePhysicsWorld {
 
     public int addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
         int id = newObjectId();
-        AddRigidBody message = new AddRigidBody(networkWorld.getStep() , id, networkedPhysicsObjectDto);
+        AddRigidBody message = new AddRigidBody(networkWorld.getStep(), id, networkedPhysicsObjectDto);
         addManipulation(message);
         return id;
     }
 
-    public int addInputNow(PhysicsInput input){
+    public int addInputNow(PhysicsInput input) {
         int id = newInputId();
-        setInput(input,id);
+        setInput(input, id);
         return id;
     }
 
-    public void setInput(PhysicsInput input, int id){
+    public void setInput(PhysicsInput input, int id) {
         SetInput setInput = new SetInput(networkWorld.getStep(), id, input);
         addManipulation(setInput);
     }
@@ -98,21 +98,21 @@ public class RewindablePhysicsWorld {
 //    }
 
     public void rewindToLastState() {
-        if (lastWorldState==null){
-            networkWorld= new NetworkPhysicsWorld(physicsListener);
-        }else{
+        if (lastWorldState == null) {
+            networkWorld = new NetworkPhysicsWorld(physicsListener);
+        } else {
             restore(lastWorldState);
         }
     }
 
     public WorldState saveState() {
         WorldState state = networkWorld.getState();
-        lastWorldState= state;
+        lastWorldState = state;
         return state;
     }
 
-    public void restore(WorldState worldState){
-        networkWorld= new NetworkPhysicsWorld(worldState, physicsListener);
+    public void restore(WorldState worldState) {
+        networkWorld = new NetworkPhysicsWorld(worldState, physicsListener);
         physicsListener.rewinded();
     }
 
@@ -125,10 +125,11 @@ public class RewindablePhysicsWorld {
         return networkWorld.objects.get(physicsObjectId);
     }
 
-    protected int newObjectId(){
+    protected int newObjectId() {
         return ++objectIdCounter;
     }
-    protected int newInputId(){
+
+    protected int newInputId() {
         return ++newInputId;
     }
 

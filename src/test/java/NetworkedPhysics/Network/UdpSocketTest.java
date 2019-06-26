@@ -12,10 +12,13 @@ import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.concurrent.Semaphore;
 
 class UdpSocketTest {
 
     UdpSocket udpSocket;
+    private final int aSecond = 1000;
+    private final float aSecondf = 1000f;
 
     @BeforeEach
     public void before() {
@@ -51,25 +54,103 @@ class UdpSocketTest {
         ByteBuf copy = buffer.copy();
         b.getChannel().writeAndFlush(new DatagramPacket(buffer, localhost));
         a.getChannel().writeAndFlush(new DatagramPacket(copy, localhost));
+
+        a.shutdown().awaitUninterruptibly();
+        b.shutdown().awaitUninterruptibly();
+
     }
 
     @Test
-    void the_packet_loss_should_go_up_when_too_many_packet_are_send() {
-        float tooManyPacketloss = 0.2f;
+    void the_packet_loss_should_go_up_when_too_many_packet_are_send() throws InterruptedException {
+        //Test fails, when CPU ist slower than Databandwidth from Network
+        float tooManyPacketloss = 20.2f;
+        final int packetSize = 300;
         int port = 8080;
+        int packetsPerSecond = 1;
+        Exchange<Integer> id = new Exchange<>();
 
-        NettyUDPServer server = new NettyUDPServer();
+        NettyUDPClient client = new NettyUDPClient(new UDPConnectionAdapter());
+        NettyUDPServer server = new NettyUDPServer(new UDPServerAdapter() {
+            @Override
+            public void newClient(int ID) {
+                id.set(ID);
+            }
+        });
+
         server.startOn(port);
+        client.connect(new InetSocketAddress("192.168.100.42", port));
 
-        NettyUDPClient client = new NettyUDPClient();
-        client.connect(new InetSocketAddress("localhost", port));
+        Message packetSizedMessage = new Message() {
 
-        ConnectionStatistics stats = client.getStatistics();
-        double packetLossOverLastSecond = stats.getPacketLossOver(1000);
+            @Override
+            public byte getCommandCode() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getPacket() {
+                return new byte[packetSize - 1];
+            }
+        };
+
+        client.send(packetSizedMessage);
+        sleep(aSecond);
+        ConnectionStatistics stats = server.getStatistics(id.get());
+        double packetLossOverLastSecond = 0;
+
+        while (packetLossOverLastSecond < tooManyPacketloss) {
+            performOneSecondTackted(packetsPerSecond *= 2, () -> client.send(packetSizedMessage));
+            sleep(50);
+//            packetLossOverLastSecond = stats.getPacketLossOver(aSecond+50);
+            int receivedPacketsAmount = stats.howManyPacketsReceivedIn(aSecond + 50);
+            packetLossOverLastSecond= ((float) receivedPacketsAmount)/packetsPerSecond;
+            System.out.println(packetLossOverLastSecond);
+        }
+
+        server.stop();
+        client.disconnect();
+    }
+
+    class Exchange<V> {
+        private V v;
+        private Semaphore semaphore = new Semaphore(0);
+
+        public V get() throws InterruptedException {
+            semaphore.acquire();
+            semaphore.release();
+            return v;
+        }
+
+        public void set(V v) {
+            this.v = v;
+            semaphore.release(1);
+        }
+
+    }
 
 
+    private void performOneSecondTackted(int tack, Runnable fnc) {
+        long startTime = System.currentTimeMillis();
 
+        while (timeSince(startTime) < aSecond) {
+            fnc.run();
+            sleep(aSecondf / tack);
+        }
+    }
 
+    private long timeSince(long startTime) {
+        return System.currentTimeMillis() - startTime;
+    }
+
+    private void sleep(float v) {
+        if (v <= 0) {
+            return;
+        }
+        try {
+            Thread.sleep((long) v);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

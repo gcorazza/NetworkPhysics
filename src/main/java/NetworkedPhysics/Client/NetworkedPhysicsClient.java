@@ -17,14 +17,13 @@ import java.net.InetSocketAddress;
 
 public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable, UDPConnectionListener {
 
-    UDPClient clientSocket= new NettyUDPClient();
+    UDPClient clientSocket= new NettyUDPClient(this);
 
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
         super(updateInputsCallback);
         clientSocket.connect(socketAddress);
         clientSocket.send(new GetWorldState());
     }
-
 
     public void wishAddObject(NetworkedPhysicsObjectDto o){
 

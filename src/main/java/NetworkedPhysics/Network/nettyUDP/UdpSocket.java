@@ -70,7 +70,12 @@ public class UdpSocket {
 
     public void send(Message msg, int stamp, InetSocketAddress destination) {
         ByteBuf buffer = messageToByteBuf(msg, stamp);
-        channel.writeAndFlush(new DatagramPacket(buffer, destination));
+        boolean done=false;
+        try {
+            done = channel.writeAndFlush(new DatagramPacket(buffer, destination)).await().isDone();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private ByteBuf messageToByteBuf(Message msg, int stamp) {

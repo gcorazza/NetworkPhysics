@@ -18,11 +18,10 @@ import static NetworkedPhysics.Common.Protocol.Protocol.userCommands;
 
 public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Runnable, UDPServerListener {
 
-    private UDPServer udpServer = new NettyUDPServer();
+    private UDPServer udpServer = new NettyUDPServer(this);
 
     public NetworkedPhysicsServer(int port, NetworkPhysicsListener networkPhysicsListener) {
         super(networkPhysicsListener);
-        udpServer.setListener(this);
         udpServer.startOn(port);
     }
 

@@ -11,9 +11,13 @@ import java.net.InetSocketAddress;
 
 public class NettyUDPClient implements UDPClient {
 
-    UDPConnectionListener listener;
+    private UDPConnectionListener listener;
     private UdpSocket udpSocket;
     private UdpConnection connection;
+
+    public NettyUDPClient(UDPConnectionListener listener) {
+        this.listener = listener;
+    }
 
     private static Message disconnect = new Message() {
         @Override

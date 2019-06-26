@@ -20,7 +20,7 @@ class UdpConnection {
     private Map<Byte, StampedMessage> sendMsgBuffer = new HashMap<>();
     private Map<Byte, Long> receivedStempBuffer = new HashMap<>();
 
-    private int stempRoundTime;
+    private final int stampRoundTime = 50;
     private ConnectionStatistics stats = new ConnectionStatistics();
 
     public UdpConnection(InetSocketAddress inetSocketAddress, int id, UdpSocket udpSocket) {
@@ -53,11 +53,10 @@ class UdpConnection {
         Pair<Message, Byte> messageStampPair = packetToMessage(msg);
         Message message = messageStampPair.getKey();
         byte stamp = messageStampPair.getValue();
-        stempRoundTime = 50;
-        boolean alreadyReceived = (receivedStempBuffer.get(stamp) == null
-                || receivedStempBuffer.get(stamp) - System.currentTimeMillis() < stempRoundTime);
-        if (alreadyReceived)
-            return;
+
+        if (receivedStempBuffer.get(stamp) != null)
+            if (System.currentTimeMillis() - receivedStempBuffer.get(stamp) < stampRoundTime)
+                return;
 
         stats.addStamp(stamp);
 
