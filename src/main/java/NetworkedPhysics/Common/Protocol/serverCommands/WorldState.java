@@ -1,6 +1,6 @@
 package NetworkedPhysics.Common.Protocol.serverCommands;
 
-import NetworkedPhysics.Client.NetworkedPhysicsClient;
+import NetworkedPhysics.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
@@ -53,6 +53,6 @@ public class WorldState implements ServerCommand {
 
     @Override
     public void processMessage(NetworkedPhysicsClient physicsClient) {
-        physicsClient.setWorldState(this);
+        physicsClient.restore(this);
     }
 }

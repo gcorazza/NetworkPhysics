@@ -13,6 +13,7 @@ import javafx.util.Pair;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 
 
 public class UdpSocket {
@@ -38,7 +39,7 @@ public class UdpSocket {
                     .option(ChannelOption.SO_BROADCAST, true)
                     .handler(new ChannelInitializer<NioDatagramChannel>() {
                         @Override
-                        protected void initChannel(NioDatagramChannel ch) throws Exception {
+                        protected void initChannel(NioDatagramChannel ch) {
                             ch.pipeline().addLast(datagramPacketInboundHandler);
                         }
                     });
@@ -59,7 +60,7 @@ public class UdpSocket {
         return channel;
     }
 
-    public void send(Message msg, int stamp) {
+    public void send(Message msg, short stamp) {
         if (channel.isConnected()) {
             ByteBuf buffer = messageToByteBuf(msg, stamp);
             channel.writeAndFlush(new DatagramPacket(buffer, channel.remoteAddress()));
@@ -68,30 +69,30 @@ public class UdpSocket {
         }
     }
 
-    public void send(Message msg, int stamp, InetSocketAddress destination) {
+    public void send(Message msg, short stamp, InetSocketAddress destination) {
         ByteBuf buffer = messageToByteBuf(msg, stamp);
-        boolean done=false;
-        try {
-            done = channel.writeAndFlush(new DatagramPacket(buffer, destination)).await().isDone();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        channel.writeAndFlush(new DatagramPacket(buffer, destination));
     }
 
-    private ByteBuf messageToByteBuf(Message msg, int stamp) {
+    private ByteBuf messageToByteBuf(Message msg, short stamp) {
         byte[] bytes = msg.getPacket();
         ByteBuf buffer = channel.alloc().buffer(bytes.length + 2);
-        buffer.writeByte(stamp);
+        byte[] stampBytes = ByteBuffer.allocate(2).putShort(stamp).array();
+        buffer.writeByte(stampBytes[0]);
+        buffer.writeByte(stampBytes[1]);
         buffer.writeByte(msg.getCommandCode());
         buffer.writeBytes(bytes);
         return buffer;
     }
 
-    static Pair<Message, Byte> packetToMessage(DatagramPacket packet) {
+    static Pair<Message, Short> packetToMessage(DatagramPacket packet) {
         final ByteBuf buf = packet.content();
         final int rcvPktLength = buf.readableBytes();
-        final byte[] payload = new byte[rcvPktLength - 2];
-        byte stamp = buf.readByte();
+        final byte[] payload = new byte[rcvPktLength - 3];
+        byte stamp1 = buf.readByte();
+        byte stamp2 = buf.readByte();
+        ByteBuffer put = ByteBuffer.allocate(2).put(stamp1).put(stamp2);
+        short stamp = put.getShort(0);
         byte code = buf.readByte();
         buf.readBytes(payload);
         Message message = new Message() {
@@ -105,7 +106,7 @@ public class UdpSocket {
                 return payload;
             }
         };
-        return new Pair<>(message, Byte.valueOf(stamp));
+        return new Pair<>(message, Short.valueOf(stamp));
     }
 
     public Future<?> shutdown() {

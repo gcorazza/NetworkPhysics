@@ -7,21 +7,21 @@ import io.netty.channel.socket.DatagramPacket;
 import javafx.util.Pair;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import static NetworkedPhysics.Network.nettyUDP.UdpSocket.packetToMessage;
 
 class UdpConnection {
     public final InetSocketAddress inetSocketAddress;
-    private byte messageStamp = 0;
+    private short messageStamp = 0;
     public final int id;
     private UdpSocket udpSocket;
-    private Map<Byte, StampedMessage> sendMsgBuffer = new HashMap<>();
-    private Map<Byte, Long> receivedStempBuffer = new HashMap<>();
+    private List<Short> receivedStempBuffer = new ArrayList<>();
 
     private final int stampRoundTime = 50;
     private ConnectionStatistics stats = new ConnectionStatistics();
+    private int sendTimes=2;
 
     public UdpConnection(InetSocketAddress inetSocketAddress, int id, UdpSocket udpSocket) {
         this.inetSocketAddress = inetSocketAddress;
@@ -29,44 +29,45 @@ class UdpConnection {
         this.udpSocket = udpSocket;
     }
 
-    public byte nextStamp() {
+    public short nextStamp() {
         return ++messageStamp;
     }
 
     public void send(Message message) {
-        byte stamp = nextStamp();
-        udpSocket.send(message, stamp, inetSocketAddress);
-    }
-
-
-    private class StampedMessage {
-        private Message message;
-        private byte stamp;
-
-        public StampedMessage(Message message, byte stamp) {
-            this.message = message;
-            this.stamp = stamp;
+        short stamp = nextStamp();
+        int sendTimes= getSendTimes();
+        for (int i = 0; i < sendTimes; i++) {
+            udpSocket.send(message, stamp, inetSocketAddress);
         }
     }
 
+    private int getSendTimes() {
+        return sendTimes;
+    }
+
+
     void receiveMessage(DatagramPacket msg, UDPConnectionListener listener) {
-        Pair<Message, Byte> messageStampPair = packetToMessage(msg);
+        Pair<Message, Short> messageStampPair = packetToMessage(msg);
         Message message = messageStampPair.getKey();
-        byte stamp = messageStampPair.getValue();
+        short stamp = messageStampPair.getValue();
 
-        if (receivedStempBuffer.get(stamp) != null)
-            if (System.currentTimeMillis() - receivedStempBuffer.get(stamp) < stampRoundTime)
-                return;
+        if (receivedStempBuffer.contains(stamp))
+            return;
 
-        stats.addStamp(stamp);
+        stats.received(stamp);
+        received(stamp);
 
-        receivedStempBuffer.put(stamp, System.currentTimeMillis());
         if (message.getCommandCode() == Byte.MIN_VALUE) {
             listener.disconnected(id);
-        } else if (message.getCommandCode() == Byte.MIN_VALUE + 1) {
-            send(sendMsgBuffer.get(message.getPacket()[0]).message);
         } else
             listener.newMessage(id, message);
+    }
+
+    private void received(short stamp) {
+        receivedStempBuffer.add(stamp);
+        if (receivedStempBuffer.size()>10000){
+            receivedStempBuffer.remove(0);
+        }
     }
 
     public ConnectionStatistics getStats() {

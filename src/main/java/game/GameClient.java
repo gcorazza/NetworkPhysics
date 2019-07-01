@@ -1,6 +1,6 @@
 package game;
 
-import NetworkedPhysics.Client.NetworkedPhysicsClient;
+import NetworkedPhysics.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
 import Rendering.PhysicsWorldRenderer;
 
@@ -8,14 +8,13 @@ import java.net.InetSocketAddress;
 
 public class GameClient {
 
-    private final NetworkedPhysicsClient networkedPhysicsClient;
-    private PhysicsWorldRenderer physicsWorldRenderer;
-
-    public GameClient(InetSocketAddress socketAddress) throws Exception {
-        networkedPhysicsClient = new NetworkedPhysicsClient(socketAddress, new NetworkPhysicsListenerAdapter() {
+    public static void main(String[] args) throws Exception {
+        final PhysicsWorldRenderer physicsWorldRenderer = new PhysicsWorldRenderer();
+        InetSocketAddress localhost = new InetSocketAddress("localhost", 8080);
+        NetworkedPhysicsClient networkedPhysicsClient = new NetworkedPhysicsClient(localhost, new NetworkPhysicsListenerAdapter() {
             @Override
             public void newObject(int physicsObject) {
-                physicsWorldRenderer.newObject(networkedPhysicsClient.getObject(physicsObject));
+                physicsWorldRenderer.newObject(physicsObject);
             }
 
             @Override
@@ -23,14 +22,9 @@ public class GameClient {
                 physicsWorldRenderer.syncObjects();
             }
         });
-        physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsClient);
-    }
+        physicsWorldRenderer.setNetworkedPhysics(networkedPhysicsClient);
 
-    public static void main(String[] args) throws Exception {
-        new GameClient(new InetSocketAddress("localhost", 8080)).run();
-    }
-
-    public void run() {
+        new Thread(networkedPhysicsClient).start();
         physicsWorldRenderer.run();
     }
 }

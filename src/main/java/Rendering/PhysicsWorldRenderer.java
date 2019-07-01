@@ -7,6 +7,7 @@ package Rendering;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsObject;
+import NetworkedPhysics.NetworkedPhysicsClient;
 import Util.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -66,9 +67,12 @@ public class PhysicsWorldRenderer {
     private WorldState ws;
 
     public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
-        this.rewindablePhysicsWorld = rewindablePhysicsWorld;
         init();
-        syncObjects();
+        setNetworkedPhysics(rewindablePhysicsWorld);
+    }
+
+    public PhysicsWorldRenderer() throws Exception {
+        init();
     }
 
     public void run() {
@@ -112,7 +116,7 @@ public class PhysicsWorldRenderer {
         window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
-
+        glfwMakeContextCurrent(window);
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             public void invoke(long window, int key, int scancode, int action, int mods) {
@@ -260,10 +264,10 @@ public class PhysicsWorldRenderer {
     }
 
     private void rewindAtStep300to100() {
-        int step= rewindablePhysicsWorld.getStep();
+        int step = rewindablePhysicsWorld.getStep();
         //            int step=rewindablePhysicsWorld.step();
         if (step > 100 && ws == null) {
-            ws= new WorldState();
+            ws = new WorldState();
             rewindablePhysicsWorld.saveState();
             System.out.println("saved world state");
         }
@@ -306,9 +310,16 @@ public class PhysicsWorldRenderer {
         glUniformMatrix4fv(uniformLocationProjection, false, perspective.get(mat4Buffer));
     }
 
-    public void newObject(PhysicsObject physicsObject) {
-        PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(physicsObject, shaderProgram);
+    public void newObject(int physicsObject) {
+        if (rewindablePhysicsWorld == null)
+            return;
+        PhysicsObject object = rewindablePhysicsWorld.getObject(physicsObject);
+        if (object == null) {
+            return;
+        }
+        PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(object, shaderProgram);
         entities.add(physicsWorldEntity);
+
     }
 
 
@@ -365,4 +376,8 @@ public class PhysicsWorldRenderer {
         glEnd();
     }
 
+    public void setNetworkedPhysics(RewindablePhysicsWorld networkedPhysicsClient) throws Exception {
+        this.rewindablePhysicsWorld = networkedPhysicsClient;
+        syncObjects();
+    }
 }

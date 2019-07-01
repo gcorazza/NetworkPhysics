@@ -6,7 +6,7 @@ import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
 import NetworkedPhysics.Common.ObjectState;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.PhysicsObject;
-import NetworkedPhysics.Server.NetworkedPhysicsServer;
+import NetworkedPhysics.NetworkedPhysicsServer;
 import Rendering.PhysicsWorldRenderer;
 
 import javax.vecmath.Quat4f;
@@ -27,7 +27,7 @@ public class GameServer {
             @Override
             public void newObject(int physicsObjectId) {
                 PhysicsObject physicsObject = networkedPhysicsServer.getObject(physicsObjectId);
-                physicsWorldRenderer.newObject(physicsObject);
+                physicsWorldRenderer.newObject(physicsObjectId);
                 if (physicsObject.getBody().isStaticObject())
                     return;
                 physicsObject.getBody().setLinearVelocity(new Vector3f(-1, 0, -1));

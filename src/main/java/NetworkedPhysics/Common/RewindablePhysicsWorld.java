@@ -31,6 +31,7 @@ public class RewindablePhysicsWorld {
     public RewindablePhysicsWorld(NetworkPhysicsListener updateInputs) {
         this.physicsListener = updateInputs;
         networkWorld = new NetworkPhysicsWorld(updateInputs);
+        saveState();
     }
 
     public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener, WorldState worldState) {
@@ -52,8 +53,12 @@ public class RewindablePhysicsWorld {
     }
 
     public void addManipulation(WorldManipulation worldManipulation) {
-        List<WorldManipulation> stepManipulations = manipulations.computeIfAbsent(worldManipulation.frame, k -> new ArrayList<>());
+        List<WorldManipulation> stepManipulations = manipulations.computeIfAbsent(worldManipulation.step, k -> new ArrayList<>());
         stepManipulations.add(worldManipulation);
+
+        if (networkWorld.step > worldManipulation.step) {
+            rewindToLastState();
+        }
     }
 
     public int addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
@@ -103,6 +108,10 @@ public class RewindablePhysicsWorld {
         } else {
             restore(lastWorldState);
         }
+    }
+
+    public WorldState getLastWorldState(){
+        return lastWorldState;
     }
 
     public WorldState saveState() {

@@ -3,7 +3,7 @@ package NetworkedPhysics.Common.Protocol.clientCommands;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Protocol.UserCommand;
-import NetworkedPhysics.Server.NetworkedPhysicsServer;
+import NetworkedPhysics.NetworkedPhysicsServer;
 
 import static Util.Utils.gson;
 

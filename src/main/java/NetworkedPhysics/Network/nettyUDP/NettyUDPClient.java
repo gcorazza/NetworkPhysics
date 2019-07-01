@@ -41,6 +41,17 @@ public class NettyUDPClient implements UDPClient {
         });
         udpSocket.connect(socketAddress);
         connection = new UdpConnection(socketAddress, 0, udpSocket);
+        connection.send(new Message() {
+            @Override
+            public byte getCommandCode() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getPacket() {
+                return new byte[0];
+            }
+        });
     }
 
     @Override

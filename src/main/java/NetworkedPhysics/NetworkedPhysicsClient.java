@@ -1,12 +1,13 @@
-package NetworkedPhysics.Client;
+package NetworkedPhysics;
 
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.Protocol.Protocol;
+import NetworkedPhysics.Common.Protocol.ServerCommand;
 import NetworkedPhysics.Common.Protocol.clientCommands.ClientInput;
 import NetworkedPhysics.Common.Protocol.clientCommands.GetWorldState;
-import NetworkedPhysics.Common.NetworkPhysicsListener;
-import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
-import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Network.Message;
 import NetworkedPhysics.Network.UDPClient;
 import NetworkedPhysics.Network.UDPConnectionListener;
@@ -17,19 +18,19 @@ import java.net.InetSocketAddress;
 
 public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable, UDPConnectionListener {
 
-    UDPClient clientSocket= new NettyUDPClient(this);
+    private final InetSocketAddress socketAddress;
+    UDPClient clientSocket = new NettyUDPClient(this);
 
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
         super(updateInputsCallback);
-        clientSocket.connect(socketAddress);
-        clientSocket.send(new GetWorldState());
+        this.socketAddress = socketAddress;
     }
 
-    public void wishAddObject(NetworkedPhysicsObjectDto o){
+    public void wishAddObject(NetworkedPhysicsObjectDto o) {
 
     }
 
-    public void wishDeleteObject(NetworkedPhysicsObjectDto o){
+    public void wishDeleteObject(NetworkedPhysicsObjectDto o) {
 
     }
 
@@ -38,20 +39,19 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
     }
 
     public void run() {
-        running=true;
-
-        while(running){
+        running = true;
+        clientSocket.connect(socketAddress);
+        while (running) {
             stepToActualFrame();
         }
     }
 
-    public void setWorldState(WorldState worldState) {
-
-    }
-
     @Override
     public void newMessage(int fromId, Message message) {
-
+        ServerCommand command=Protocol.getServerCommand(message);
+        if (command != null) {
+            command.processMessage(this);
+        }
     }
 
     @Override

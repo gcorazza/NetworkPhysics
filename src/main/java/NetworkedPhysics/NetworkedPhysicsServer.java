@@ -1,20 +1,21 @@
-package NetworkedPhysics.Server;
+package NetworkedPhysics;
 
 import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.Protocol.Protocol;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
 import NetworkedPhysics.Common.Protocol.UserCommand;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Network.Message;
 import NetworkedPhysics.Network.UDPServer;
 import NetworkedPhysics.Network.UDPServerListener;
 import NetworkedPhysics.Network.nettyUDP.NettyUDPServer;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static NetworkedPhysics.Common.Protocol.Protocol.userCommands;
 
 public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Runnable, UDPServerListener {
 
@@ -66,7 +67,19 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     @Override
     public void newClient(int id) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
+        WorldState lastWorldState = getLastWorldState();
+        sendTo(id, lastWorldState);
+        sendManipulationsSince(id, lastWorldState.step);
         physicsListener.newClient(id);
+    }
+
+    private void sendManipulationsSince(int id, int step) {
+        for (int i = step; i < networkWorld.getStep(); i++) {
+            List<WorldManipulation> worldManipulations = manipulations.get(i);
+            if (worldManipulations != null) {
+                worldManipulations.forEach(wm -> sendTo(id, wm));
+            }
+        }
     }
 
     @Override
@@ -76,18 +89,9 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
 
     @Override
     public void newMessage(int fromId, Message message) {
-        Class<? extends UserCommand> aClass = userCommands.get(message.getCommandCode());
-        if (aClass == null) {
-            Logger.getGlobal().log(Level.INFO, "No Protocol entry found for: " + message.getCommandCode());
-            return;
-        }
-        try {
-            UserCommand userCommand = ((UserCommand) aClass.newInstance().fromBlob(message.getPacket()));
-            userCommand.processMessage(this, fromId);
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        UserCommand command = Protocol.getUserCommand(message);
+        if (command != null) {
+            command.processMessage(this, fromId);
         }
     }
 

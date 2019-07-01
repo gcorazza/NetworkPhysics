@@ -1,7 +1,7 @@
 package NetworkedPhysics.Common.Protocol.clientCommands;
 
 import NetworkedPhysics.Common.Protocol.UserCommand;
-import NetworkedPhysics.Server.NetworkedPhysicsServer;
+import NetworkedPhysics.NetworkedPhysicsServer;
 
 public class GetWorldState implements UserCommand {
     public static final byte COMMANDID=2;

@@ -1,6 +1,6 @@
 package NetworkedPhysics.Common.Protocol.serverCommands.Manipulations;
 
-import NetworkedPhysics.Client.NetworkedPhysicsClient;
+import NetworkedPhysics.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import com.google.gson.Gson;
@@ -9,8 +9,11 @@ import static Util.Utils.gson;
 
 public class AddRigidBody extends WorldManipulation {
     public static final byte COMMANDID=5;
-    private final int id;
-    private final NetworkedPhysicsObjectDto physicsObject;
+    private int id;
+    private NetworkedPhysicsObjectDto physicsObject;
+
+    public AddRigidBody() {
+    }
 
     public AddRigidBody(int step, int id, NetworkedPhysicsObjectDto physicsObjectDto) {
         super(step);

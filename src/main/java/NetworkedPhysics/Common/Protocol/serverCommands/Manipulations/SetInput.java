@@ -1,9 +1,8 @@
 package NetworkedPhysics.Common.Protocol.serverCommands.Manipulations;
 
-import NetworkedPhysics.Client.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import NetworkedPhysics.Common.PhysicsInput;
-import NetworkedPhysics.Common.Protocol.PhysicsMessage;
+import NetworkedPhysics.NetworkedPhysicsClient;
 
 import static Util.Utils.gson;
 
@@ -11,6 +10,9 @@ public class SetInput extends WorldManipulation{
     public static final byte COMMANDID=4;
     private int id;
     PhysicsInput input;
+
+    public SetInput() {
+    }
 
     public SetInput(int frame, int id, PhysicsInput input) {
         super(frame);
@@ -25,7 +27,7 @@ public class SetInput extends WorldManipulation{
 
 
     @Override
-    public PhysicsMessage fromBlob(byte[] blob) {
+    public SetInput fromBlob(byte[] blob) {
         return gson.fromJson(new String(blob), SetInput.class);
     }
 

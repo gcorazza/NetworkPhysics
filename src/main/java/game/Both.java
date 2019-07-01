@@ -17,10 +17,10 @@ public class Both {
         } catch (InterruptedException e) {
         }
 
-        try {
-            new GameClient(new InetSocketAddress("localhost", 8080)).run();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            new GameClient(new InetSocketAddress("localhost", 8080)).run();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 }

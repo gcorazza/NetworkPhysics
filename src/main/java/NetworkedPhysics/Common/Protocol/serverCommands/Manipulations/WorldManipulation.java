@@ -5,10 +5,13 @@ import NetworkedPhysics.Common.Protocol.ServerCommand;
 
 public abstract class WorldManipulation implements ServerCommand {
 
-    public final int frame;
+    public int step;
+
+    public WorldManipulation() {
+    }
 
     protected WorldManipulation(int frame) {
-        this.frame = frame;
+        this.step = frame;
     }
 
     public abstract void manipulate(NetworkPhysicsWorld networkedPhysics);
