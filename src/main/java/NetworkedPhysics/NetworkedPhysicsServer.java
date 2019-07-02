@@ -68,6 +68,7 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     public void newClient(int id) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
         WorldState lastWorldState = getLastWorldState();
+        lastWorldState.updateTimesPassed(networkWorld.getStartTime());
         sendTo(id, lastWorldState);
         sendManipulationsSince(id, lastWorldState.step);
         physicsListener.newClient(id);

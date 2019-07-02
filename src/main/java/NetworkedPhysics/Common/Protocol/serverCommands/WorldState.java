@@ -35,9 +35,7 @@ public class WorldState implements ServerCommand {
 
     public Map<Integer, PhysicsInput> getInputsCopy() {
         Map<Integer, PhysicsInput> copy = new HashMap<>();
-        inputs.entrySet().forEach( e ->{
-            copy.put(e.getKey(),SerializationUtils.clone(e.getValue()));
-        });
+        inputs.entrySet().forEach( e -> copy.put(e.getKey(),SerializationUtils.clone(e.getValue())));
         return copy;
     }
 
@@ -53,6 +51,10 @@ public class WorldState implements ServerCommand {
 
     @Override
     public void processMessage(NetworkedPhysicsClient physicsClient) {
-        physicsClient.restore(this);
+        physicsClient.setRemoteWorldState(this);
+    }
+
+    public void updateTimesPassed(long startTime) {
+        timePassed= (int) (System.currentTimeMillis()-startTime);
     }
 }

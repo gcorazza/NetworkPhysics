@@ -28,10 +28,9 @@ public class GameServer {
             public void newObject(int physicsObjectId) {
                 PhysicsObject physicsObject = networkedPhysicsServer.getObject(physicsObjectId);
                 physicsWorldRenderer.newObject(physicsObjectId);
-                if (physicsObject.getBody().isStaticObject())
+                if (physicsObject.getBody().isStaticObject()) {
                     return;
-                physicsObject.getBody().setLinearVelocity(new Vector3f(-1, 0, -1));
-                physicsObject.getBody().setAngularVelocity(new Vector3f(1, 5, 1));
+                }
             }
 
             @Override
@@ -44,7 +43,7 @@ public class GameServer {
             @Override
             public void clientInput(PhysicsInput clientInput, int from) {
                 int inputId = inputMapping.get(from);
-                networkedPhysicsServer.setInput(clientInput,inputId);
+                networkedPhysicsServer.setInput(clientInput, inputId);
             }
 
             @Override
@@ -52,11 +51,12 @@ public class GameServer {
                 physicsWorldRenderer.syncObjects();
             }
         });
+        Vector3f linearVelocity = new Vector3f(-1, 0, -1);
+        Vector3f angularVelocity = new Vector3f(1, 5, 1);
         Quat4f rotation = new Quat4f(0, 0, 0, 10);
-        ObjectState objectStateSphere = new ObjectState(new Vector3f(0, 0, 0), rotation, new Vector3f(), new Vector3f());
+        ObjectState objectStateSphere = new ObjectState(new Vector3f(0, 0, 0), rotation, angularVelocity, linearVelocity);
         ObjectState objectStatePlane = new ObjectState(new Vector3f(0, -4, 0), rotation, new Vector3f(), new Vector3f());
-
-        ObjectState objectStateCube = new ObjectState(new Vector3f(0, 3, 0), rotation, new Vector3f(), new Vector3f());
+        ObjectState objectStateCube = new ObjectState(new Vector3f(0, 3, 0), rotation, angularVelocity, linearVelocity);
         NetworkedPhysicsObjectDto sphere = new NetworkedPhysicsObjectDto(Shape.SPHERE, 0.5f, 1, 1, 1, 1.5f, 0f, objectStateSphere);
         NetworkedPhysicsObjectDto cube = new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, 2, 1.5f, 0f, objectStateCube);
         NetworkedPhysicsObjectDto plane = new NetworkedPhysicsObjectDto(Shape.PLANE, 0, 1, 0, 0, 0.5f, 0.5f, objectStatePlane);

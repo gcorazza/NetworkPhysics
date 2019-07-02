@@ -24,7 +24,6 @@ public class GameClient {
         });
         physicsWorldRenderer.setNetworkedPhysics(networkedPhysicsClient);
 
-        new Thread(networkedPhysicsClient).start();
         physicsWorldRenderer.run();
     }
 }

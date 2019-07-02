@@ -28,10 +28,9 @@ public class RewindablePhysicsWorld {
     private int newInputId;
 
 
-    public RewindablePhysicsWorld(NetworkPhysicsListener updateInputs) {
-        this.physicsListener = updateInputs;
-        networkWorld = new NetworkPhysicsWorld(updateInputs);
-        saveState();
+    public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener) {
+        this.physicsListener = physicsListener;
+        networkWorld = new NetworkPhysicsWorld(physicsListener);
     }
 
     public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener, WorldState worldState) {
@@ -39,7 +38,7 @@ public class RewindablePhysicsWorld {
         networkWorld = new NetworkPhysicsWorld(worldState, physicsListener);
     }
 
-    public void stepToActualFrame() {
+    public synchronized void stepToActualFrame() {
         int shouldBeInFrame = networkWorld.shouldBeInStep();
 
         while (networkWorld.getStep() < shouldBeInFrame) {
@@ -47,12 +46,12 @@ public class RewindablePhysicsWorld {
         }
     }
 
-    public int step() {
+    public synchronized int step() {
         networkWorld.step(manipulations.get(networkWorld.getStep()));
         return networkWorld.getStep();
     }
 
-    public void addManipulation(WorldManipulation worldManipulation) {
+    public synchronized void addManipulation(WorldManipulation worldManipulation) {
         List<WorldManipulation> stepManipulations = manipulations.computeIfAbsent(worldManipulation.step, k -> new ArrayList<>());
         stepManipulations.add(worldManipulation);
 

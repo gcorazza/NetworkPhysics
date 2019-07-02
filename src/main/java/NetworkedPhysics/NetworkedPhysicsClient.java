@@ -6,7 +6,7 @@ import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.Protocol;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
 import NetworkedPhysics.Common.Protocol.clientCommands.ClientInput;
-import NetworkedPhysics.Common.Protocol.clientCommands.GetWorldState;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Network.Message;
 import NetworkedPhysics.Network.UDPClient;
@@ -24,6 +24,7 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
         super(updateInputsCallback);
         this.socketAddress = socketAddress;
+        clientSocket.connect(socketAddress);
     }
 
     public void wishAddObject(NetworkedPhysicsObjectDto o) {
@@ -39,17 +40,14 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
     }
 
     public void run() {
-        running = true;
         clientSocket.connect(socketAddress);
-        while (running) {
-            stepToActualFrame();
-        }
     }
 
     @Override
     public void newMessage(int fromId, Message message) {
         ServerCommand command=Protocol.getServerCommand(message);
         if (command != null) {
+            System.out.println(new String(command.getPacket()));
             command.processMessage(this);
         }
     }
@@ -57,5 +55,10 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
     @Override
     public void disconnected(int id) {
 
+    }
+
+    public void setRemoteWorldState(WorldState worldState) {
+        lastWorldState = worldState;
+        rewindToLastState();
     }
 }

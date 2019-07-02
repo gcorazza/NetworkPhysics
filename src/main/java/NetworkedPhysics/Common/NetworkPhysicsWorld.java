@@ -118,9 +118,7 @@ public class NetworkPhysicsWorld {
         worldState.step = step;
         worldState.btSeed = ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).getRandSeed();
         Map<Integer, PhysicsObject> objectsCopy = new HashMap<>();
-        objects.values().forEach(npo -> {
-                    objectsCopy.put(npo.id, new PhysicsObject(npo.bodyToDto(), npo.id));
-                }
+        objects.values().forEach(npo -> objectsCopy.put(npo.id, new PhysicsObject(npo.bodyToDto(), npo.id))
         );
         worldState.objectMap = objectsCopy;
         Map<Integer, PhysicsInput> inputsCopy = new HashMap<>();

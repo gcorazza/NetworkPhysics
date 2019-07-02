@@ -65,6 +65,7 @@ public class PhysicsWorldRenderer {
 
     private FPS fps = new FPS();
     private WorldState ws;
+    private double lastX,lastY;
 
     public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
         init();
@@ -145,9 +146,11 @@ public class PhysicsWorldRenderer {
         glfwSetCursorPosCallback(window, mousePosCallback = new GLFWCursorPosCallback() {
             @Override
             public void invoke(long l, double x, double y) {
-                glfwSetCursorPos(window, width / 2, height / 2);
-                double dx = width / 2 - x;
-                double dy = height / 2 - y;
+                //glfwSetCursorPos(window, width / 2, height / 2);
+                double dx = lastX - x;
+                double dy = lastY - y;
+                lastX=x;
+                lastY=y;
                 camLookYRad -= dy / camSensitivity;
                 camLookXRad += dx / camSensitivity;
 
@@ -252,7 +255,6 @@ public class PhysicsWorldRenderer {
     }
 
     private void loop() {
-
         while (!glfwWindowShouldClose(window)) {
             glfwMakeContextCurrent(window);
             updateControlls();
