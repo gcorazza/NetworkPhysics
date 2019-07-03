@@ -66,6 +66,7 @@ public class PhysicsWorldRenderer {
     private FPS fps = new FPS();
     private WorldState ws;
     private double lastX,lastY;
+    private boolean camMode2=true;
 
     public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
         init();
@@ -151,6 +152,13 @@ public class PhysicsWorldRenderer {
                 double dy = lastY - y;
                 lastX=x;
                 lastY=y;
+
+                if(camMode2){
+                    glfwSetCursorPos(window, width / 2, height / 2);
+                    dx = width / 2 - x;
+                    dy = height / 2 - y;
+                }
+
                 camLookYRad -= dy / camSensitivity;
                 camLookXRad += dx / camSensitivity;
 

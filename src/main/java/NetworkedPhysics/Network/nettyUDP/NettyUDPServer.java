@@ -7,12 +7,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class NettyUDPServer implements UDPServer {
 
     private UDPServerListener listener;
     private UdpSocket serverSocket;
 
     private ConnectionMapper connectionMapper;
+    private Timer timer = new Timer();
 
     public NettyUDPServer(UDPServerListener listener) {
         this.listener = listener;
@@ -40,12 +45,25 @@ public class NettyUDPServer implements UDPServer {
             }
         });
         connectionMapper = new ConnectionMapper(serverSocket);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                ArrayList<UdpConnection> toRemove= new ArrayList<>();
+                connectionMapper.connections().forEach(con -> {
+                    if (con.hasTimeOut()) {
+                        listener.disconnected(con.id);
+                        toRemove.add(con);
+                    }
+                });
+                connectionMapper.connections().removeAll(toRemove);
+            }
+        },0,5000);
     }
-
 
 
     @Override
     public void stop() {
+        timer.cancel();
         serverSocket.shutdown().awaitUninterruptibly();
     }
 
@@ -54,6 +72,8 @@ public class NettyUDPServer implements UDPServer {
         UdpConnection udpConnection = connectionMapper.get(id);
         if (udpConnection != null) {
             udpConnection.send(message);
+        }else{
+            System.out.println("client with id not found: " + id);
         }
     }
 

@@ -47,8 +47,7 @@ public class NetworkPhysicsWorld {
     }
 
     protected int shouldBeInStep() {
-        int i = (int) (((float) (System.currentTimeMillis() - startTime)) / 1000 * stepsPerSecond);
-        return i;
+        return (int) (((float) (System.currentTimeMillis() - startTime)) / 1000 * stepsPerSecond);
     }
 
 //    protected long timeForStep(int step) {
@@ -83,7 +82,7 @@ public class NetworkPhysicsWorld {
         step++;
     }
 
-    public void addRigidBody(NetworkedPhysicsObjectDto objectDto, int id) {
+    public synchronized void addRigidBody(NetworkedPhysicsObjectDto objectDto, int id) {
         PhysicsObject physicsObject = new PhysicsObject(objectDto, id);
         if (objects.get(id)!=null){
             throw new RuntimeException("ID:"+id +" already exists");
@@ -111,7 +110,7 @@ public class NetworkPhysicsWorld {
         inputs.put(id, input);
     }
 
-    public WorldState getState() {
+    public synchronized WorldState getState() {
         WorldState worldState = new WorldState();
         worldState.stepsPerSecond = stepsPerSecond;
         worldState.timePassed = (int) (System.currentTimeMillis() - startTime);

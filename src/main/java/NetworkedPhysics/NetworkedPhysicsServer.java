@@ -35,17 +35,23 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     }
 
     //calledByServer
-//    public void setClientInput(PhysicsInput clientInput) {
-//        SetInput setInput = new SetInput(networkWorld.getStep() + 1, clientInput);
+//    public void setClientInput(PhysicsInput setClientInput) {
+//        SetInput setInput = new SetInput(networkWorld.getStep() + 1, setClientInput);
 //        super.addManipulation(setInput);
 //        sendToAll(setInput);
 //    }
 
 
     @Override
-    public void addManipulation(WorldManipulation worldManipulation) {
+    public synchronized void addManipulation(WorldManipulation worldManipulation) {
         udpServer.sendToAll(worldManipulation);
         super.addManipulation(worldManipulation);
+    }
+
+    @Override
+    public int update() {
+        stepToActualFrame();
+        return networkWorld.getStep();
     }
 
     public void run() {
@@ -56,7 +62,7 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
         }
     }
 
-    public void clientInput(PhysicsInput clientInput, int from) {
+    public void setClientInput(PhysicsInput clientInput, int from) {
         physicsListener.clientInput(clientInput, from);
     }
 
@@ -65,7 +71,7 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     }
 
     @Override
-    public void newClient(int id) {
+    public synchronized void newClient(int id) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
         WorldState lastWorldState = getLastWorldState();
         lastWorldState.updateTimesPassed(networkWorld.getStartTime());

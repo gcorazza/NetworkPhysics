@@ -14,12 +14,16 @@ import NetworkedPhysics.Network.UDPConnectionListener;
 import NetworkedPhysics.Network.nettyUDP.NettyUDPClient;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable, UDPConnectionListener {
 
     private final InetSocketAddress socketAddress;
     UDPClient clientSocket = new NettyUDPClient(this);
+    private List<ServerCommand> messages = Collections.synchronizedList(new ArrayList<>());
 
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
         super(updateInputsCallback);
@@ -48,7 +52,7 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
         ServerCommand command=Protocol.getServerCommand(message);
         if (command != null) {
             System.out.println(new String(command.getPacket()));
-            command.processMessage(this);
+            messages.add(command);
         }
     }
 
@@ -60,5 +64,19 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
     public void setRemoteWorldState(WorldState worldState) {
         lastWorldState = worldState;
         rewindToLastState();
+    }
+
+    @Override
+    public int update() {
+        processMessages();
+        stepToActualFrame();
+        return networkWorld.getStep();
+    }
+
+    private void processMessages() {
+        int size = messages.size();
+        for (int i = 0; i < size; i++) {
+            messages.remove(0).processMessage(this);
+        }
     }
 }

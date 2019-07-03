@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RewindablePhysicsWorld {
+public abstract class RewindablePhysicsWorld {
 
 
     protected final NetworkPhysicsListener physicsListener;
@@ -60,20 +60,20 @@ public class RewindablePhysicsWorld {
         }
     }
 
-    public int addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
+    public synchronized int addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
         int id = newObjectId();
         AddRigidBody message = new AddRigidBody(networkWorld.getStep(), id, networkedPhysicsObjectDto);
         addManipulation(message);
         return id;
     }
 
-    public int addInputNow(PhysicsInput input) {
+    public  int addInputNow(PhysicsInput input) {
         int id = newInputId();
         setInput(input, id);
         return id;
     }
 
-    public void setInput(PhysicsInput input, int id) {
+    public synchronized void setInput(PhysicsInput input, int id) {
         SetInput setInput = new SetInput(networkWorld.getStep(), id, input);
         addManipulation(setInput);
     }
@@ -82,10 +82,7 @@ public class RewindablePhysicsWorld {
         return running;
     }
 
-    public int update() {
-        stepToActualFrame();
-        return networkWorld.getStep();
-    }
+    public abstract int update();
 
 //    public void send(PhysicsMessage message, UdpConnection udpConnection){
 //        udpConnection.incrementMessageStamp();
@@ -110,6 +107,10 @@ public class RewindablePhysicsWorld {
     }
 
     public WorldState getLastWorldState(){
+        if (lastWorldState != null) {
+            return lastWorldState;
+        }
+        lastWorldState = saveState();
         return lastWorldState;
     }
 

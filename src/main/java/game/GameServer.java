@@ -11,9 +11,7 @@ import Rendering.PhysicsWorldRenderer;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class GameServer {
 
@@ -34,15 +32,15 @@ public class GameServer {
             }
 
             @Override
-            public void newClient(int id) {
+            public void newClient(int clientID) {
                 int playerCubeId = networkedPhysicsServer.addNetworkedPhysicsObjectNow(playerCube());
                 int inId = networkedPhysicsServer.addInputNow(new PhysicsInput(playerCubeId));
-                inputMapping.put(id, inId);
+                inputMapping.put(clientID, inId);
             }
 
             @Override
-            public void clientInput(PhysicsInput clientInput, int from) {
-                int inputId = inputMapping.get(from);
+            public void clientInput(PhysicsInput clientInput, int clientID) {
+                int inputId = inputMapping.get(clientID);
                 networkedPhysicsServer.setInput(clientInput, inputId);
             }
 
@@ -72,6 +70,18 @@ public class GameServer {
     }
 
     public void run() {
+        Timer randomCubeTimer = new Timer();
+//        randomCubeTimer.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Vector3f linearVelocity = new Vector3f(-1, 0, -1);
+//                Vector3f angularVelocity = new Vector3f(1, 5, 1);
+//                Quat4f rotation = new Quat4f(0, 0, 0, 10);
+//                ObjectState objectStateCube = new ObjectState(new Vector3f(0, 3, 0), rotation, angularVelocity, linearVelocity);
+//                NetworkedPhysicsObjectDto cube = new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, 2, 1.5f, 0f, objectStateCube);
+//                networkedPhysicsServer.addNetworkedPhysicsObjectNow(cube);
+//            }
+//        },2000,20000);
         physicsWorldRenderer.run();
         networkedPhysicsServer.shutDown();
     }
