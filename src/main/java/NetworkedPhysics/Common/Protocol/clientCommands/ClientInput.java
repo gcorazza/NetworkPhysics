@@ -26,8 +26,8 @@ public class ClientInput implements UserCommand {
     }
 
     @Override
-    public void processMessage(NetworkedPhysicsServer physicsServer, int from) {
-        physicsServer.setClientInput(clientInput, from);
+    public void processMessage(NetworkedPhysicsServer physicsServer, int clientId) {
+        physicsServer.setClientInput(clientInput, clientId);
     }
 
     @Override

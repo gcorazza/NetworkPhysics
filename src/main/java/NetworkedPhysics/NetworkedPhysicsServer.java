@@ -1,10 +1,14 @@
 package NetworkedPhysics;
 
+import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.Protocol;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
 import NetworkedPhysics.Common.Protocol.UserCommand;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBody;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.SetInput;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
@@ -17,22 +21,31 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Runnable, UDPServerListener {
+public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
 
     private UDPServer udpServer = new NettyUDPServer(this);
 
+    private RewindablePhysicsWorld rewindableWorld;
+    private NetworkPhysicsListener physicsListener;
+    private boolean running;
+
+    private int objectIdCounter;
+    private int newInputId;
+
+
     public NetworkedPhysicsServer(int port, NetworkPhysicsListener networkPhysicsListener) {
-        super(networkPhysicsListener);
+        rewindableWorld = new RewindablePhysicsWorld(networkPhysicsListener);
+        this.physicsListener = networkPhysicsListener;
         udpServer.startOn(port);
     }
 
-    public int getStepsPerSecond() {
-        return networkWorld.getStepsPerSecond();
-    }
-
-    public long getStartTime() {
-        return networkWorld.getStartTime();
-    }
+//    public int getStepsPerSecond() {
+//        return networkWorld.getStepsPerSecond();
+//    }
+//
+//    public long getStartTime() {
+//        return networkWorld.getStartTime();
+//    }
 
     //calledByServer
 //    public void setClientInput(PhysicsInput setClientInput) {
@@ -42,23 +55,16 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
 //    }
 
 
-    @Override
-    public synchronized void addManipulation(WorldManipulation worldManipulation) {
-        udpServer.sendToAll(worldManipulation);
-        super.addManipulation(worldManipulation);
-    }
-
-    @Override
     public int update() {
-        stepToActualFrame();
-        return networkWorld.getStep();
+        rewindableWorld.stepToActualFrame();
+        return rewindableWorld.getStep();
     }
 
     public void run() {
         running = true;
 
         while (running) {
-            stepToActualFrame();
+            rewindableWorld.stepToActualFrame();
         }
     }
 
@@ -73,16 +79,16 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     @Override
     public synchronized void newClient(int id) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
-        WorldState lastWorldState = getLastWorldState();
-        lastWorldState.updateTimesPassed(networkWorld.getStartTime());
+        WorldState lastWorldState = rewindableWorld.getLastWorldState();
+        lastWorldState.updateTimesPassed(rewindableWorld.getStartTime());
         sendTo(id, lastWorldState);
         sendManipulationsSince(id, lastWorldState.step);
         physicsListener.newClient(id);
     }
 
     private void sendManipulationsSince(int id, int step) {
-        for (int i = step; i < networkWorld.getStep(); i++) {
-            List<WorldManipulation> worldManipulations = manipulations.get(i);
+        for (int i = step; i < rewindableWorld.getStep(); i++) {
+            List<WorldManipulation> worldManipulations = rewindableWorld.getManipulations().get(i);
             if (worldManipulations != null) {
                 worldManipulations.forEach(wm -> sendTo(id, wm));
             }
@@ -105,4 +111,43 @@ public class NetworkedPhysicsServer extends RewindablePhysicsWorld implements Ru
     public void shutDown() {
         udpServer.stop();
     }
+
+    public PhysicsObject getObject(int physicsObjectId) {
+        return rewindableWorld.getObject(physicsObjectId);
+    }
+
+    public synchronized int addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
+        int id = newObjectId();
+        AddRigidBody message = rewindableWorld.addNetworkedPhysicsObject(networkedPhysicsObjectDto, id);
+        udpServer.sendToAll(message);
+        return id;
+    }
+
+    public synchronized int addInputNow(PhysicsInput input) {
+        int id = newInputId();
+        setInputNow(input, id);
+        return id;
+    }
+
+    public synchronized void setInputNow(PhysicsInput input, int id) {
+        SetInput setInput = rewindableWorld.setInput(input, id);
+        udpServer.sendToAll(setInput);
+    }
+
+    protected int newObjectId() {
+        return ++objectIdCounter;
+    }
+
+    protected int newInputId() {
+        return ++newInputId;
+    }
+
+    public RewindablePhysicsWorld getRewindableWorld() {
+        return rewindableWorld;
+    }
+
+    public WorldState getWorldStateNewClient() {
+        return rewindableWorld.getLastWorldState();
+    }
 }
+

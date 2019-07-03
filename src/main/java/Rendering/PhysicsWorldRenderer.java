@@ -77,21 +77,15 @@ public class PhysicsWorldRenderer {
         init();
     }
 
-    public void run() {
-        try {
-            loop();
-
-            // Release window and window callbacks
-            glfwDestroyWindow(window);
-            keyCallback.free();
-            wsCallback.free();
-            if (debugProc != null)
-                debugProc.free();
-        } finally {
-            // Terminate GLFW and release the GLFWerrorfun
-            glfwTerminate();
-            errorCallback.free();
-        }
+    public void free(){
+        // Release window and window callbacks
+        glfwDestroyWindow(window);
+        keyCallback.free();
+        wsCallback.free();
+        if (debugProc != null)
+            debugProc.free();
+        glfwTerminate();
+        errorCallback.free();
     }
 
     private void init() throws Exception {
@@ -262,15 +256,15 @@ public class PhysicsWorldRenderer {
         fps.tick();
     }
 
-    private void loop() {
-        while (!glfwWindowShouldClose(window)) {
-            glfwMakeContextCurrent(window);
-            updateControlls();
-            setCamera();
-            renderAFrame();
-            int step = rewindablePhysicsWorld.update();
-//            rewindAtStep300to100();
-        }
+    public void update(){
+        glfwMakeContextCurrent(window);
+        updateControlls();
+        setCamera();
+        renderAFrame();
+    }
+
+    public boolean shouldClose(){
+        return glfwWindowShouldClose(window);
     }
 
     private void rewindAtStep300to100() {

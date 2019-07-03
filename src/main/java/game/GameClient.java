@@ -9,21 +9,25 @@ import java.net.InetSocketAddress;
 public class GameClient {
 
     public static void main(String[] args) throws Exception {
-        final PhysicsWorldRenderer physicsWorldRenderer = new PhysicsWorldRenderer();
+        final PhysicsWorldRenderer renderer = new PhysicsWorldRenderer();
         InetSocketAddress localhost = new InetSocketAddress("localhost", 8080);
-        NetworkedPhysicsClient networkedPhysicsClient = new NetworkedPhysicsClient(localhost, new NetworkPhysicsListenerAdapter() {
+        NetworkedPhysicsClient physicsClient = new NetworkedPhysicsClient(localhost, new NetworkPhysicsListenerAdapter() {
             @Override
             public void newObject(int physicsObject) {
-                physicsWorldRenderer.newObject(physicsObject);
+                renderer.newObject(physicsObject);
             }
 
             @Override
             public void rewinded() {
-                physicsWorldRenderer.syncObjects();
+                renderer.syncObjects();
             }
         });
-        physicsWorldRenderer.setNetworkedPhysics(networkedPhysicsClient);
 
-        physicsWorldRenderer.run();
+        renderer.setNetworkedPhysics(physicsClient);
+        while (!renderer.shouldClose()){
+            physicsClient.update();
+            renderer.update();
+        }
+        renderer.free();
     }
 }

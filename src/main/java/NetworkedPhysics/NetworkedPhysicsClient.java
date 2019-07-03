@@ -66,7 +66,6 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
         rewindToLastState();
     }
 
-    @Override
     public int update() {
         processMessages();
         stepToActualFrame();

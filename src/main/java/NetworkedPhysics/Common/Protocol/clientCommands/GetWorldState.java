@@ -4,7 +4,7 @@ import NetworkedPhysics.Common.Protocol.UserCommand;
 import NetworkedPhysics.NetworkedPhysicsServer;
 
 public class GetWorldState implements UserCommand {
-    public static final byte COMMANDID=2;
+    public static final byte COMMANDID = 2;
 
     public GetWorldState() {
     }
@@ -20,7 +20,7 @@ public class GetWorldState implements UserCommand {
 
     @Override
     public void processMessage(NetworkedPhysicsServer physicsServer, int from) {
-        physicsServer.sendTo(from,physicsServer.saveState());
+        physicsServer.sendTo(from, physicsServer.getWorldStateNewClient());
     }
 
     @Override

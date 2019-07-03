@@ -15,17 +15,17 @@ import java.util.*;
 
 public class GameServer {
 
-    private PhysicsWorldRenderer physicsWorldRenderer;
-    private final NetworkedPhysicsServer networkedPhysicsServer;
+    private PhysicsWorldRenderer renderer;
+    private final NetworkedPhysicsServer physicsServer;
 
     Map<Integer, Integer> inputMapping = new HashMap();
 
     public GameServer(int port) throws Exception {
-        networkedPhysicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
+        physicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
             @Override
             public void newObject(int physicsObjectId) {
-                PhysicsObject physicsObject = networkedPhysicsServer.getObject(physicsObjectId);
-                physicsWorldRenderer.newObject(physicsObjectId);
+                PhysicsObject physicsObject = physicsServer.getObject(physicsObjectId);
+                renderer.newObject(physicsObjectId);
                 if (physicsObject.getBody().isStaticObject()) {
                     return;
                 }
@@ -33,20 +33,20 @@ public class GameServer {
 
             @Override
             public void newClient(int clientID) {
-                int playerCubeId = networkedPhysicsServer.addNetworkedPhysicsObjectNow(playerCube());
-                int inId = networkedPhysicsServer.addInputNow(new PhysicsInput(playerCubeId));
+                int playerCubeId = physicsServer.addNetworkedPhysicsObjectNow(playerCube());
+                int inId = physicsServer.addInputNow(new PhysicsInput(playerCubeId));
                 inputMapping.put(clientID, inId);
             }
 
             @Override
             public void clientInput(PhysicsInput clientInput, int clientID) {
                 int inputId = inputMapping.get(clientID);
-                networkedPhysicsServer.setInput(clientInput, inputId);
+                physicsServer.setInputNow(clientInput, inputId);
             }
 
             @Override
             public void rewinded() {
-                physicsWorldRenderer.syncObjects();
+                renderer.syncObjects();
             }
         });
         Vector3f linearVelocity = new Vector3f(-1, 0, -1);
@@ -59,10 +59,11 @@ public class GameServer {
         NetworkedPhysicsObjectDto cube = new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, 2, 1.5f, 0f, objectStateCube);
         NetworkedPhysicsObjectDto plane = new NetworkedPhysicsObjectDto(Shape.PLANE, 0, 1, 0, 0, 0.5f, 0.5f, objectStatePlane);
 
-        networkedPhysicsServer.addNetworkedPhysicsObjectNow(sphere);
-        networkedPhysicsServer.addNetworkedPhysicsObjectNow(cube);
-        networkedPhysicsServer.addNetworkedPhysicsObjectNow(plane);
-        physicsWorldRenderer = new PhysicsWorldRenderer(networkedPhysicsServer);
+        physicsServer.addNetworkedPhysicsObjectNow(sphere);
+        physicsServer.addNetworkedPhysicsObjectNow(cube);
+        physicsServer.addNetworkedPhysicsObjectNow(plane);
+        renderer = new PhysicsWorldRenderer(physicsServer.getRewindableWorld());
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -79,11 +80,16 @@ public class GameServer {
 //                Quat4f rotation = new Quat4f(0, 0, 0, 10);
 //                ObjectState objectStateCube = new ObjectState(new Vector3f(0, 3, 0), rotation, angularVelocity, linearVelocity);
 //                NetworkedPhysicsObjectDto cube = new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, 2, 1.5f, 0f, objectStateCube);
-//                networkedPhysicsServer.addNetworkedPhysicsObjectNow(cube);
+//                physicsServer.addNetworkedPhysicsObjectNow(cube);
 //            }
 //        },2000,20000);
-        physicsWorldRenderer.run();
-        networkedPhysicsServer.shutDown();
+
+        while (!renderer.shouldClose()){
+            physicsServer.update();
+            renderer.update();
+        }
+        renderer.free();
+        physicsServer.shutDown();
     }
 
     private NetworkedPhysicsObjectDto playerCube() {

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class RewindablePhysicsWorld {
+public class RewindablePhysicsWorld {
 
 
     protected final NetworkPhysicsListener physicsListener;
@@ -24,8 +24,6 @@ public abstract class RewindablePhysicsWorld {
     //protected UdpSocket connection;
     protected WorldState lastWorldState;
 
-    private int objectIdCounter;
-    private int newInputId;
 
 
     public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener) {
@@ -60,29 +58,21 @@ public abstract class RewindablePhysicsWorld {
         }
     }
 
-    public synchronized int addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
-        int id = newObjectId();
-        AddRigidBody message = new AddRigidBody(networkWorld.getStep(), id, networkedPhysicsObjectDto);
+    public AddRigidBody addNetworkedPhysicsObject(NetworkedPhysicsObjectDto networkedPhysicsObjectDto, int id) {
+        AddRigidBody message = new AddRigidBody(getStep(), id, networkedPhysicsObjectDto);
         addManipulation(message);
-        return id;
+        return message;
     }
 
-    public  int addInputNow(PhysicsInput input) {
-        int id = newInputId();
-        setInput(input, id);
-        return id;
-    }
-
-    public synchronized void setInput(PhysicsInput input, int id) {
+    public synchronized SetInput setInput(PhysicsInput input, int id) {
         SetInput setInput = new SetInput(networkWorld.getStep(), id, input);
         addManipulation(setInput);
+        return setInput;
     }
 
     public boolean isRunning() {
         return running;
     }
-
-    public abstract int update();
 
 //    public void send(PhysicsMessage message, UdpConnection udpConnection){
 //        udpConnection.incrementMessageStamp();
@@ -134,17 +124,16 @@ public abstract class RewindablePhysicsWorld {
         return networkWorld.objects.get(physicsObjectId);
     }
 
-    protected int newObjectId() {
-        return ++objectIdCounter;
-    }
-
-    protected int newInputId() {
-        return ++newInputId;
-    }
-
-
     public int getStep() {
         return networkWorld.getStep();
+    }
+
+    public Map<Integer, List<WorldManipulation>> getManipulations() {
+        return manipulations;
+    }
+
+    public long getStartTime() {
+        return networkWorld.getStartTime();
     }
 }
 
