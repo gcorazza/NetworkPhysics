@@ -23,7 +23,7 @@ public class GameClient {
             }
         });
 
-        renderer.setNetworkedPhysics(physicsClient);
+        renderer.setNetworkedPhysics(physicsClient.getRewindableWorld());
         while (!renderer.shouldClose()){
             physicsClient.update();
             renderer.update();

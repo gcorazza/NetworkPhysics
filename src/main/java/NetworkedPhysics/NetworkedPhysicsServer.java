@@ -50,7 +50,7 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
     //calledByServer
 //    public void setClientInput(PhysicsInput setClientInput) {
 //        SetInput setInput = new SetInput(networkWorld.getStep() + 1, setClientInput);
-//        super.addManipulation(setInput);
+//        super.addRemoteManipulation(setInput);
 //        sendToAll(setInput);
 //    }
 
@@ -118,7 +118,7 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
 
     public synchronized int addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto) {
         int id = newObjectId();
-        AddRigidBody message = rewindableWorld.addNetworkedPhysicsObject(networkedPhysicsObjectDto, id);
+        AddRigidBody message = rewindableWorld.addNetworkedPhysicsObjectNow(networkedPhysicsObjectDto, id);
         udpServer.sendToAll(message);
         return id;
     }

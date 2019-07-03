@@ -6,6 +6,8 @@ import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.Protocol;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
 import NetworkedPhysics.Common.Protocol.clientCommands.ClientInput;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBody;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Network.Message;
@@ -19,14 +21,16 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Runnable, UDPConnectionListener {
+public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
 
     private final InetSocketAddress socketAddress;
     UDPClient clientSocket = new NettyUDPClient(this);
     private List<ServerCommand> messages = Collections.synchronizedList(new ArrayList<>());
+    private RewindablePhysicsWorld rewindableWorld;
+    private WorldState remoteWorldState;
 
-    public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener updateInputsCallback) {
-        super(updateInputsCallback);
+    public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener physicsListener) {
+        rewindableWorld = new RewindablePhysicsWorld(physicsListener);
         this.socketAddress = socketAddress;
         clientSocket.connect(socketAddress);
     }
@@ -49,7 +53,7 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
 
     @Override
     public void newMessage(int fromId, Message message) {
-        ServerCommand command=Protocol.getServerCommand(message);
+        ServerCommand command = Protocol.getServerCommand(message);
         if (command != null) {
             System.out.println(new String(command.getPacket()));
             messages.add(command);
@@ -62,14 +66,14 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
     }
 
     public void setRemoteWorldState(WorldState worldState) {
-        lastWorldState = worldState;
-        rewindToLastState();
+        remoteWorldState = worldState;
+        rewindableWorld.restore(remoteWorldState);
     }
 
     public int update() {
         processMessages();
-        stepToActualFrame();
-        return networkWorld.getStep();
+        rewindableWorld.stepToActualFrame();
+        return rewindableWorld.getStep();
     }
 
     private void processMessages() {
@@ -77,5 +81,13 @@ public class NetworkedPhysicsClient extends RewindablePhysicsWorld implements Ru
         for (int i = 0; i < size; i++) {
             messages.remove(0).processMessage(this);
         }
+    }
+
+    public void addRemoteManipulation(WorldManipulation manipulation) {
+        rewindableWorld.addManipulation(manipulation);
+    }
+
+    public RewindablePhysicsWorld getRewindableWorld() {
+        return rewindableWorld;
     }
 }

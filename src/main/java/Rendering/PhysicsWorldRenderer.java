@@ -66,7 +66,7 @@ public class PhysicsWorldRenderer {
     private FPS fps = new FPS();
     private WorldState ws;
     private double lastX,lastY;
-    private boolean camMode2=true;
+    private boolean camMode2=false;
 
     public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
         init();
@@ -109,7 +109,7 @@ public class PhysicsWorldRenderer {
         int HEIGHT = 600;
 
         // Create the window
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Physics World Renderer", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
         glfwMakeContextCurrent(window);
@@ -142,10 +142,8 @@ public class PhysicsWorldRenderer {
             @Override
             public void invoke(long l, double x, double y) {
                 //glfwSetCursorPos(window, width / 2, height / 2);
-                double dx = lastX - x;
-                double dy = lastY - y;
-                lastX=x;
-                lastY=y;
+                double dx=0;
+                double dy=0;
 
                 if(camMode2){
                     glfwSetCursorPos(window, width / 2, height / 2);
@@ -243,6 +241,9 @@ public class PhysicsWorldRenderer {
         }
         if (keyDown[GLFW_KEY_LEFT_SHIFT]) {
             camPos.add(new Vector3f(0, -camSpeed, 0), camPos);
+        }
+        if (keyDown[GLFW_KEY_C]) {
+            camMode2=!camMode2;
         }
     }
 

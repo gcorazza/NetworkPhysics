@@ -2,6 +2,7 @@ package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.Dto.Shape;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ class RewindablePhysicsWorldTest {
         RewindablePhysicsWorld world = new RewindablePhysicsWorld(updateInputs);
 
         NetworkedPhysicsObjectDto body = lameCube();
-        world.addNetworkedPhysicsObject(body,10);
+        world.addNetworkedPhysicsObjectNow(body,10);
         stepWorld100Times(world,12);
 
         WorldState worldState = world.saveState();
@@ -51,7 +52,7 @@ class RewindablePhysicsWorldTest {
             }
         });
         int physicsObjectId = 10;
-        world.addNetworkedPhysicsObject(lameCube(), physicsObjectId);
+        world.addNetworkedPhysicsObjectNow(lameCube(), physicsObjectId);
         world.step();
         System.out.println("----STart----");
         world.getObject(physicsObjectId).print();
@@ -69,5 +70,24 @@ class RewindablePhysicsWorldTest {
         world.step();  //
         world.getObject(physicsObjectId).print();
 
+    }
+
+    @Test
+    void should_be_deterministic_when_restored_and_when_manipulated() {
+        RewindablePhysicsWorld world1 = new RewindablePhysicsWorld(new NetworkPhysicsListenerAdapter());
+        RewindablePhysicsWorld world2 = new RewindablePhysicsWorld(new NetworkPhysicsListenerAdapter());
+        world1.addNetworkedPhysicsObjectNow(lameCube(), 11);
+        world1.addNetworkedPhysicsObjectNow(lameCube(), 12);
+        world1.step();
+        WorldState world1State = world1.saveState();
+        AddRigidBody manipulation = world1.addNetworkedPhysicsObjectNow(lameCube(), 13);
+        world2.restore(world1State);
+        world2.addManipulation(manipulation);
+
+        world1.step();
+
+        world2.step();
+
+        System.out.println(world1);
     }
 }

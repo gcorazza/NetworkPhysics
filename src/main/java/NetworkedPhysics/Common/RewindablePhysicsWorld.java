@@ -58,7 +58,7 @@ public class RewindablePhysicsWorld {
         }
     }
 
-    public AddRigidBody addNetworkedPhysicsObject(NetworkedPhysicsObjectDto networkedPhysicsObjectDto, int id) {
+    public AddRigidBody addNetworkedPhysicsObjectNow(NetworkedPhysicsObjectDto networkedPhysicsObjectDto, int id) {
         AddRigidBody message = new AddRigidBody(getStep(), id, networkedPhysicsObjectDto);
         addManipulation(message);
         return message;
