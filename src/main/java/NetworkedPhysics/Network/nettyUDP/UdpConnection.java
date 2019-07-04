@@ -7,10 +7,7 @@ import io.netty.channel.socket.DatagramPacket;
 import javafx.util.Pair;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import static NetworkedPhysics.Network.nettyUDP.UdpSocket.packetToMessage;
 
@@ -32,6 +29,11 @@ class UdpConnection {
     private byte pingCode = Byte.MIN_VALUE + 1;
     private long lastPingSend;
     private int ping;
+    public static final int maxUDPSize = 500;
+
+    public static final byte partCode = Byte.MIN_VALUE + 2;
+    private byte messagePartId;
+    private HashMap<Integer, MessagePart> partMap = new HashMap<>();
 
     public UdpConnection(InetSocketAddress inetSocketAddress, int id, UdpSocket udpSocket) {
         this.inetSocketAddress = inetSocketAddress;
@@ -61,11 +63,38 @@ class UdpConnection {
     }
 
     public void send(Message message) {
-        short stamp = nextStamp();
-        int sendTimes = getSendTimes();
-        for (int i = 0; i < sendTimes; i++) {
-            udpSocket.send(message, stamp, inetSocketAddress);
+        byte[] packet = message.getPacket();
+        if (packet.length > maxUDPSize) {
+            messageToParts(message).forEach(this::send);
+        } else {
+            short stamp = nextStamp();
+            int sendTimes = getSendTimes();
+            for (int i = 0; i < sendTimes; i++) {
+                udpSocket.send(message, stamp, inetSocketAddress);
+            }
         }
+
+    }
+
+    private ArrayList<Message> messageToParts(Message message) {
+        ArrayList<Message> parts = new ArrayList<>();
+        messagePartId++;
+        byte[] packet = message.getPacket();
+        int sendIndex = 0;
+        while (sendIndex < packet.length) {
+            byte[] part;
+
+            if (sendIndex + maxUDPSize - 4 > packet.length) {
+                part = new byte[packet.length - sendIndex];
+            } else {
+                part = new byte[maxUDPSize - 4];
+            }
+
+            System.arraycopy(packet, sendIndex, part, 0, part.length);
+            sendIndex += part.length;
+            parts.add(new PartMessage(messagePartId, part));
+        }
+        return parts;
     }
 
     private int getSendTimes() {
@@ -88,6 +117,8 @@ class UdpConnection {
             listener.disconnected(id);
         } else if (message.getCommandCode() == pingCode) {
             ping = (int) (System.currentTimeMillis() - lastPingSend);
+        } else if (message.getCommandCode() == partCode) {
+
         } else
             listener.newMessage(id, message);
     }
@@ -110,6 +141,9 @@ class UdpConnection {
 
     public int getPing() {
         return ping;
+    }
+
+    private class MessagePart {
     }
 }
 

@@ -14,6 +14,7 @@ import javafx.util.Pair;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 
 public class UdpSocket {
@@ -60,14 +61,6 @@ public class UdpSocket {
         return channel;
     }
 
-    public void send(Message msg, short stamp) {
-        if (channel.isConnected()) {
-            ByteBuf buffer = messageToByteBuf(msg, stamp);
-            channel.writeAndFlush(new DatagramPacket(buffer, channel.remoteAddress()));
-        } else {
-            throw new RuntimeException("Not Connected: give a destination");
-        }
-    }
 
     public void send(Message msg, short stamp, InetSocketAddress destination) {
         ByteBuf buffer = messageToByteBuf(msg, stamp);

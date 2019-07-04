@@ -45,6 +45,7 @@ public class GameServer {
                 renderer.syncObjects();
             }
         });
+        renderer = new PhysicsWorldRenderer(physicsServer.getRewindableWorld());
         Vector3f linearVelocity = new Vector3f(-1, 0, -1);
         Vector3f angularVelocity = new Vector3f(1, 5, 1);
         Quat4f rotation = new Quat4f(0, 0, 0, 10);
@@ -58,7 +59,6 @@ public class GameServer {
         physicsServer.addNetworkedPhysicsObjectNow(sphere);
         physicsServer.addNetworkedPhysicsObjectNow(cube);
         physicsServer.addNetworkedPhysicsObjectNow(plane);
-        renderer = new PhysicsWorldRenderer(physicsServer.getRewindableWorld());
 
     }
 
