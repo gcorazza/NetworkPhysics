@@ -24,11 +24,7 @@ public class GameServer {
         physicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
             @Override
             public void newObject(int physicsObjectId) {
-                PhysicsObject physicsObject = physicsServer.getObject(physicsObjectId);
                 renderer.newObject(physicsObjectId);
-                if (physicsObject.getBody().isStaticObject()) {
-                    return;
-                }
             }
 
             @Override

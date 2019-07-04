@@ -79,10 +79,9 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
     @Override
     public synchronized void newClient(int id) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
-        WorldState lastWorldState = rewindableWorld.getLastWorldState();
-        lastWorldState.updateTimesPassed(rewindableWorld.getStartTime());
-        sendTo(id, lastWorldState);
-        sendManipulationsSince(id, lastWorldState.step);
+        WorldState worldState = getWorldStateNewClient();
+        sendTo(id, worldState);
+        sendManipulationsSince(id, worldState.step);
         physicsListener.newClient(id);
     }
 
@@ -147,7 +146,9 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
     }
 
     public WorldState getWorldStateNewClient() {
-        return rewindableWorld.getLastWorldState();
+        WorldState worldState = rewindableWorld.saveState();
+        rewindableWorld.restore(worldState);
+        return worldState;
     }
 }
 

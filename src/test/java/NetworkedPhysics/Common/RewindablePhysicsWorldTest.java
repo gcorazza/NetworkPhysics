@@ -22,10 +22,10 @@ class RewindablePhysicsWorldTest {
 
         WorldState worldState = world.saveState();
         stepWorld100Times(world,0);
-        System.out.println(gson.toJson(world.getObject(0).bodyToDto()));
+        System.out.println(gson.toJson(world.getObject(10).bodyToDto()));
         world.restore(worldState);
         stepWorld100Times(world,0);
-        System.out.println(gson.toJson(world.getObject(0).bodyToDto()));
+        System.out.println(gson.toJson(world.getObject(10).bodyToDto()));
     }
 
     private NetworkedPhysicsObjectDto lameCube() {
@@ -80,8 +80,9 @@ class RewindablePhysicsWorldTest {
         world1.addNetworkedPhysicsObjectNow(lameCube(), 12);
         world1.step();
         WorldState world1State = world1.saveState();
-        AddRigidBody manipulation = world1.addNetworkedPhysicsObjectNow(lameCube(), 13);
+        world1.restore(world1State);
         world2.restore(world1State);
+        AddRigidBody manipulation = world1.addNetworkedPhysicsObjectNow(lameCube(), 13);
         world2.addManipulation(manipulation);
 
         world1.step();
