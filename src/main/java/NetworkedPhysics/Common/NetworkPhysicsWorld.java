@@ -1,6 +1,7 @@
 package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
@@ -106,8 +107,11 @@ public class NetworkPhysicsWorld {
         return step;
     }
 
-    public void setInput(PhysicsInput input, int id) {
-        inputs.put(id, input);
+    public void setInput(InputArguments input, int inputId) {
+        PhysicsInput physicsInput = inputs.get(inputId);
+        if (physicsInput != null) {
+            physicsInput.setInputArguments(input);
+        }
     }
 
     public synchronized WorldState getState() {
@@ -130,5 +134,9 @@ public class NetworkPhysicsWorld {
 
     public PhysicsObject getObject(int objId) {
         return objects.get(objId);
+    }
+
+    public void addInput(int id, PhysicsInput input) {
+        inputs.put(id, input);
     }
 }

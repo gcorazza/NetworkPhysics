@@ -4,6 +4,7 @@
  */
 package Rendering;
 
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsObject;
@@ -65,8 +66,11 @@ public class PhysicsWorldRenderer {
 
     private FPS fps = new FPS();
     private WorldState ws;
-    private double lastX,lastY;
-    private boolean camMode2=false;
+    private double lastX, lastY;
+    private boolean camMode2 = false;
+
+
+    private NetworkedPhysicsClient game;
 
     public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
         init();
@@ -77,7 +81,7 @@ public class PhysicsWorldRenderer {
         init();
     }
 
-    public void free(){
+    public void free() {
         // Release window and window callbacks
         glfwDestroyWindow(window);
         keyCallback.free();
@@ -116,13 +120,24 @@ public class PhysicsWorldRenderer {
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             public void invoke(long window, int key, int scancode, int action, int mods) {
-                if (key == GLFW_KEY_UNKNOWN)
+                if (key == GLFW_KEY_UNKNOWN) {
                     return;
+                }
+                if (game != null && key == GLFW_KEY_U && action == GLFW_RELEASE) {
+                    InputArguments clientInput = new InputArguments();
+                    clientInput.click=false;
+                    game.sendMyInput(clientInput);
+                }
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
                     glfwSetWindowShouldClose(window, true);
                 }
                 if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                     keyDown[key] = true;
+                    if (game != null && key == GLFW_KEY_U) {
+                        InputArguments clientInput = new InputArguments();
+                        clientInput.click=true;
+                        game.sendMyInput(clientInput);
+                    }
                 } else {
                     keyDown[key] = false;
                 }
@@ -142,10 +157,10 @@ public class PhysicsWorldRenderer {
             @Override
             public void invoke(long l, double x, double y) {
                 //glfwSetCursorPos(window, width / 2, height / 2);
-                double dx=0;
-                double dy=0;
+                double dx = 0;
+                double dy = 0;
 
-                if(camMode2){
+                if (camMode2) {
                     glfwSetCursorPos(window, width / 2, height / 2);
                     dx = width / 2 - x;
                     dy = height / 2 - y;
@@ -243,7 +258,7 @@ public class PhysicsWorldRenderer {
             camPos.add(new Vector3f(0, -camSpeed, 0), camPos);
         }
         if (keyDown[GLFW_KEY_C]) {
-            camMode2=!camMode2;
+            camMode2 = !camMode2;
         }
     }
 
@@ -257,14 +272,14 @@ public class PhysicsWorldRenderer {
         fps.tick();
     }
 
-    public void update(){
+    public void update() {
         glfwMakeContextCurrent(window);
         updateControlls();
         setCamera();
         renderAFrame();
     }
 
-    public boolean shouldClose(){
+    public boolean shouldClose() {
         return glfwWindowShouldClose(window);
     }
 
@@ -384,5 +399,9 @@ public class PhysicsWorldRenderer {
     public void setNetworkedPhysics(RewindablePhysicsWorld networkedPhysicsClient) throws Exception {
         this.rewindablePhysicsWorld = networkedPhysicsClient;
         syncObjects();
+    }
+
+    public void setGame(NetworkedPhysicsClient game) {
+        this.game = game;
     }
 }

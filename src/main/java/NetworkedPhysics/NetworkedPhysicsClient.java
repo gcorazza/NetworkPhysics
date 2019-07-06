@@ -5,8 +5,7 @@ import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.Protocol;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
-import NetworkedPhysics.Common.Protocol.clientCommands.ClientInput;
-import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBody;
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
@@ -43,8 +42,8 @@ public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
 
     }
 
-    public void sendMyInput(PhysicsInput myInput) {
-        clientSocket.send(new ClientInput(myInput));
+    public void sendMyInput(InputArguments myInput) {
+        clientSocket.send(myInput);
     }
 
     public void run() {
@@ -53,6 +52,7 @@ public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
 
     @Override
     public void newMessage(int fromId, Message message) {
+        System.out.println(new String(message.getPacket()));
         ServerCommand command = Protocol.getServerCommand(message);
         if (command != null) {
             System.out.println(new String(command.getPacket()));

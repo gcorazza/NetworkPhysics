@@ -1,5 +1,7 @@
 package NetworkedPhysics.Common;
 
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
+
 public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     @Override
     public void newObject(int physicsObject) {
@@ -22,7 +24,7 @@ public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     }
 
     @Override
-    public void clientInput(PhysicsInput clientInput, int from) {
+    public void clientInput(InputArguments clientInput, int from) {
 
     }
 

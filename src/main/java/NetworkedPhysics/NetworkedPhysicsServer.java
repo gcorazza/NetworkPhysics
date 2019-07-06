@@ -7,6 +7,8 @@ import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.Protocol;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
 import NetworkedPhysics.Common.Protocol.UserCommand;
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddInput;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.SetInput;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
@@ -68,7 +70,7 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
         }
     }
 
-    public void setClientInput(PhysicsInput clientInput, int from) {
+    public void setClientInput(InputArguments clientInput, int from) {
         physicsListener.clientInput(clientInput, from);
     }
 
@@ -124,11 +126,12 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
 
     public synchronized int addInputNow(PhysicsInput input) {
         int id = newInputId();
-        setInputNow(input, id);
+        AddInput addInput = rewindableWorld.addInputNow(id, input);
+        udpServer.sendToAll(addInput);
         return id;
     }
 
-    public synchronized void setInputNow(PhysicsInput input, int id) {
+    public synchronized void setInputNow(InputArguments input, int id) {
         SetInput setInput = rewindableWorld.setInput(input, id);
         udpServer.sendToAll(setInput);
     }

@@ -1,5 +1,7 @@
 package NetworkedPhysics.Common;
 
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
+
 public interface NetworkPhysicsListener {
     public void newObject(int physicsObject);
 
@@ -9,5 +11,5 @@ public interface NetworkPhysicsListener {
 
     public void rewinded();
 
-    void clientInput(PhysicsInput clientInput, int from);
+    void clientInput(InputArguments clientInput, int from);
 }

@@ -1,7 +1,7 @@
 package NetworkedPhysics.Common.Protocol.serverCommands.Manipulations;
 
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
-import NetworkedPhysics.Common.PhysicsInput;
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
 import NetworkedPhysics.NetworkedPhysicsClient;
 
 import static Util.Utils.gson;
@@ -9,16 +9,17 @@ import static Util.Utils.gson;
 public class SetInput extends WorldManipulation{
     public static final byte COMMANDID=4;
     private int id;
-    PhysicsInput input;
+    private InputArguments input;
 
     public SetInput() {
     }
 
-    public SetInput(int frame, int id, PhysicsInput input) {
+    public SetInput(int frame, int id, InputArguments input) {
         super(frame);
         this.id = id;
         this.input = input;
     }
+
 
     @Override
     public void manipulate(NetworkPhysicsWorld networkedPhysics) {

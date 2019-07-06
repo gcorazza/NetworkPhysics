@@ -1,16 +1,18 @@
 package NetworkedPhysics.Common;
 
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
+
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
 public class PhysicsInput implements Serializable {
     int objId;
+    private InputArguments inputArguments= new InputArguments();
 
     public PhysicsInput(int objId) {
         this.objId = objId;
     }
 
-    boolean click;
     transient boolean lastClicked;
 
     public void update(NetworkPhysicsWorld physicsWorld){
@@ -19,7 +21,7 @@ public class PhysicsInput implements Serializable {
             return;
         }
 
-        if (click){
+        if (inputArguments.click){
             if(!lastClicked){
                 lastClicked=true;
                 object.getBody().setLinearVelocity(new Vector3f(10,-10,10));
@@ -28,5 +30,9 @@ public class PhysicsInput implements Serializable {
             lastClicked=false;
         }
 
+    }
+
+    public void setInputArguments(InputArguments inputArguments) {
+        this.inputArguments = inputArguments;
     }
 }

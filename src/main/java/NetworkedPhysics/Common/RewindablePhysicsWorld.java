@@ -1,6 +1,8 @@
 package NetworkedPhysics.Common;
 
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
+import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddInput;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBody;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.SetInput;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
@@ -64,7 +66,13 @@ public class RewindablePhysicsWorld {
         return message;
     }
 
-    public synchronized SetInput setInput(PhysicsInput input, int id) {
+    public AddInput addInputNow(int id, PhysicsInput input) {
+        AddInput addInput = new AddInput(id, input, getStep());
+        addManipulation(addInput);
+        return addInput;
+    }
+
+    public synchronized SetInput setInput(InputArguments input, int id) {
         SetInput setInput = new SetInput(networkWorld.getStep(), id, input);
         addManipulation(setInput);
         return setInput;
@@ -73,12 +81,11 @@ public class RewindablePhysicsWorld {
     public boolean isRunning() {
         return running;
     }
-
 //    public void send(PhysicsMessage message, UdpConnection udpConnection){
 //        udpConnection.incrementMessageStamp();
 //        connection.send(message,udpConnection.inetSocketAddress);
-//    }
 
+//    }
 //    public void sendToServer(UdpConnection receiver, PhysicsMessage message) {
 //        message.stamp = receiver.nextStamp();
 //        connection.send(message, receiver.inetSocketAddress);
@@ -86,6 +93,7 @@ public class RewindablePhysicsWorld {
 //
 //    public void shutDown() {
 //        connection.shutdown();
+
 //    }
 
     public void rewindToLastState() {

@@ -1,24 +1,19 @@
 package NetworkedPhysics.Common.Protocol.clientCommands;
 
-import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.Common.Protocol.UserCommand;
 import NetworkedPhysics.NetworkedPhysicsServer;
 
+import java.io.Serializable;
+
 import static Util.Utils.gson;
 
-public class ClientInput implements UserCommand {
+public class InputArguments implements UserCommand, Serializable {
     public static final byte COMMANDID = 3;
+    public boolean click;
 
-    PhysicsInput clientInput;
-
-    public ClientInput() {
+    public InputArguments() {
     }
-
-    public ClientInput(PhysicsInput clientInput) {
-        this.clientInput = clientInput;
-    }
-
 
     @Override
     public byte getCommandCode() {
@@ -27,7 +22,7 @@ public class ClientInput implements UserCommand {
 
     @Override
     public void processMessage(NetworkedPhysicsServer physicsServer, int clientId) {
-        physicsServer.setClientInput(clientInput, clientId);
+        physicsServer.setClientInput(this, clientId);
     }
 
     @Override
@@ -37,6 +32,6 @@ public class ClientInput implements UserCommand {
 
     @Override
     public PhysicsMessage fromBlob(byte[] blob) {
-        return gson.fromJson(new String(blob), ClientInput.class);
+        return gson.fromJson(new String(blob), InputArguments.class);
     }
 }

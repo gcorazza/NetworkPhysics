@@ -5,7 +5,7 @@ import NetworkedPhysics.Common.Dto.Shape;
 import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
 import NetworkedPhysics.Common.ObjectState;
 import NetworkedPhysics.Common.PhysicsInput;
-import NetworkedPhysics.Common.PhysicsObject;
+import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
 import NetworkedPhysics.NetworkedPhysicsServer;
 import Rendering.PhysicsWorldRenderer;
 
@@ -17,8 +17,7 @@ public class GameServer {
 
     private PhysicsWorldRenderer renderer;
     private final NetworkedPhysicsServer physicsServer;
-
-    Map<Integer, Integer> inputMapping = new HashMap();
+    private Map<Integer, Integer> inputMapping = new HashMap<>();
 
     public GameServer(int port) throws Exception {
         physicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
@@ -35,14 +34,16 @@ public class GameServer {
             }
 
             @Override
-            public void clientInput(PhysicsInput clientInput, int clientID) {
+            public void clientInput(InputArguments clientInput, int clientID) {
                 int inputId = inputMapping.get(clientID);
                 physicsServer.setInputNow(clientInput, inputId);
             }
 
             @Override
             public void rewinded() {
-                renderer.syncObjects();
+                if (renderer != null) {
+                    renderer.syncObjects();
+                }
             }
         });
         renderer = new PhysicsWorldRenderer(physicsServer.getRewindableWorld());
