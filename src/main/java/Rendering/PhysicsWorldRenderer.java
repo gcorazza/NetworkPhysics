@@ -17,6 +17,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import javax.swing.*;
+import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -72,6 +74,10 @@ public class PhysicsWorldRenderer {
 
     private NetworkedPhysicsClient game;
 
+    JFrame frame = new JFrame("Debug Window");
+    private JLabel stepLabel = new JLabel(" ");
+    private JLabel startTimeLabel = new JLabel(" ");
+
     public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
         init();
         setNetworkedPhysics(rewindablePhysicsWorld);
@@ -90,6 +96,7 @@ public class PhysicsWorldRenderer {
             debugProc.free();
         glfwTerminate();
         errorCallback.free();
+        frame.dispose();
     }
 
     private void init() throws Exception {
@@ -128,9 +135,6 @@ public class PhysicsWorldRenderer {
                     clientInput.click=false;
                     game.sendMyInput(clientInput);
                 }
-                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                    glfwSetWindowShouldClose(window, true);
-                }
                 if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                     keyDown[key] = true;
                     if (game != null && key == GLFW_KEY_U) {
@@ -140,6 +144,9 @@ public class PhysicsWorldRenderer {
                     }
                 } else {
                     keyDown[key] = false;
+                }
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                    glfwSetWindowShouldClose(window, true);
                 }
             }
         });
@@ -173,6 +180,15 @@ public class PhysicsWorldRenderer {
                     camLookYRad = Math.PI / 2 - 0.001;
                 if (camLookYRad < -Math.PI / 2)
                     camLookYRad = -Math.PI / 2 + 0.001;
+            }
+        });
+
+        glfwSetMouseButtonCallback(window, new GLFWMouseButtonCallbackI() {
+            @Override
+            public void invoke(long window, int button, int action, int mods) {
+                if (action ==GLFW_PRESS && button == GLFW_MOUSE_BUTTON_1){
+
+                }
             }
         });
 
@@ -214,6 +230,15 @@ public class PhysicsWorldRenderer {
         setPerspectiveProjection();
 
         glEnableClientState(GL_VERTEX_ARRAY);
+
+        initJFrame();
+    }
+
+    private void initJFrame() {
+        frame.getContentPane().add(stepLabel);
+        frame.getContentPane().add(startTimeLabel);
+        frame.pack();
+        frame.setVisible(true);
     }
 
 
@@ -269,6 +294,8 @@ public class PhysicsWorldRenderer {
         glFlush();
         entities.forEach(this::drawWorldEntity);
         glfwSwapBuffers(window);
+        stepLabel.setText("Step: "+rewindablePhysicsWorld.getStep());
+        startTimeLabel.setText("StartTime: "+rewindablePhysicsWorld.getStartTime());
         fps.tick();
     }
 

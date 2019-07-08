@@ -64,6 +64,7 @@ public class NettyUDPServer implements UDPServer {
     @Override
     public void stop() {
         timer.cancel();
+        connectionMapper.connections().forEach( c -> c.close());
         serverSocket.shutdown().awaitUninterruptibly();
     }
 

@@ -24,7 +24,7 @@ public class PhysicsInput implements Serializable {
         if (inputArguments.click){
             if(!lastClicked){
                 lastClicked=true;
-                object.getBody().setLinearVelocity(new Vector3f(10,-10,10));
+                object.getBody().setLinearVelocity(new Vector3f(00,10, 2));
             }
         }else{
             lastClicked=false;

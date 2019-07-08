@@ -72,7 +72,7 @@ public class RewindablePhysicsWorld {
         return addInput;
     }
 
-    public synchronized SetInput setInput(InputArguments input, int id) {
+    public synchronized SetInput setInputNow(InputArguments input, int id) {
         SetInput setInput = new SetInput(networkWorld.getStep(), id, input);
         addManipulation(setInput);
         return setInput;
@@ -119,6 +119,9 @@ public class RewindablePhysicsWorld {
     }
 
     public void restore(WorldState worldState) {
+        if (lastWorldState ==null || worldState.step>lastWorldState.step){
+            lastWorldState = worldState;
+        }
         networkWorld = new NetworkPhysicsWorld(worldState, physicsListener);
         physicsListener.rewinded();
     }

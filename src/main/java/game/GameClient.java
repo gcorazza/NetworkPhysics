@@ -30,6 +30,7 @@ public class GameClient {
             renderer.update();
         }
         renderer.free();
+        physicsClient.close();
 
     }
 }

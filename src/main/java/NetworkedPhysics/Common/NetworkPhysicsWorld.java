@@ -111,6 +111,8 @@ public class NetworkPhysicsWorld {
         PhysicsInput physicsInput = inputs.get(inputId);
         if (physicsInput != null) {
             physicsInput.setInputArguments(input);
+        }else{
+            System.out.println("inputId not found: " + inputId);
         }
     }
 

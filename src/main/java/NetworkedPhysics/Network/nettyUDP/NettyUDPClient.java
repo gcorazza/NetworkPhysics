@@ -56,7 +56,9 @@ public class NettyUDPClient implements UDPClient {
 
     @Override
     public void disconnect() {
-        send(disconnect);
+        connection.close();
+        udpSocket.shutdown().awaitUninterruptibly();
+//        send(disconnect);
     }
 
     @Override

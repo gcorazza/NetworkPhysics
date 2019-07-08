@@ -55,7 +55,6 @@ public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
         System.out.println(new String(message.getPacket()));
         ServerCommand command = Protocol.getServerCommand(message);
         if (command != null) {
-            System.out.println(new String(command.getPacket()));
             messages.add(command);
         }
     }
@@ -89,5 +88,9 @@ public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
 
     public RewindablePhysicsWorld getRewindableWorld() {
         return rewindableWorld;
+    }
+
+    public void close() {
+        clientSocket.disconnect();
     }
 }

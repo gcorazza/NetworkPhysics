@@ -113,10 +113,10 @@ class UdpConnection {
         Message message = messageStampPair.getKey();
         short stamp = messageStampPair.getValue();
 
-        if (receivedStempBuffer.contains(stamp))
-            return;
-
         stats.received(stamp);
+        if (receivedStempBuffer.contains(stamp)) {
+            return;
+        }
         received(stamp);
 
         if (message.getCommandCode() == Byte.MIN_VALUE) {
@@ -220,6 +220,10 @@ class UdpConnection {
                 return stamp;
             }
         }
+    }
+
+    public void close(){
+        pingTimer.cancel();
     }
 }
 
