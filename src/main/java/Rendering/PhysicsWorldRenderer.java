@@ -236,7 +236,7 @@ public class PhysicsWorldRenderer {
 
     private void initJFrame() {
         frame.getContentPane().add(stepLabel);
-        frame.getContentPane().add(startTimeLabel);
+//        frame.getContentPane().add(startTimeLabel);
         frame.pack();
         frame.setVisible(true);
     }

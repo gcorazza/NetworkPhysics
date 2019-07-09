@@ -8,6 +8,7 @@ import javafx.util.Pair;
 
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static NetworkedPhysics.Network.nettyUDP.UdpSocket.packetToMessage;
 
@@ -26,7 +27,7 @@ class UdpConnection {
     private int recievedStampBufferSize = 1000;
 
     private Timer pingTimer = new Timer();
-    private byte pingCode = Byte.MIN_VALUE + 1;
+    private static byte pingCode = Byte.MIN_VALUE + 1;
     private long lastPingSend;
     private int ping;
     public static final int maxUDPSize = 500;
@@ -34,11 +35,20 @@ class UdpConnection {
     public static final byte partCode = Byte.MIN_VALUE + 2;
     private byte messagePartId;
     private HashMap<Byte, MessageAssembler> partMap = new HashMap<>();
+    private static Map<Byte, BiFunction<Pair<Message, Short>,UdpConnection, Void>>  protocol = new HashMap<>();
+    private static byte disconnectCode = Byte.MIN_VALUE;
+    static {
+        protocol.put(disconnectCode, (ms, con)-> con.disconnected());
+        protocol.put(pingCode, (ms, con)-> con.gotPing());
+        protocol.put(partCode, (ms, con)-> con.partMessage(ms));
+    }
+    private UDPConnectionListener listener;
 
-    public UdpConnection(InetSocketAddress inetSocketAddress, int id, UdpSocket udpSocket) {
+    public UdpConnection(InetSocketAddress inetSocketAddress, int id, UdpSocket udpSocket, UDPConnectionListener listener) {
         this.inetSocketAddress = inetSocketAddress;
         this.id = id;
         this.udpSocket = udpSocket;
+        this.listener = listener;
         pingTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -108,7 +118,7 @@ class UdpConnection {
     }
 
 
-    void receiveMessage(DatagramPacket msg, UDPConnectionListener listener) {
+    void receiveMessage(DatagramPacket msg) {
         Pair<Message, Short> messageStampPair = packetToMessage(msg);
         Message message = messageStampPair.getKey();
         short stamp = messageStampPair.getValue();
@@ -117,27 +127,42 @@ class UdpConnection {
         if (receivedStempBuffer.contains(stamp)) {
             return;
         }
+
         received(stamp);
 
-        if (message.getCommandCode() == Byte.MIN_VALUE) {
-            listener.disconnected(id);
-        } else if (message.getCommandCode() == pingCode) {
-            ping = (int) (System.currentTimeMillis() - lastPingSend);
-        } else if (message.getCommandCode() == partCode) {
-            byte[] messagePacket = message.getPacket();
-            byte partId = messagePacket[0];
-            MessageAssembler messagePart = partMap.get(partId);
-            if (messagePart == null) {
-                int partAmount = messagePacket[1]+1;
-                messagePart = new MessageAssembler(partAmount);
-                partMap.put(partId, messagePart);
-            }
-            messagePart.add(stamp, messagePacket);
-            if (messagePart.isReady()) {
-                listener.newMessage(id, messagePart.getMessage());
-            }
-        } else
+        BiFunction<Pair<Message, Short>, UdpConnection, Void> function = protocol.get(message.getCommandCode());
+        if (function != null) {
+            function.apply(messageStampPair, this);
+        }else{
             listener.newMessage(id, message);
+        }
+    }
+
+    private Void partMessage(Pair<Message, Short> ms) {
+        byte[] messagePacket = ms.getKey().getPacket();
+        byte partId = messagePacket[0];
+        MessageAssembler messagePart = partMap.get(partId);
+        if (messagePart == null) {
+            int partAmount = messagePacket[1]+1;
+            messagePart = new MessageAssembler(partAmount);
+            partMap.put(partId, messagePart);
+        }
+        messagePart.add(ms.getValue(), messagePacket);
+        if (messagePart.isReady()) {
+            listener.newMessage(id, messagePart.getMessage());
+            partMap.remove(partId);
+        }
+        return null;
+    }
+
+    private Void gotPing() {
+        ping = (int) (System.currentTimeMillis() - lastPingSend);
+        return null;
+    }
+
+    private Void disconnected() {
+        listener.disconnected(id);
+        return null;
     }
 
     private void received(short stamp) {

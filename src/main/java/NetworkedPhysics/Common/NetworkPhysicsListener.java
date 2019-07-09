@@ -11,5 +11,5 @@ public interface NetworkPhysicsListener {
 
     public void rewinded();
 
-    void clientInput(InputArguments clientInput, int from);
+    void gotClientInput(InputArguments clientInput, int from);
 }

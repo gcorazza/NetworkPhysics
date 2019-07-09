@@ -24,7 +24,7 @@ public class NetworkPhysicsListenerAdapter implements NetworkPhysicsListener{
     }
 
     @Override
-    public void clientInput(InputArguments clientInput, int from) {
+    public void gotClientInput(InputArguments clientInput, int from) {
 
     }
 

@@ -22,7 +22,7 @@ public class InputArguments implements UserCommand, Serializable {
 
     @Override
     public void processMessage(NetworkedPhysicsServer physicsServer, int clientId) {
-        physicsServer.setClientInput(this, clientId);
+        physicsServer.gotInputArguments(this, clientId);
     }
 
     @Override

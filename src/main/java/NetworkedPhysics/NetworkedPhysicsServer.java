@@ -50,14 +50,14 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
 //    }
 
     //calledByServer
-//    public void setClientInput(PhysicsInput setClientInput) {
-//        SetInput setInputNow = new SetInput(networkWorld.getStep() + 1, setClientInput);
+//    public void gotInputArguments(PhysicsInput gotInputArguments) {
+//        SetInput setInputNow = new SetInput(networkWorld.getStep() + 1, gotInputArguments);
 //        super.addRemoteManipulation(setInputNow);
 //        sendToAll(setInputNow);
 //    }
 
 
-    public int update() {
+    public synchronized int update() {
         rewindableWorld.stepToActualFrame();
         return rewindableWorld.getStep();
     }
@@ -70,8 +70,8 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
         }
     }
 
-    public void setClientInput(InputArguments clientInput, int from) {
-        physicsListener.clientInput(clientInput, from);
+    public void gotInputArguments(InputArguments clientInput, int from) {
+        physicsListener.gotClientInput(clientInput, from);
     }
 
     public void sendTo(int id, ServerCommand command) {

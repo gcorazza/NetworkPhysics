@@ -36,11 +36,11 @@ public class NettyUDPClient implements UDPClient {
         udpSocket = new UdpSocket(0, new SimpleChannelInboundHandler<DatagramPacket>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) {
-                connection.receiveMessage(msg, listener);
+                connection.receiveMessage(msg);
             }
         });
         udpSocket.connect(socketAddress);
-        connection = new UdpConnection(socketAddress, 0, udpSocket);
+        connection = new UdpConnection(socketAddress, 0, udpSocket, listener);
         connection.send(new Message() {
             @Override
             public byte getCommandCode() {

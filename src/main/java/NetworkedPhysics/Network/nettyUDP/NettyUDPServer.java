@@ -41,10 +41,10 @@ public class NettyUDPServer implements UDPServer {
                         listener.newClient(connection.id);
                 }
 
-                connection.receiveMessage(msg, listener);
+                connection.receiveMessage(msg);
             }
         });
-        connectionMapper = new ConnectionMapper(serverSocket);
+        connectionMapper = new ConnectionMapper(serverSocket, listener);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {

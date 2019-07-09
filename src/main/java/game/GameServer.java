@@ -34,7 +34,7 @@ public class GameServer {
             }
 
             @Override
-            public void clientInput(InputArguments clientInput, int clientID) {
+            public void gotClientInput(InputArguments clientInput, int clientID) {
                 Integer inputId = inputMapping.get(clientID);
                 physicsServer.setInputNow(clientInput, inputId);
             }
