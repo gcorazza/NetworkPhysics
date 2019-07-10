@@ -35,4 +35,10 @@ public class InputArguments implements UserCommand, Serializable {
     public PhysicsMessage fromBlob(byte[] blob) {
         return gson.fromJson(new String(blob), InputArguments.class);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        InputArguments arguments = ((InputArguments) obj);
+        return click== arguments.click && spawnClick == arguments.spawnClick;
+    }
 }

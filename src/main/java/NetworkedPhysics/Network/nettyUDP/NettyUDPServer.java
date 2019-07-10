@@ -80,7 +80,7 @@ public class NettyUDPServer implements UDPServer {
 
     @Override
     public void sendToAll(Message message) {
-        connectionMapper.connections().forEach(udpConnection -> serverSocket.send(message, udpConnection.nextStamp(), udpConnection.inetSocketAddress));
+        connectionMapper.connections().forEach(udpConnection -> udpConnection.send(message));
     }
 
     public ConnectionStatistics getStatistics(int id) {

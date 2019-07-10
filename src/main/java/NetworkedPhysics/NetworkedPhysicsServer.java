@@ -82,7 +82,7 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
     public synchronized void newClient(int id) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
         WorldState worldState = getWorldStateNewClient();
-        sendTo(id, worldState);
+        udpServer.sendToAll(worldState);
         sendManipulationsSince(id, worldState.step);
         physicsListener.newClient(id);
     }

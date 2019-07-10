@@ -47,4 +47,19 @@ public class PhysicsObject implements Serializable {
     public void print() {
         System.out.println(gsonPretty.toJson(bodyToDto()));
     }
+
+    public double diff(PhysicsObject phyObj) {
+        double diff=0;
+        Vector3f linearVelocity0 = body.getLinearVelocity(new Vector3f());
+        Vector3f linearVelocity1 = phyObj.body.getLinearVelocity(new Vector3f());
+        linearVelocity0.sub(linearVelocity1);
+        diff+=linearVelocity0.length();
+
+        Vector3f angularVelocity0 = body.getAngularVelocity(new Vector3f());
+        Vector3f angularVelocity1 = phyObj.body.getAngularVelocity(new Vector3f());
+        angularVelocity0.sub(angularVelocity1);
+        diff+=angularVelocity0.length();
+
+        return diff;
+    }
 }

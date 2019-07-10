@@ -7,12 +7,13 @@ import NetworkedPhysics.Common.Protocol.ServerCommand;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static Util.Utils.gson;
 
 public class WorldState implements ServerCommand {
-    public static final byte COMMANDID=1;
+    public static final byte COMMANDID = 1;
     public int timePassed;
     public int stepsPerSecond;
     public int step;
@@ -35,7 +36,7 @@ public class WorldState implements ServerCommand {
 
     public Map<Integer, PhysicsInput> getInputsCopy() {
         Map<Integer, PhysicsInput> copy = new HashMap<>();
-        inputs.entrySet().forEach( e -> copy.put(e.getKey(),SerializationUtils.clone(e.getValue())));
+        inputs.entrySet().forEach(e -> copy.put(e.getKey(), SerializationUtils.clone(e.getValue())));
         return copy;
     }
 
@@ -55,6 +56,42 @@ public class WorldState implements ServerCommand {
     }
 
     public void updateTimesPassed(long startTime) {
-        timePassed= (int) (System.currentTimeMillis()-startTime);
+        timePassed = (int) (System.currentTimeMillis() - startTime);
+    }
+
+    public double getDifference(WorldState ws) {
+        double diff = 0;
+
+        if (ws == null || ws.step != step || ws.inputs.size() != inputs.size() || ws.objectMap.size() != objectMap.size()) {
+            return -1;
+        }
+        Iterator<Integer> keyInputIt = inputs.keySet().iterator();
+
+        while (keyInputIt.hasNext()) {
+            int next = keyInputIt.next();
+            PhysicsInput input0 = inputs.get(next);
+            PhysicsInput input1 = ws.inputs.get(next);
+            if (input0 == null || input1 == null) {
+                return -1;
+            }
+            if (!input0.equals(input1)){
+                return -1;
+            }
+        }
+
+        Iterator<Integer> objKeyIt = objectMap.keySet().iterator();
+
+        while (objKeyIt.hasNext()) {
+            int next = objKeyIt.next();
+            PhysicsObject physicsObject0 = objectMap.get(next);
+            PhysicsObject physicsObject1 = ws.objectMap.get(next);
+            if (physicsObject0 == null || physicsObject1 == null) {
+                return -1;
+            }
+            diff+=physicsObject0.diff(physicsObject1);
+        }
+
+
+        return diff;
     }
 }

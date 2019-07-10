@@ -40,4 +40,10 @@ public class PhysicsInput implements Serializable {
     public void setInputArguments(InputArguments inputArguments) {
         this.inputArguments = inputArguments;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        PhysicsInput input= ((PhysicsInput) obj);
+        return objId== input.objId && inputArguments.equals(input.inputArguments);
+    }
 }
