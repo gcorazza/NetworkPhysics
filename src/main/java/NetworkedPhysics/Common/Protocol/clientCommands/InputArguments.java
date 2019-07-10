@@ -11,6 +11,7 @@ import static Util.Utils.gson;
 public class InputArguments implements UserCommand, Serializable {
     public static final byte COMMANDID = 3;
     public boolean click;
+    public boolean spawnClick;
 
     public InputArguments() {
     }

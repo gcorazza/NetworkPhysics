@@ -6,6 +6,10 @@ import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
 public class PhysicsInput implements Serializable {
+    public int getObjId() {
+        return objId;
+    }
+
     int objId;
     private InputArguments inputArguments= new InputArguments();
 
@@ -24,11 +28,8 @@ public class PhysicsInput implements Serializable {
         if (inputArguments.click){
             if(!lastClicked){
                 lastClicked=true;
-                System.out.println(object.getBody().getLinearVelocity(new Vector3f()));
                 object.getBody().activate();
                 object.getBody().setLinearVelocity(new Vector3f(0,10, 2));
-                System.out.println(object.getBody().getLinearVelocity(new Vector3f()));
-                System.out.println(physicsWorld.world.getCollisionObjectArray().contains(object.getBody()));
             }
         }else{
             lastClicked=false;

@@ -146,6 +146,10 @@ public class RewindablePhysicsWorld {
     public long getStartTime() {
         return networkWorld.getStartTime();
     }
+
+    public PhysicsInput getInput(int inputId) {
+        return networkWorld.getInput(inputId);
+    }
 }
 
 /*

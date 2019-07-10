@@ -37,6 +37,12 @@ public class GameServer {
             public void gotClientInput(InputArguments clientInput, int clientID) {
                 Integer inputId = inputMapping.get(clientID);
                 physicsServer.setInputNow(clientInput, inputId);
+                PhysicsInput input = physicsServer.getInput(inputId);
+                if (clientInput.spawnClick){
+                    clientInput.spawnClick=false;
+                    ObjectState objectState = new ObjectState();
+                    physicsServer.addNetworkedPhysicsObjectNow(new NetworkedPhysicsObjectDto(Shape.CUBE,1,1,1, objectState));
+                }
             }
 
             @Override

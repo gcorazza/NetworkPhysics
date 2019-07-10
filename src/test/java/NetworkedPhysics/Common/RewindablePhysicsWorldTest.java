@@ -90,5 +90,6 @@ class RewindablePhysicsWorldTest {
         world2.step();
 
         System.out.println(world1);
+        world1.equals(world2);
     }
 }

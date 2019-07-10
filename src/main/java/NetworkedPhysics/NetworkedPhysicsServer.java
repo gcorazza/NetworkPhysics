@@ -153,5 +153,9 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
         rewindableWorld.restore(worldState);
         return worldState;
     }
+
+    public PhysicsInput getInput(int inputId) {
+        return rewindableWorld.getInput(inputId);
+    }
 }
 

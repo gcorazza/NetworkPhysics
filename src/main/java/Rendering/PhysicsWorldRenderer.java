@@ -132,15 +132,21 @@ public class PhysicsWorldRenderer {
                 }
                 if (game != null && key == GLFW_KEY_U && action == GLFW_RELEASE) {
                     InputArguments clientInput = new InputArguments();
-                    clientInput.click=false;
+                    clientInput.click = false;
                     game.sendMyInput(clientInput);
                 }
                 if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                     keyDown[key] = true;
-                    if (game != null && key == GLFW_KEY_U) {
-                        InputArguments clientInput = new InputArguments();
-                        clientInput.click=true;
-                        game.sendMyInput(clientInput);
+                    if (game != null) {
+                        if (key == GLFW_KEY_U) {
+                            InputArguments clientInput = new InputArguments();
+                            clientInput.click = true;
+                            game.sendMyInput(clientInput);
+                        }if (key == GLFW_KEY_I) {
+                            InputArguments clientInput = new InputArguments();
+                            clientInput.spawnClick = true;
+                            game.sendMyInput(clientInput);
+                        }
                     }
                 } else {
                     keyDown[key] = false;
@@ -186,7 +192,7 @@ public class PhysicsWorldRenderer {
         glfwSetMouseButtonCallback(window, new GLFWMouseButtonCallbackI() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
-                if (action ==GLFW_PRESS && button == GLFW_MOUSE_BUTTON_1){
+                if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_1) {
 
                 }
             }
@@ -294,8 +300,8 @@ public class PhysicsWorldRenderer {
         glFlush();
         entities.forEach(this::drawWorldEntity);
         glfwSwapBuffers(window);
-        stepLabel.setText("Step: "+rewindablePhysicsWorld.getStep());
-        startTimeLabel.setText("StartTime: "+rewindablePhysicsWorld.getStartTime());
+        stepLabel.setText("Step: " + rewindablePhysicsWorld.getStep());
+        startTimeLabel.setText("StartTime: " + rewindablePhysicsWorld.getStartTime());
         fps.tick();
     }
 

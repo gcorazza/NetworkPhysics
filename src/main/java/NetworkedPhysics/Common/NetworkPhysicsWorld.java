@@ -141,4 +141,8 @@ public class NetworkPhysicsWorld {
     public void addInput(int id, PhysicsInput input) {
         inputs.put(id, input);
     }
+
+    public PhysicsInput getInput(int inputId) {
+        return inputs.get(inputId);
+    }
 }

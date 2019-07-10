@@ -28,7 +28,12 @@ public class AddRigidBody extends WorldManipulation {
 
     @Override
     public AddRigidBody fromBlob(byte[] blob) {
-        return new Gson().fromJson(new String(blob), AddRigidBody.class);
+        return gson.fromJson(new String(blob), AddRigidBody.class);
+    }
+
+    @Override
+    public byte[] getPacket() {
+        return gson.toJson(this).getBytes();
     }
 
 
@@ -40,10 +45,5 @@ public class AddRigidBody extends WorldManipulation {
     @Override
     public byte getCommandCode() {
         return COMMANDID;
-    }
-
-    @Override
-    public byte[] getPacket() {
-        return gson.toJson(this).getBytes();
     }
 }
