@@ -23,14 +23,15 @@ import java.util.List;
 public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
 
     private final InetSocketAddress socketAddress;
+    private NetworkPhysicsListener physicsListener;
     UDPClient clientSocket = new NettyUDPClient(this);
     private List<ServerCommand> messages = Collections.synchronizedList(new ArrayList<>());
     private RewindablePhysicsWorld rewindableWorld;
-    private WorldState remoteWorldState;
+//    private WorldState remoteWorldState;
 
     public NetworkedPhysicsClient(InetSocketAddress socketAddress, NetworkPhysicsListener physicsListener) {
-        rewindableWorld = new RewindablePhysicsWorld(physicsListener);
         this.socketAddress = socketAddress;
+        this.physicsListener = physicsListener;
         clientSocket.connect(socketAddress);
     }
 
@@ -65,12 +66,15 @@ public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
     }
 
     public void setRemoteWorldState(WorldState worldState) {
-        remoteWorldState = worldState;
-        rewindableWorld.restore(remoteWorldState);
+        rewindableWorld = new RewindablePhysicsWorld( physicsListener);
+        rewindableWorld.restoreState(worldState);
     }
 
     public int update() {
         processMessages();
+        if (rewindableWorld == null) {
+            return -1;
+        }
         rewindableWorld.stepToActualFrame();
         return rewindableWorld.getStep();
     }
@@ -80,10 +84,6 @@ public class NetworkedPhysicsClient implements Runnable, UDPConnectionListener {
         for (int i = 0; i < size; i++) {
             messages.remove(0).processMessage(this);
         }
-    }
-
-    public void addRemoteManipulation(WorldManipulation manipulation) {
-        rewindableWorld.addManipulation(manipulation);
     }
 
     public RewindablePhysicsWorld getRewindableWorld() {

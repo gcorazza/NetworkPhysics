@@ -15,15 +15,15 @@ import java.util.*;
 
 public class GameServer {
 
-    private PhysicsWorldRenderer renderer;
+    private PhysicsWorldRenderer renderer = new PhysicsWorldRenderer();
     private final NetworkedPhysicsServer physicsServer;
     private Map<Integer, Integer> inputMapping = new HashMap<>();
 
-    public GameServer(int port) throws Exception {
+    public GameServer(int port) {
         physicsServer = new NetworkedPhysicsServer(port, new NetworkPhysicsListenerAdapter() {
             @Override
             public void newObject(int physicsObjectId) {
-                renderer.newObject(physicsObjectId);
+                renderer.newObject(physicsServer.getRewindableWorld().getObject(physicsObjectId));
             }
 
             @Override
@@ -46,12 +46,9 @@ public class GameServer {
 
             @Override
             public void rewinded() {
-                if (renderer != null) {
-                    renderer.syncObjects();
-                }
+                renderer.syncObjects(physicsServer.getRewindableWorld());
             }
         });
-        renderer = new PhysicsWorldRenderer(physicsServer.getRewindableWorld());
         Vector3f linearVelocity = new Vector3f(-1, 0, -1);
         Vector3f angularVelocity = new Vector3f(1, 5, 1);
         Quat4f rotation = new Quat4f(0, 0, 0, 10);

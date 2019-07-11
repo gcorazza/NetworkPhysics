@@ -38,7 +38,7 @@ public class AddRigidBody extends WorldManipulation {
 
     @Override
     public void processMessage(NetworkedPhysicsClient physicsClient) {
-        physicsClient.addRemoteManipulation(this);
+        physicsClient.getRewindableWorld().addManipulation(this);
     }
 
     @Override

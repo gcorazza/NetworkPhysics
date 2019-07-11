@@ -44,6 +44,6 @@ public class SetInput extends WorldManipulation{
 
     @Override
     public void processMessage(NetworkedPhysicsClient physicsClient) {
-        physicsClient.addRemoteManipulation(this);
+        physicsClient.getRewindableWorld().addManipulation(this);
     }
 }

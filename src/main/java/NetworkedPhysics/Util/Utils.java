@@ -9,16 +9,21 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import javax.vecmath.Vector3f;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
 public class Utils {
 
-    public static String loadResource(String fileName) throws Exception {
-        String result;
+    public static String loadResource(String fileName) {
+        String result = null;
         try (InputStream in = Class.forName(Utils.class.getName()).getResourceAsStream(fileName);
              Scanner scanner = new Scanner(in, "UTF-8")) {
             result = scanner.useDelimiter("\\A").next();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return result;
     }

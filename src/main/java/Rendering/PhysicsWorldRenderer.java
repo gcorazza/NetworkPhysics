@@ -42,7 +42,6 @@ public class PhysicsWorldRenderer {
     private long window;
     private int width, height;
 
-    private RewindablePhysicsWorld rewindablePhysicsWorld;
     private ShaderProgram shaderProgram;
     private Matrix4f cam = new Matrix4f();
     private boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
@@ -71,18 +70,18 @@ public class PhysicsWorldRenderer {
     private boolean camMode2 = false;
 
 
-    private NetworkedPhysicsClient game;
+    private NetworkedPhysicsClient physicsClient;
 
     JFrame frame = new JFrame("Debug Window");
     private JLabel stepLabel = new JLabel(" ");
     private JLabel startTimeLabel = new JLabel(" ");
 
-    public PhysicsWorldRenderer(RewindablePhysicsWorld rewindablePhysicsWorld) throws Exception {
+    public PhysicsWorldRenderer() {
         init();
-        setNetworkedPhysics(rewindablePhysicsWorld);
     }
 
-    public PhysicsWorldRenderer() throws Exception {
+    public PhysicsWorldRenderer(NetworkedPhysicsClient physicsClient) {
+        this.physicsClient =physicsClient;
         init();
     }
 
@@ -98,7 +97,7 @@ public class PhysicsWorldRenderer {
         frame.dispose();
     }
 
-    private void init() throws Exception {
+    private void init() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
         glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
@@ -129,22 +128,23 @@ public class PhysicsWorldRenderer {
                 if (key == GLFW_KEY_UNKNOWN) {
                     return;
                 }
-                if (game != null && key == GLFW_KEY_U && action == GLFW_RELEASE) {
+                if (physicsClient != null && key == GLFW_KEY_U && action == GLFW_RELEASE) {
                     InputArguments clientInput = new InputArguments();
                     clientInput.click = false;
-                    game.sendMyInput(clientInput);
+                    physicsClient.sendMyInput(clientInput);
                 }
                 if (action == GLFW_PRESS || action == GLFW_REPEAT) {
                     keyDown[key] = true;
-                    if (game != null) {
+                    if (physicsClient != null) {
                         if (key == GLFW_KEY_U) {
                             InputArguments clientInput = new InputArguments();
                             clientInput.click = true;
-                            game.sendMyInput(clientInput);
-                        }if (key == GLFW_KEY_I) {
+                            physicsClient.sendMyInput(clientInput);
+                        }
+                        if (key == GLFW_KEY_I) {
                             InputArguments clientInput = new InputArguments();
                             clientInput.spawnClick = true;
-                            game.sendMyInput(clientInput);
+                            physicsClient.sendMyInput(clientInput);
                         }
                     }
                 } else {
@@ -299,8 +299,10 @@ public class PhysicsWorldRenderer {
         glFlush();
         entities.forEach(this::drawWorldEntity);
         glfwSwapBuffers(window);
-        stepLabel.setText("Step: " + rewindablePhysicsWorld.getStep());
-        startTimeLabel.setText("StartTime: " + rewindablePhysicsWorld.getStartTime());
+//        if (rewindablePhysicsWorld != null) {
+//            stepLabel.setText("Step: " + rewindablePhysicsWorld.getStep());
+//            startTimeLabel.setText("StartTime: " + rewindablePhysicsWorld.getStartTime());
+//        }
         fps.tick();
     }
 
@@ -315,20 +317,6 @@ public class PhysicsWorldRenderer {
         return glfwWindowShouldClose(window);
     }
 
-    private void rewindAtStep300to100() {
-        int step = rewindablePhysicsWorld.getStep();
-        //            int step=rewindablePhysicsWorld.step();
-        if (step > 100 && ws == null) {
-            ws = new WorldState();
-            rewindablePhysicsWorld.saveState();
-            System.out.println("saved world state");
-        }
-
-        if (step > 300) {
-            rewindablePhysicsWorld.rewindToLastState();
-            System.out.println("restored world??");
-        }
-    }
 
     private void drawWorldEntity(PhysicsWorldEntity worldEntity) {
         worldEntity.getShader().bind();
@@ -362,20 +350,16 @@ public class PhysicsWorldRenderer {
         glUniformMatrix4fv(uniformLocationProjection, false, perspective.get(mat4Buffer));
     }
 
-    public void newObject(int physicsObject) {
-        if (rewindablePhysicsWorld == null)
-            return;
-        PhysicsObject object = rewindablePhysicsWorld.getObject(physicsObject);
+    public void newObject(PhysicsObject object) {
         if (object == null) {
             return;
         }
         PhysicsWorldEntity physicsWorldEntity = new PhysicsWorldEntity(object, shaderProgram);
         entities.add(physicsWorldEntity);
-
     }
 
 
-    public void syncObjects() {
+    public void syncObjects(RewindablePhysicsWorld rewindablePhysicsWorld) {
         Collection<PhysicsObject> objects = rewindablePhysicsWorld.getObjects().values();
         entities.removeAll(entities);
         objects.forEach(physicsObject -> entities.add(new PhysicsWorldEntity(physicsObject, shaderProgram)));
@@ -428,12 +412,4 @@ public class PhysicsWorldRenderer {
         glEnd();
     }
 
-    public void setNetworkedPhysics(RewindablePhysicsWorld networkedPhysicsClient) throws Exception {
-        this.rewindablePhysicsWorld = networkedPhysicsClient;
-        syncObjects();
-    }
-
-    public void setGame(NetworkedPhysicsClient game) {
-        this.game = game;
-    }
 }

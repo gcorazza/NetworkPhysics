@@ -35,7 +35,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>game.GameClient</mainClass>
+                            <mainClass>physicsClient.GameClient</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

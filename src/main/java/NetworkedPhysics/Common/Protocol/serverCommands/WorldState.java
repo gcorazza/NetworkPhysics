@@ -21,6 +21,10 @@ public class WorldState implements ServerCommand {
     public Map<Integer, PhysicsObject> objectMap;
     public Map<Integer, PhysicsInput> inputs;
 
+    public WorldState() {
+        System.out.println();
+    }
+
     @Override
     public WorldState fromBlob(byte[] blob) {
         return gson.fromJson(new String(blob), WorldState.class);
@@ -28,9 +32,7 @@ public class WorldState implements ServerCommand {
 
     public Map<Integer, PhysicsObject> getObjectsCopy() {
         Map<Integer, PhysicsObject> copy = new HashMap<>();
-        objectMap.values().forEach(o -> {
-            copy.put(o.id, SerializationUtils.clone(o));
-        });
+        objectMap.values().forEach(o -> copy.put(o.id, SerializationUtils.clone(o)));
         return copy;
     }
 

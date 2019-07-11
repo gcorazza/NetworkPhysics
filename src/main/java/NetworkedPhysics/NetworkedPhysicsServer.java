@@ -150,7 +150,7 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
 
     public WorldState getWorldStateNewClient() {
         WorldState worldState = rewindableWorld.saveState();
-        rewindableWorld.restore(worldState);
+        rewindableWorld.restoreState(worldState);
         return worldState;
     }
 

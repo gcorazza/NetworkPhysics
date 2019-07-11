@@ -8,34 +8,23 @@ import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.SetInput;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.WorldManipulation;
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RewindablePhysicsWorld {
 
 
     protected final NetworkPhysicsListener physicsListener;
-    protected NetworkPhysicsWorld networkWorld;
+    protected NetworkPhysicsWorld networkWorld; //not null
 
     protected Map<Integer, List<WorldManipulation>> manipulations = new HashMap<>();
 
-    protected int port;
-    protected boolean running = false;
-    //protected UdpSocket connection;
-    protected WorldState lastWorldState;
+    protected LinkedList<WorldState> jumpBackPoints = new LinkedList<>();
+    private int cachedJumpBackPoints = 2;
 
 
-
-    public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener) {
+    public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener) { //For Server
         this.physicsListener = physicsListener;
         networkWorld = new NetworkPhysicsWorld(physicsListener);
-    }
-
-    public RewindablePhysicsWorld(NetworkPhysicsListener physicsListener, WorldState worldState) {
-        this.physicsListener = physicsListener;
-        networkWorld = new NetworkPhysicsWorld(worldState, physicsListener);
     }
 
     public synchronized void stepToActualFrame() {
@@ -56,7 +45,22 @@ public class RewindablePhysicsWorld {
         stepManipulations.add(worldManipulation);
 
         if (networkWorld.step > worldManipulation.step) {
-            rewindToLastState();
+            rewindToStep(worldManipulation.step);
+        }
+    }
+
+    private void rewindToStep(int step) {
+        if (networkWorld.step <= step)
+            return;
+
+        Iterator<WorldState> jmpPoint = jumpBackPoints.descendingIterator();
+        while (jmpPoint.hasNext()) {
+            WorldState next = jmpPoint.next();
+            System.out.println();
+            if (next.step <= step) {
+                restoreState(next);
+                return;
+            }
         }
     }
 
@@ -78,9 +82,6 @@ public class RewindablePhysicsWorld {
         return setInput;
     }
 
-    public boolean isRunning() {
-        return running;
-    }
 //    public void send(PhysicsMessage message, UdpConnection udpConnection){
 //        udpConnection.incrementMessageStamp();
 //        connection.send(message,udpConnection.inetSocketAddress);
@@ -96,32 +97,17 @@ public class RewindablePhysicsWorld {
 
 //    }
 
-    public void rewindToLastState() {
-        if (lastWorldState == null) {
-            networkWorld = new NetworkPhysicsWorld(physicsListener);
-        } else {
-            restore(lastWorldState);
-        }
-    }
-
-    public WorldState getLastWorldState(){
-        if (lastWorldState != null) {
-            return lastWorldState;
-        }
-        lastWorldState = saveState();
-        return lastWorldState;
-    }
 
     public WorldState saveState() {
         WorldState state = networkWorld.getState();
-        lastWorldState = state;
+        jumpBackPoints.addFirst(state);
+        if (jumpBackPoints.size() > cachedJumpBackPoints) {
+            jumpBackPoints.removeLast();
+        }
         return state;
     }
 
-    public void restore(WorldState worldState) {
-        if (lastWorldState ==null || worldState.step>lastWorldState.step){
-            lastWorldState = worldState;
-        }
+    public void restoreState(WorldState worldState) {
         networkWorld = new NetworkPhysicsWorld(worldState, physicsListener);
         physicsListener.rewinded();
     }
