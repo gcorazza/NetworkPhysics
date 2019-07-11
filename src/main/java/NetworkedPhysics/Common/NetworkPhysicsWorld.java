@@ -8,6 +8,8 @@ import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,16 @@ public class NetworkPhysicsWorld {
     protected int stepsPerSecond = 60;
     protected long startTime;
     final NetworkPhysicsListener physicsListener;
+    private boolean logStatesToFile = false;
+    private FileOutputStream stateWriter;
+
+    {
+        try {
+            stateWriter = new FileOutputStream(new Date().toString() + "_" + Thread.currentThread().getName() + ".states");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public NetworkPhysicsWorld(NetworkPhysicsListener physicsListener) {
@@ -40,7 +52,7 @@ public class NetworkPhysicsWorld {
         objects = worldState.getObjectsCopy();
         inputs = worldState.getInputsCopy();
         ((SequentialImpulseConstraintSolver) world.getConstraintSolver()).setRandSeed(worldState.btSeed);
-        objects.values().forEach( o -> world.addRigidBody( o.getBody()));
+        objects.values().forEach(o -> world.addRigidBody(o.getBody()));
     }
 
     protected int msPassedSiceStart() {
@@ -51,28 +63,6 @@ public class NetworkPhysicsWorld {
         return (int) (((float) (System.currentTimeMillis() - startTime)) / 1000 * stepsPerSecond);
     }
 
-//    protected long timeForStep(int step) {
-//        int v = (int) (step * (1000f / stepsPerSecond));
-//        return (startTime + v);
-//    }
-
-//    protected int msToNextStep() {
-//        long l = System.currentTimeMillis();
-//        long tff = timeForStep(step + 1);
-//        return (int) (tff - l);
-//    }
-
-//    protected void waitTilNextStep() {
-//        try {
-//            int i = msToNextStep();
-//            if (i > 0)
-//                Thread.sleep(i);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-
     public void step(List<WorldManipulation> worldManipulations) {
         if (worldManipulations != null) {
             worldManipulations.forEach(wm -> wm.manipulate(this));
@@ -81,12 +71,22 @@ public class NetworkPhysicsWorld {
         world.stepSimulation(1f / stepsPerSecond, 0);
 
         step++;
+
+        if (logStatesToFile) {
+            byte[] packet = getState().getPacket();
+            try {
+                stateWriter.write(packet);
+                stateWriter.write('\n');
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public synchronized void addRigidBody(NetworkedPhysicsObjectDto objectDto, int id) {
         PhysicsObject physicsObject = new PhysicsObject(objectDto, id);
-        if (objects.get(id)!=null){
-            throw new RuntimeException("ID:"+id +" already exists");
+        if (objects.get(id) != null) {
+            throw new RuntimeException("ID:" + id + " already exists");
         }
         objects.put(id, physicsObject);
         world.addRigidBody(physicsObject.getBody());
@@ -111,7 +111,7 @@ public class NetworkPhysicsWorld {
         PhysicsInput physicsInput = inputs.get(inputId);
         if (physicsInput != null) {
             physicsInput.setInputArguments(input);
-        }else{
+        } else {
             System.out.println("inputId not found: " + inputId);
         }
     }
@@ -127,7 +127,7 @@ public class NetworkPhysicsWorld {
         );
         worldState.objectMap = objectsCopy;
         Map<Integer, PhysicsInput> inputsCopy = new HashMap<>();
-        inputs.entrySet().forEach( e -> {
+        inputs.entrySet().forEach(e -> {
             inputsCopy.put(e.getKey(), SerializationUtils.clone(e.getValue()));
         });
         worldState.inputs = inputsCopy;

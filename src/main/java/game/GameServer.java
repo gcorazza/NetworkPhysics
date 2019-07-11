@@ -37,7 +37,6 @@ public class GameServer {
             public void gotClientInput(InputArguments clientInput, int clientID) {
                 Integer inputId = inputMapping.get(clientID);
                 physicsServer.setInputNow(clientInput, inputId);
-                PhysicsInput input = physicsServer.getInput(inputId);
                 if (clientInput.spawnClick){
                     clientInput.spawnClick=false;
                     ObjectState objectState = new ObjectState();

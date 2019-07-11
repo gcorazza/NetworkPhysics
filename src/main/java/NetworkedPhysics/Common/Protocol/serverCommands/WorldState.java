@@ -65,19 +65,6 @@ public class WorldState implements ServerCommand {
         if (ws == null || ws.step != step || ws.inputs.size() != inputs.size() || ws.objectMap.size() != objectMap.size()) {
             return -1;
         }
-        Iterator<Integer> keyInputIt = inputs.keySet().iterator();
-
-        while (keyInputIt.hasNext()) {
-            int next = keyInputIt.next();
-            PhysicsInput input0 = inputs.get(next);
-            PhysicsInput input1 = ws.inputs.get(next);
-            if (input0 == null || input1 == null) {
-                return -1;
-            }
-            if (!input0.equals(input1)){
-                return -1;
-            }
-        }
 
         Iterator<Integer> objKeyIt = objectMap.keySet().iterator();
 
