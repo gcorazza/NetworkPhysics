@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.gson;
 
 public class WorldState implements ServerCommand {
     public static final byte COMMANDID = 1;

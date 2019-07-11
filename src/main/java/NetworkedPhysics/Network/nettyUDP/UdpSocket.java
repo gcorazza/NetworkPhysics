@@ -1,6 +1,7 @@
 package NetworkedPhysics.Network.nettyUDP;
 
 import NetworkedPhysics.Network.Message;
+import NetworkedPhysics.Util.Pair;
 import io.netty.bootstrap.Bootstrap;
 
 import io.netty.buffer.ByteBuf;
@@ -9,7 +10,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.concurrent.Future;
-import javafx.util.Pair;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;

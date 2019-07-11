@@ -3,9 +3,8 @@ package NetworkedPhysics.Common.Protocol.serverCommands.Manipulations;
 import NetworkedPhysics.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.Dto.NetworkedPhysicsObjectDto;
 import NetworkedPhysics.Common.NetworkPhysicsWorld;
-import com.google.gson.Gson;
 
-import static Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.gson;
 
 public class AddRigidBody extends WorldManipulation {
     public static final byte COMMANDID=5;

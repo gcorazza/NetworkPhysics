@@ -1,4 +1,4 @@
-package Util;
+package NetworkedPhysics.Util;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
