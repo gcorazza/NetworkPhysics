@@ -5,7 +5,7 @@ import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.PhysicsMessage;
 import NetworkedPhysics.NetworkedPhysicsClient;
 
-import static Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.gson;
 
 public class AddInput extends WorldManipulation {
     private int id;

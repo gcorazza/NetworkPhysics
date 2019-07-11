@@ -6,7 +6,7 @@ import NetworkedPhysics.NetworkedPhysicsServer;
 
 import java.io.Serializable;
 
-import static Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.gson;
 
 public class InputArguments implements UserCommand, Serializable {
     public static final byte COMMANDID = 3;

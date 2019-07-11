@@ -6,7 +6,7 @@ import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddRigidBod
 import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import org.junit.jupiter.api.Test;
 
-import static Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.gson;
 
 class RewindablePhysicsWorldTest {
 

@@ -3,8 +3,8 @@ package NetworkedPhysics.Network.nettyUDP;
 
 import NetworkedPhysics.Network.Message;
 import NetworkedPhysics.Network.UDPConnectionListener;
+import NetworkedPhysics.Util.Pair;
 import io.netty.channel.socket.DatagramPacket;
-import javafx.util.Pair;
 
 import java.net.InetSocketAddress;
 import java.util.*;

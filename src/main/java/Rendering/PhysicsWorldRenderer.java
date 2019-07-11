@@ -9,7 +9,7 @@ import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.Common.RewindablePhysicsWorld;
 import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.NetworkedPhysicsClient;
-import Util.Utils;
+import NetworkedPhysics.Util.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -18,7 +18,6 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import javax.swing.*;
-import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ import NetworkedPhysics.Common.NetworkPhysicsWorld;
 import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
 import NetworkedPhysics.NetworkedPhysicsClient;
 
-import static Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.gson;
 
 public class SetInput extends WorldManipulation{
     public static final byte COMMANDID=4;

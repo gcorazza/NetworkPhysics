@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static Util.Utils.getWorld;
+import static NetworkedPhysics.Util.Utils.getWorld;
 
 public class NetworkPhysicsWorld {
 

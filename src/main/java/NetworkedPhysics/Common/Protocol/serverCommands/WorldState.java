@@ -9,7 +9,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.gson;
 
 public class WorldState implements ServerCommand {
     public static final byte COMMANDID=1;
