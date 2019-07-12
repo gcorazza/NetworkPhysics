@@ -12,9 +12,7 @@ public class Shapes {
             cube = new BoundedObj(Class.forName(Shapes.class.getName()).getResourceAsStream("/cube.obj"));
             sphere = new BoundedObj(Class.forName(Shapes.class.getName()).getResourceAsStream("/sphere.obj"));
             plane = new BoundedObj(Class.forName(Shapes.class.getName()).getResourceAsStream("/plane.obj"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
