@@ -9,8 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import javax.vecmath.Vector3f;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Scanner;
 
 public class Utils {
@@ -44,5 +43,13 @@ public class Utils {
 
     public static Gson gson = new Gson();
     public static Gson gsonPretty = new GsonBuilder().setPrettyPrinting().create();
+
+    public static byte[] toByteArray(Serializable o) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(o);
+        oos.flush();
+        return bos.toByteArray();
+    }
 
 }
