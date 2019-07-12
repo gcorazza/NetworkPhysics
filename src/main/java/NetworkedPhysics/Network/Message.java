@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface Message {
     byte getCommandCode();
-    byte[] getPacket() throws IOException;
+    byte[] getPacket();
 }

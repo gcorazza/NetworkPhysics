@@ -44,12 +44,37 @@ public class Utils {
     public static Gson gson = new Gson();
     public static Gson gsonPretty = new GsonBuilder().setPrettyPrinting().create();
 
-    public static byte[] toByteArray(Serializable o) throws IOException {
+    public static byte[] toByteArray(Serializable o) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(o);
-        oos.flush();
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(bos);
+            oos.writeObject(o);
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return bos.toByteArray();
+    }
+
+    public static Serializable fromByteArray(byte[] bytes) {
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInput in = null;
+        Serializable o = null;
+        try {
+            in = new ObjectInputStream(bis);
+            o = (Serializable) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ignored) {
+            }
+        }
+        return o;
     }
 
 }

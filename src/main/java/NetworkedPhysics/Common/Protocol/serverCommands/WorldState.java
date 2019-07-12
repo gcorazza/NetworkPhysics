@@ -13,8 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static NetworkedPhysics.Util.Utils.gson;
-import static NetworkedPhysics.Util.Utils.toByteArray;
+import static NetworkedPhysics.Util.Utils.*;
 
 public class WorldState implements ServerCommand, Serializable {
     public transient static final byte COMMANDID = 1;
@@ -70,14 +69,15 @@ public class WorldState implements ServerCommand, Serializable {
     }
 
     @Override
-    public WorldState fromBlob(byte[] blob) throws IOException {
-        return gson.fromJson(new String(blob), WorldState.class);
+    public WorldState fromBlob(byte[] blob) {
+        return (WorldState) fromByteArray(blob);
+        //return gson.fromJson(new String(blob), WorldState.class);
     }
 
     @Override
-    public byte[] getPacket() throws IOException {
-        byte[] bytes = toByteArray(this);
-        return gson.toJson(this).getBytes();
+    public byte[] getPacket() {
+        return toByteArray(this);
+        //return gson.toJson(this).getBytes();
     }
 
     @Override
