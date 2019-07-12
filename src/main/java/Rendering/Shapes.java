@@ -9,10 +9,12 @@ public class Shapes {
 
     static {
         try {
-            cube = new BoundedObj(System.class.getResource("/cube.obj").openStream());
-            sphere = new BoundedObj(System.class.getResource("/sphere.obj").openStream());
-            plane = new BoundedObj(System.class.getResource("/plane.obj").openStream());
+            cube = new BoundedObj(Class.forName(Shapes.class.getName()).getResourceAsStream("/cube.obj"));
+            sphere = new BoundedObj(Class.forName(Shapes.class.getName()).getResourceAsStream("/sphere.obj"));
+            plane = new BoundedObj(Class.forName(Shapes.class.getName()).getResourceAsStream("/plane.obj"));
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

@@ -7,7 +7,6 @@ import NetworkedPhysics.Network.nettyUDP.UdpSocket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.socket.DatagramPacket;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,7 +62,6 @@ class UdpSocketTest {
     }
 
     @Test
-    @Ignore
     void the_packet_loss_should_go_up_when_too_many_packet_are_send() throws InterruptedException {
         //Test fails, when CPU ist slower than Databandwidth from Network
         float tooManyPacketloss = 1.6f;
