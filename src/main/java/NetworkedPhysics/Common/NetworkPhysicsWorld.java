@@ -30,7 +30,7 @@ public class NetworkPhysicsWorld {
 
     {
         try {
-            stateWriter = new FileOutputStream(new Date().toString() + "_" + Thread.currentThread().getName() + ".states");
+            stateWriter = new FileOutputStream("_" + Thread.currentThread().getName() + ".states");
         } catch (IOException e) {
             e.printStackTrace();
         }
