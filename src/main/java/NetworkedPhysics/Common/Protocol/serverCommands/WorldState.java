@@ -4,30 +4,26 @@ import NetworkedPhysics.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
+import NetworkedPhysics.Util.Utils;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import static NetworkedPhysics.Util.Utils.gson;
+import static NetworkedPhysics.Util.Utils.toByteArray;
 
-public class WorldState implements ServerCommand {
-    public static final byte COMMANDID = 1;
+public class WorldState implements ServerCommand, Serializable {
+    public transient static final byte COMMANDID = 1;
     public int timePassed;
     public int stepsPerSecond;
     public int step;
     public long btSeed;
     public Map<Integer, PhysicsObject> objectMap;
     public Map<Integer, PhysicsInput> inputs;
-
-    public WorldState() {
-    }
-
-    @Override
-    public WorldState fromBlob(byte[] blob) {
-        return gson.fromJson(new String(blob), WorldState.class);
-    }
 
     public Map<Integer, PhysicsObject> getObjectsCopy() {
         Map<Integer, PhysicsObject> copy = new HashMap<>();
@@ -39,21 +35,6 @@ public class WorldState implements ServerCommand {
         Map<Integer, PhysicsInput> copy = new HashMap<>();
         inputs.entrySet().forEach(e -> copy.put(e.getKey(), SerializationUtils.clone(e.getValue())));
         return copy;
-    }
-
-    @Override
-    public byte getCommandCode() {
-        return COMMANDID;
-    }
-
-    @Override
-    public byte[] getPacket() {
-        return gson.toJson(this).getBytes();
-    }
-
-    @Override
-    public void processMessage(NetworkedPhysicsClient physicsClient) {
-        physicsClient.setRemoteWorldState(this);
     }
 
     public void updateTimesPassed(long startTime) {
@@ -81,5 +62,26 @@ public class WorldState implements ServerCommand {
 
 
         return diff;
+    }
+
+    @Override
+    public byte getCommandCode() {
+        return COMMANDID;
+    }
+
+    @Override
+    public WorldState fromBlob(byte[] blob) throws IOException {
+        return gson.fromJson(new String(blob), WorldState.class);
+    }
+
+    @Override
+    public byte[] getPacket() throws IOException {
+        byte[] bytes = toByteArray(this);
+        return gson.toJson(this).getBytes();
+    }
+
+    @Override
+    public void processMessage(NetworkedPhysicsClient physicsClient) {
+        physicsClient.setRemoteWorldState(this);
     }
 }
