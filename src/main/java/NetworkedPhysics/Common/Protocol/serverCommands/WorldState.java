@@ -22,7 +22,6 @@ public class WorldState implements ServerCommand {
     public Map<Integer, PhysicsInput> inputs;
 
     public WorldState() {
-        System.out.println();
     }
 
     @Override
