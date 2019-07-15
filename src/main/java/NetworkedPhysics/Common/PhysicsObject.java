@@ -7,6 +7,7 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.io.Serializable;
 
 import static NetworkedPhysics.Util.Utils.gsonPretty;
@@ -38,7 +39,7 @@ public class PhysicsObject implements Serializable {
         Transform worldTransform = body.getWorldTransform(new Transform());
         Vector3f angularVelocity = body.getAngularVelocity(new Vector3f());
         Vector3f linearVelocity = body.getLinearVelocity(new Vector3f());
-        ObjectState objectState = new ObjectState(worldTransform.origin, worldTransform.getRotation(new Quat4f()), angularVelocity, linearVelocity);
+        ObjectState objectState = new ObjectState(worldTransform.origin, new Vector4f(worldTransform.getRotation(new Quat4f())), angularVelocity, linearVelocity);
         NetworkedPhysicsObjectDto dtoCopy = SerializationUtils.clone(dto);
         dtoCopy.objectState=objectState;
         return dtoCopy;
