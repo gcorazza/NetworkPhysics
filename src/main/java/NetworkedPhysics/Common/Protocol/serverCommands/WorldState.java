@@ -1,21 +1,23 @@
 package NetworkedPhysics.Common.Protocol.serverCommands;
 
+import NetworkedPhysics.Cereal.Putter;
+import NetworkedPhysics.Cereal.WorldStateCereal;
 import NetworkedPhysics.NetworkedPhysicsClient;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.ServerCommand;
-import NetworkedPhysics.Util.Utils;
 import org.apache.commons.lang3.SerializationUtils;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Consumer;
 
+import static NetworkedPhysics.Cereal.WorldStateCereal.worldStateCereal;
 import static NetworkedPhysics.Util.Utils.*;
 
-public class WorldState implements ServerCommand, Serializable {
+public class WorldState implements ServerCommand, Serializable{
     public transient static final byte COMMANDID = 1;
     public int timePassed;
     public int stepsPerSecond;
@@ -70,14 +72,52 @@ public class WorldState implements ServerCommand, Serializable {
 
     @Override
     public WorldState fromBlob(byte[] blob) {
-        return (WorldState) fromByteArray(blob);
-        //return gson.fromJson(new String(blob), WorldState.class);
+//        return (WorldState) fromByteArray(blob);
+        try {
+            WorldState worldState = worldStateCereal.get(new DataInputStream(new ByteArrayInputStream(blob)));
+            System.out.println("gsonPretty.toJson(worldState) = " + gson.toJson(worldState));
+
+            return worldState;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        return gson.fromJson(new String(blob),WorldState.class);
+        return null;
     }
 
     @Override
     public byte[] getPacket() {
-        return toByteArray(this);
-        //return gson.toJson(this).getBytes();
+        byte[] mySerialization = runPutter(out2 -> worldStateCereal.put(this, out2));
+        byte[] gsonSerialization = gson.toJson(this).getBytes();
+        byte[] apache = SerializationUtils.serialize(this);
+        byte[] javaSerialisation = toByteArray(this);
+
+        System.out.println("my = " + mySerialization.length);
+        System.out.println("apache = " + apache.length);
+        System.out.println("java = " + javaSerialisation.length);
+        System.out.println("gson = " + gsonSerialization.length);
+
+        try {
+            System.out.println("my: "+gson.toJson(worldStateCereal.get(new DataInputStream(new ByteArrayInputStream(mySerialization)))));
+            System.out.println("gs: "+ new String(gsonSerialization));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return mySerialization;
+    }
+
+    public static byte[] runPutter(Putter putter) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        DataOutputStream out1 = new DataOutputStream(out);
+        try {
+            putter.putTo(out1);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return out.toByteArray();
     }
 
     @Override

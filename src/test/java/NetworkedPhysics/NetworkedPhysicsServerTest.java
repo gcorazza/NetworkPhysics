@@ -4,10 +4,7 @@ import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,5 +32,19 @@ class NetworkedPhysicsServerTest {
         BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
         reader.lines().forEach(l -> states.add(gson.fromJson(l, WorldState.class)));
         return states;
+    }
+
+    @Test
+    void testDataStream() throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(out);
+        float magicfloat = 0.296842f;
+        dataOutputStream.writeFloat(magicfloat);
+        out.close();;
+        byte[] bytes = out.toByteArray();
+
+        DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(bytes));
+        float v = dataInputStream.readFloat();
+        assertEquals(magicfloat, v);
     }
 }

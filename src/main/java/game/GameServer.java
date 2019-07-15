@@ -11,6 +11,7 @@ import Rendering.PhysicsWorldRenderer;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.util.*;
 
 public class GameServer {
@@ -51,10 +52,10 @@ public class GameServer {
         });
         Vector3f linearVelocity = new Vector3f(-1, 0, -1);
         Vector3f angularVelocity = new Vector3f(1, 5, 1);
-        Quat4f rotation = new Quat4f(0, 0, 0, 10);
-        Quat4f leftWall = new Quat4f(0, 0, -1, 2);
-        Quat4f rightWall = new Quat4f(0, 0, 1, 2);
-        Quat4f frontWall = new Quat4f(-1, 0, 0, 2);
+        Vector4f rotation = new Vector4f(0, 0, 0, 10);
+        Vector4f leftWall = new Vector4f(0, 0, -1, 2);
+        Vector4f rightWall = new Vector4f(0, 0, 1, 2);
+        Vector4f frontWall = new Vector4f(-1, 0, 0, 2);
 
         ObjectState objectStateSphere = new ObjectState(new Vector3f(0, 0, 0), rotation, angularVelocity, linearVelocity);
         ObjectState planeFloor = new ObjectState(new Vector3f(0, -4, 0), rotation, new Vector3f(), new Vector3f());
@@ -91,7 +92,7 @@ public class GameServer {
             public void run() {
                 Vector3f linearVelocity = new Vector3f(-1, 0, -1);
                 Vector3f angularVelocity = new Vector3f(1, 5, 1);
-                Quat4f rotation = new Quat4f(0, 0, 0, 10);
+                Vector4f rotation = new Vector4f(0, 0, 0, 10);
                 ObjectState objectStateCube = new ObjectState(new Vector3f(0, 3, 0), rotation, angularVelocity, linearVelocity);
                 NetworkedPhysicsObjectDto cube = new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, 2, 1.5f, 0f, objectStateCube);
                 physicsServer.addNetworkedPhysicsObjectNow(cube);
@@ -108,7 +109,7 @@ public class GameServer {
     }
 
     private NetworkedPhysicsObjectDto playerCube() {
-        Quat4f rotation = new Quat4f(0, 0, 0, 10);
+        Vector4f rotation = new Vector4f(0, 0, 0, 10);
         int x = new Random().nextInt(10) - 5;
         int z = new Random().nextInt(10) - 5;
         ObjectState objectStateCube = new ObjectState(new Vector3f(x, 3, z), rotation, new Vector3f(), new Vector3f());

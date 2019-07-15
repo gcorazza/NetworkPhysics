@@ -1,23 +1,25 @@
 package NetworkedPhysics.Common;
 
 import javax.vecmath.Quat4f;
+import javax.vecmath.Tuple4f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.io.Serializable;
 
 public class ObjectState implements Serializable {
     private Vector3f origin;
-    private Quat4f rotation;
+    private Tuple4f rotation; //Must be Tuple4f because QUad4f calculates xyzw from input arguments, which leads to incorret bits
     private Vector3f angularVelocity;
     private Vector3f linearVelocity;
 
     public ObjectState() {
         origin= new Vector3f();
-        rotation= new Quat4f(0,0,0,1);
+        rotation= new Vector4f(0,0,0,1);
         angularVelocity= new Vector3f();
         linearVelocity= new Vector3f();
     }
 
-    public ObjectState(Vector3f origin, Quat4f rotation, Vector3f angularVelocity, Vector3f linearVelocity) {
+    public ObjectState(Vector3f origin, Vector4f rotation, Vector3f angularVelocity, Vector3f linearVelocity) {
         this.origin = origin;
         this.rotation = rotation;
         this.angularVelocity = angularVelocity;
@@ -28,7 +30,7 @@ public class ObjectState implements Serializable {
         return origin;
     }
 
-    public Quat4f getRotation() {
+    public Tuple4f getRotation() {
         return rotation;
     }
 

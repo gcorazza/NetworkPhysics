@@ -10,6 +10,7 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
 
@@ -56,7 +57,7 @@ public class NetworkedPhysicsObjectDto implements Serializable {
         Transform transform = new Transform();
         transform.setIdentity();
         transform.origin.set(objectState.getOrigin());
-        transform.setRotation(objectState.getRotation());
+        transform.setRotation(new Quat4f(objectState.getRotation()));
         Vector3f localInertia = new Vector3f(0, 0, 0);
         shape.calculateLocalInertia(mass, localInertia);
         RigidBodyConstructionInfo bodyConstructionInfo = new RigidBodyConstructionInfo(mass, new DefaultMotionState(transform), shape, localInertia);
