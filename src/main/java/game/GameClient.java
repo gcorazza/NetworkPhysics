@@ -12,7 +12,7 @@ public class GameClient {
     private final NetworkedPhysicsClient physicsClient;
 
     public static void main(String[] args) {
-        InetSocketAddress localhost = new InetSocketAddress("localhost", 8080);
+        InetSocketAddress localhost = new InetSocketAddress("192.168.0.236", 8080);
         new GameClient(localhost).run();
     }
 

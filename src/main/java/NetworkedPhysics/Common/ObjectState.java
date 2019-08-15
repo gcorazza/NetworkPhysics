@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class ObjectState implements Serializable {
     private Vector3f origin;
-    private Tuple4f rotation; //Must be Tuple4f because QUad4f calculates xyzw from input arguments, which leads to incorret bits
+    private Vector4f rotation; //Must be Tuple4f because QUad4f calculates xyzw from input arguments, which leads to incorret bits
     private Vector3f angularVelocity;
     private Vector3f linearVelocity;
 

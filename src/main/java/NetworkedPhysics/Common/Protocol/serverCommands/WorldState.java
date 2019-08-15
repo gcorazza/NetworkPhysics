@@ -98,13 +98,6 @@ public class WorldState implements ServerCommand, Serializable{
         System.out.println("java = " + javaSerialisation.length);
         System.out.println("gson = " + gsonSerialization.length);
 
-        try {
-            System.out.println("my: "+gson.toJson(worldStateCereal.get(new DataInputStream(new ByteArrayInputStream(mySerialization)))));
-            System.out.println("gs: "+ new String(gsonSerialization));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         return mySerialization;
     }
 

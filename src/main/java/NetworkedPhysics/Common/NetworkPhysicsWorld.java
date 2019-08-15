@@ -25,7 +25,7 @@ public class NetworkPhysicsWorld {
     protected int stepsPerSecond = 60;
     protected long startTime;
     final NetworkPhysicsListener physicsListener;
-    private boolean logStatesToFile = false;
+    private boolean logStatesToFile = true;
     private FileOutputStream stateWriter;
 
     {
