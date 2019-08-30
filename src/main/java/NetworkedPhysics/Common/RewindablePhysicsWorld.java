@@ -56,7 +56,6 @@ public class RewindablePhysicsWorld {
         Iterator<WorldState> jmpPoint = jumpBackPoints.descendingIterator();
         while (jmpPoint.hasNext()) {
             WorldState next = jmpPoint.next();
-            System.out.println();
             if (next.step <= step) {
                 restoreState(next);
                 return;

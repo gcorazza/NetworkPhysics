@@ -8,7 +8,5 @@ import java.util.List;
 
 public interface Cereal<V> {
     DataOutputStream put(V v, DataOutputStream out) throws IOException;
-//    DataOutputStream put(List<V> v, DataOutputStream out);
     V get(DataInputStream in) throws IOException;
-//    List<V> get(DataInputStream in);
 }

@@ -20,7 +20,7 @@ public class GetWorldState implements UserCommand {
 
     @Override
     public void processMessage(NetworkedPhysicsServer physicsServer, int from) {
-        physicsServer.sendAll(physicsServer.getWorldStateNewClient());
+        physicsServer.send(physicsServer.getWorldStateNewClient());
     }
 
     @Override

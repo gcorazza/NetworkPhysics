@@ -16,13 +16,16 @@ class NetworkedPhysicsServerTest {
     @Test
     void compareTwoServerAndClientStatesAndExpect0Diff() throws FileNotFoundException {
         System.out.println("loading states ...");
-        ArrayList<WorldState> clientStates = readStates("Client.states");
-        ArrayList<WorldState> serverStates = readStates("Server.states");
+        ArrayList<WorldState> clientStates = readStates("_main0.states");
+        ArrayList<WorldState> serverStates = readStates("_main.states");
         double[] diffs = new double[clientStates.size()];
 
         System.out.println("comparing states ...");
         for (int i = 0; i < clientStates.size(); i++) {
             diffs[i]= clientStates.get(i).getDifference(serverStates.get(i));
+        }
+        for (int i = 0; i < diffs.length; i++) {
+            System.out.println(i+";"+diffs[i]);
         }
         assertArrayEquals(new double[clientStates.size()],diffs);
     }

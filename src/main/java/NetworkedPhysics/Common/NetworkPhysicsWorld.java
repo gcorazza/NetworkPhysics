@@ -25,7 +25,7 @@ public class NetworkPhysicsWorld {
     protected int stepsPerSecond = 60;
     protected long startTime;
     final NetworkPhysicsListener physicsListener;
-    private boolean logStatesToFile = true;
+    private boolean logStatesToFile = false;
     private FileOutputStream stateWriter;
 
     {
@@ -68,7 +68,7 @@ public class NetworkPhysicsWorld {
             worldManipulations.forEach(wm -> wm.manipulate(this));
         }
         inputs.values().forEach(in -> in.update(this));
-        world.stepSimulation(1f / stepsPerSecond, 0);
+        world.stepSimulation(1f / stepsPerSecond);
 
         step++;
 
@@ -127,9 +127,7 @@ public class NetworkPhysicsWorld {
         );
         worldState.objectMap = objectsCopy;
         Map<Integer, PhysicsInput> inputsCopy = new HashMap<>();
-        inputs.entrySet().forEach(e -> {
-            inputsCopy.put(e.getKey(), SerializationUtils.clone(e.getValue()));
-        });
+        inputs.forEach((key, value) -> inputsCopy.put(key, SerializationUtils.clone(value)));
         worldState.inputs = inputsCopy;
         return worldState;
     }

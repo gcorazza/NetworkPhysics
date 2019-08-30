@@ -5,7 +5,6 @@ import NetworkedPhysics.Common.NetworkPhysicsListener;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.PhysicsObject;
 import NetworkedPhysics.Common.Protocol.Protocol;
-import NetworkedPhysics.Common.Protocol.ServerCommand;
 import NetworkedPhysics.Common.Protocol.UserCommand;
 import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
 import NetworkedPhysics.Common.Protocol.serverCommands.Manipulations.AddInput;
@@ -74,10 +73,6 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
         physicsListener.gotClientInput(clientInput, from);
     }
 
-    public void sendTo(int id, ServerCommand command) {
-        udpServer.send(id, command);
-    }
-
     @Override
     public synchronized void newClient(int id) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "new UDP Client");
@@ -91,7 +86,7 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
         for (int i = step; i < rewindableWorld.getStep(); i++) {
             List<WorldManipulation> worldManipulations = rewindableWorld.getManipulations().get(i);
             if (worldManipulations != null) {
-                worldManipulations.forEach(wm -> sendTo(id, wm));
+                worldManipulations.forEach(wm -> udpServer.send(id, wm));
             }
         }
     }
@@ -158,8 +153,12 @@ public class NetworkedPhysicsServer implements Runnable, UDPServerListener {
         return rewindableWorld.getInput(inputId);
     }
 
-    public void sendAll(WorldState worldStateNewClient) {
+    public void send(WorldState worldStateNewClient) {
         udpServer.sendToAll(worldStateNewClient);
+    }
+
+    public int getStep() {
+        return rewindableWorld.getStep();
     }
 }
 

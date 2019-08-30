@@ -95,8 +95,10 @@ public class WorldState implements ServerCommand, Serializable{
 
         System.out.println("my = " + mySerialization.length);
         System.out.println("apache = " + apache.length);
+        System.out.println(new String(apache));
         System.out.println("java = " + javaSerialisation.length);
         System.out.println("gson = " + gsonSerialization.length);
+        System.out.println(new String(gsonSerialization));
 
         return mySerialization;
     }

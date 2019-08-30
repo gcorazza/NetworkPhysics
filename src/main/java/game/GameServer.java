@@ -6,6 +6,7 @@ import NetworkedPhysics.Common.NetworkPhysicsListenerAdapter;
 import NetworkedPhysics.Common.ObjectState;
 import NetworkedPhysics.Common.PhysicsInput;
 import NetworkedPhysics.Common.Protocol.clientCommands.InputArguments;
+import NetworkedPhysics.Common.Protocol.serverCommands.WorldState;
 import NetworkedPhysics.NetworkedPhysicsServer;
 import Rendering.PhysicsWorldRenderer;
 
@@ -38,10 +39,10 @@ public class GameServer {
             public void gotClientInput(InputArguments clientInput, int clientID) {
                 Integer inputId = inputMapping.get(clientID);
                 physicsServer.setInputNow(clientInput, inputId);
-                if (clientInput.spawnClick){
-                    clientInput.spawnClick=false;
+                if (clientInput.spawnClick) {
+                    clientInput.spawnClick = false;
                     ObjectState objectState = new ObjectState();
-                    physicsServer.addNetworkedPhysicsObjectNow(new NetworkedPhysicsObjectDto(Shape.CUBE,1,1,1, objectState));
+                    physicsServer.addNetworkedPhysicsObjectNow(new NetworkedPhysicsObjectDto(Shape.CUBE, 1, 1, 1, objectState));
                 }
             }
 
@@ -72,22 +73,27 @@ public class GameServer {
         NetworkedPhysicsObjectDto right = new NetworkedPhysicsObjectDto(Shape.PLANE, 0, 1, 0, 0, 0.5f, 0.5f, planeRight);
 
 
-        physicsServer.addNetworkedPhysicsObjectNow(sphere);
-        physicsServer.addNetworkedPhysicsObjectNow(cube);
+        //physicsServer.addNetworkedPhysicsObjectNow(sphere);
+        //physicsServer.addNetworkedPhysicsObjectNow(cube);
         physicsServer.addNetworkedPhysicsObjectNow(floor);
         physicsServer.addNetworkedPhysicsObjectNow(left);
         physicsServer.addNetworkedPhysicsObjectNow(front);
         physicsServer.addNetworkedPhysicsObjectNow(right);
 
+//        for (float i = 5; i < 100; i++) {
+//            physicsServer.addNetworkedPhysicsObjectNow(playerCube(0, i / 1.5f, 0));
+//        }
+        physicsServer.getWorldStateNewClient().getPacket();
+        physicsServer.addNetworkedPhysicsObjectNow(playerCube(0.000001f, 1, 0));
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         new GameServer(8080).run();
     }
 
     public void run() {
         Timer randomCubeTimer = new Timer("cube Timer");
-        randomCubeTimer.scheduleAtFixedRate(new TimerTask() {
+        /*        randomCubeTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 Vector3f linearVelocity = new Vector3f(-1, 0, -1);
@@ -97,9 +103,10 @@ public class GameServer {
                 NetworkedPhysicsObjectDto cube = new NetworkedPhysicsObjectDto(Shape.CUBE, 0.5f, 1, 1, 2, 1.5f, 0f, objectStateCube);
                 physicsServer.addNetworkedPhysicsObjectNow(cube);
             }
-        },2000,20000);
+        },2000,20000);*/
 
-        while (!renderer.shouldClose()){
+//&& physicsServer.getStep() < 1600
+        while (!renderer.shouldClose() ) {
             physicsServer.update();
             renderer.update();
         }
@@ -109,10 +116,14 @@ public class GameServer {
     }
 
     private NetworkedPhysicsObjectDto playerCube() {
-        Vector4f rotation = new Vector4f(0, 0, 0, 10);
         int x = new Random().nextInt(10) - 5;
         int z = new Random().nextInt(10) - 5;
-        ObjectState objectStateCube = new ObjectState(new Vector3f(x, 3, z), rotation, new Vector3f(), new Vector3f());
+        return playerCube(x, 3, z);
+    }
+
+    private NetworkedPhysicsObjectDto playerCube(float x, float y, float z) {
+        Vector4f rotation = new Vector4f(0, 0, 0, 10);
+        ObjectState objectStateCube = new ObjectState(new Vector3f(x, y, z), rotation, new Vector3f(), new Vector3f());
         return new NetworkedPhysicsObjectDto(Shape.CUBE, 0.3f, 0.3f, 0.3f, 2, 1.5f, 0f, objectStateCube);
     }
 
